@@ -199,6 +199,7 @@ function quizHTML(){
       <div><b>${state.mock==='mock1'?'Mock 1':'Mock 2'}</b> • Câu ${state.index+1}/${total}</div>
       <div>${state.timerEnabled?`⏱ <span class="timer" id="timer">${fmtTime(rem)}</span>`:'⏱ Đồng hồ tắt'} <button class="btn btn-ghost" style="padding:6px 10px;font-size:12px;margin-left:8px" onclick="toggleTimer()">${state.timerEnabled?'Tắt đồng hồ':'Bật đồng hồ'}</button></div>
     </div>
+    <div style="margin-bottom:12px"><button class="btn btn-ghost" onclick="goHome()">🏠 Trang chủ</button></div>
     <div class="progress-wrap"><div class="progress-bar" style="width:${pct}%"></div></div>
     <div class="qtext">${escapeHtml(q.question)}</div>
     ${multi?'<div style="color:var(--muted);font-size:13px;margin-bottom:8px">Chọn một hoặc nhiều đáp án.</div>':''}
@@ -206,7 +207,6 @@ function quizHTML(){
     <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
       <button class="btn btn-ghost" onclick="prevQuestion()" ${state.index===0?'disabled':''}>← Câu trước</button>
       ${!isSubmitted?`<button class="btn btn-primary" onclick="submitAnswer()">Kiểm tra</button>`:`<button class="btn btn-primary" onclick="nextQuestion()">${state.index+1<total?'Câu tiếp theo →':'Xem kết quả'}</button>`}
-      <button class="btn btn-ghost" onclick="goHome()">Trang chủ</button>
     </div>
     ${feedbackHTML}
   </div>`;
