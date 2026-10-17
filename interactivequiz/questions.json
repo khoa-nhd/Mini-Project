@@ -1,0 +1,2840 @@
+{
+  "mock1": [
+    {
+      "num": 1,
+      "question": "Privacy risk trong ML có thể gồm:",
+      "options": {
+        "A": "Membership inference",
+        "B": "Model inversion",
+        "C": "Re-identification",
+        "D": "Không bao giờ có nếu xóa tên"
+      },
+      "answer": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "Privacy attacks có thể suy luận membership hoặc thuộc tính/đặc trưng; bỏ tên không đảm bảo privacy."
+    },
+    {
+      "num": 2,
+      "question": "Subtract cùng một constant khỏi mọi logits trước softmax:",
+      "options": {
+        "A": "Không đổi probability distribution",
+        "B": "Đổi hoàn toàn probabilities",
+        "C": "Làm tất cả bằng 0",
+        "D": "Biến thành ReLU"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Softmax invariant với việc cộng/trừ cùng constant vì numerator và denominator cùng nhân một factor."
+    },
+    {
+      "num": 3,
+      "question": "Gradient của một scalar-valued function nhiều biến chỉ hướng:",
+      "options": {
+        "A": "Giảm nhanh nhất",
+        "B": "Tăng nhanh nhất tại điểm đó",
+        "C": "Ngẫu nhiên",
+        "D": "Luôn về global minimum"
+      },
+      "answer": [
+        "B"
+      ],
+      "explanation": "Gradient chỉ hướng steepest ascent; gradient descent đi ngược nó."
+    },
+    {
+      "num": 4,
+      "question": "Nếu det(A)=0 thì điều nào đúng?",
+      "options": {
+        "A": "A chắc chắn khả nghịch",
+        "B": "A singular",
+        "C": "A có inverse duy nhất",
+        "D": "Các cột của A phụ thuộc tuyến tính"
+      },
+      "answer": [
+        "B",
+        "D"
+      ],
+      "explanation": "Determinant bằng 0 nghĩa là ma trận singular; các vector hàng/cột phụ thuộc tuyến tính và không có inverse."
+    },
+    {
+      "num": 5,
+      "question": "Autoencoder học bằng cách:",
+      "options": {
+        "A": "Encode input thành latent representation rồi reconstruct input",
+        "B": "Dự đoán class bắt buộc",
+        "C": "Tính ROC",
+        "D": "Tạo decision tree"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Encoder-decoder được train để reconstruction; bottleneck có thể học representation."
+    },
+    {
+      "num": 6,
+      "question": "Language modeling thường dự đoán:",
+      "options": {
+        "A": "Token tiếp theo hoặc token bị che tùy objective",
+        "B": "Cluster ID",
+        "C": "Bounding box",
+        "D": "PCA component"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Autoregressive LM dự đoán next token; masked LM dự đoán masked token."
+    },
+    {
+      "num": 7,
+      "question": "Information gain của split là:",
+      "options": {
+        "A": "Impurity giảm sau split",
+        "B": "Accuracy của test set",
+        "C": "Số feature còn lại",
+        "D": "Learning rate"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "IG đo mức giảm entropy/impurity nhờ split."
+    },
+    {
+      "num": 8,
+      "question": "Padding variable-length sequences nhằm:",
+      "options": {
+        "A": "Đưa sequences về kích thước batch phù hợp",
+        "B": "Tạo thêm labels",
+        "C": "Giảm số classes",
+        "D": "Tính ROC"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Padding làm các sequence có cùng tensor shape; thường đi kèm mask để bỏ qua padding."
+    },
+    {
+      "num": 9,
+      "question": "MSE nhạy với outlier vì:",
+      "options": {
+        "A": "Residual được bình phương",
+        "B": "Residual bị lấy dấu",
+        "C": "Không dùng target",
+        "D": "Luôn dùng log"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Bình phương làm lỗi lớn đóng góp disproportionate."
+    },
+    {
+      "num": 10,
+      "question": "Autoregressive language model phải tránh:",
+      "options": {
+        "A": "Nhìn token tương lai khi dự đoán token hiện tại",
+        "B": "Dùng embeddings",
+        "C": "Dùng cross entropy",
+        "D": "Dùng attention"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Causal mask ngăn information leakage từ future tokens."
+    },
+    {
+      "num": 11,
+      "question": "PCA cần centering dữ liệu vì:",
+      "options": {
+        "A": "Principal directions thường được phân tích quanh mean",
+        "B": "Để tạo labels",
+        "C": "Để tăng classes",
+        "D": "Để làm mọi variance bằng 1 bắt buộc"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Standard PCA thường center data; scaling là tùy dữ liệu."
+    },
+    {
+      "num": 12,
+      "question": "Nếu categorical feature có thứ tự thật như 'small < medium < large', có thể cân nhắc:",
+      "options": {
+        "A": "Ordinal encoding",
+        "B": "One-hot bắt buộc trong mọi trường hợp",
+        "C": "Drop feature luôn",
+        "D": "PCA trước encoding"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Ordinal encoding có thể phản ánh thứ tự; cần cân nhắc assumption của model."
+    },
+    {
+      "num": 13,
+      "question": "RMSE khác MAE ở chỗ:",
+      "options": {
+        "A": "RMSE phạt lỗi lớn mạnh hơn do bình phương",
+        "B": "MAE luôn lớn hơn RMSE",
+        "C": "RMSE không có đơn vị target",
+        "D": "MAE chỉ dùng cho classification"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Bình phương residual làm RMSE nhạy hơn với lỗi lớn."
+    },
+    {
+      "num": 14,
+      "question": "Khi dự đoán giá nhà tại thời điểm t, dùng giá trung bình của toàn bộ tương lai để tạo feature là:",
+      "options": {
+        "A": "Potential target/future leakage",
+        "B": "Luôn feature engineering hợp lệ",
+        "C": "Data augmentation",
+        "D": "Regularization"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Future information không có lúc prediction sẽ làm validation/test score giả tạo."
+    },
+    {
+      "num": 15,
+      "question": "Một model credit scoring nên được audit vì:",
+      "options": {
+        "A": "Sai lệch có thể ảnh hưởng trực tiếp đến quyền lợi tài chính của người dùng",
+        "B": "AI luôn đúng",
+        "C": "Accuracy không liên quan",
+        "D": "Không có data"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "High-stakes applications cần fairness, explainability, monitoring và governance."
+    },
+    {
+      "num": 16,
+      "question": "Epoch là:",
+      "options": {
+        "A": "Một lượt model đi qua toàn bộ training dataset",
+        "B": "Một sample",
+        "C": "Một neuron",
+        "D": "Một feature"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Một epoch = một full pass qua training data, thường qua nhiều batches."
+    },
+    {
+      "num": 17,
+      "question": "Normalization min-max thường đưa dữ liệu về:",
+      "options": {
+        "A": "Một khoảng như [0,1] nếu chọn công thức chuẩn",
+        "B": "Mean 0 std 1 bắt buộc",
+        "C": "Binary",
+        "D": "Probability bắt buộc"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Min-max scaling thường về [0,1] theo min/max training."
+    },
+    {
+      "num": 18,
+      "question": "Vanishing gradients thường gây vấn đề vì:",
+      "options": {
+        "A": "Gradient rất nhỏ làm layer trước học cực chậm",
+        "B": "Model luôn overfit",
+        "C": "Accuracy luôn 100%",
+        "D": "Input không có variance"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Gradient nhỏ lan ngược khiến early layers cập nhật rất ít."
+    },
+    {
+      "num": 19,
+      "question": "Sigmoid có range:",
+      "options": {
+        "A": "(0,1)",
+        "B": "(-∞,∞)",
+        "C": "[-1,1]",
+        "D": "[0,∞)"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Sigmoid 1/(1+e^-x) nằm giữa 0 và 1."
+    },
+    {
+      "num": 20,
+      "question": "Test set nên được dùng chủ yếu để:",
+      "options": {
+        "A": "Đánh giá cuối cùng sau khi quyết định model",
+        "B": "Tuning hyperparameters liên tục",
+        "C": "Fit scaler",
+        "D": "Impute missing values bằng statistics của test"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Test set cần giữ độc lập để ước lượng generalization sau model selection."
+    },
+    {
+      "num": 21,
+      "question": "Nếu precision=1 và recall=1 thì F1:",
+      "options": {
+        "A": "0",
+        "B": "0.5",
+        "C": "1",
+        "D": "Không xác định"
+      },
+      "answer": [
+        "C"
+      ],
+      "explanation": "Harmonic mean của 1 và 1 là 1."
+    },
+    {
+      "num": 22,
+      "question": "Nếu all predictions đều là negative trong dataset 95% negative, accuracy có thể:",
+      "options": {
+        "A": "95%",
+        "B": "5%",
+        "C": "0%",
+        "D": "100% bắt buộc"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "95/100 predictions đúng nếu 95 negative thật."
+    },
+    {
+      "num": 23,
+      "question": "Type I error là:",
+      "options": {
+        "A": "Fail to reject H0 khi H0 sai",
+        "B": "Reject H0 khi H0 đúng",
+        "C": "False negative",
+        "D": "Luôn nghiêm trọng hơn Type II"
+      },
+      "answer": [
+        "B"
+      ],
+      "explanation": "Type I = false positive: bác bỏ H0 trong khi H0 đúng."
+    },
+    {
+      "num": 24,
+      "question": "Distribution shift có thể xảy ra khi:",
+      "options": {
+        "A": "Dữ liệu người dùng sau triển khai khác dữ liệu training",
+        "B": "Training loss giảm",
+        "C": "Batch size cố định",
+        "D": "Model có bias term"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Covariate/label/concept shift đều là dạng distribution shift."
+    },
+    {
+      "num": 25,
+      "question": "BERT-style masked language modeling học từ:",
+      "options": {
+        "A": "Ngữ cảnh hai phía quanh token bị mask trong thiết kế pretraining",
+        "B": "Chỉ token tương lai",
+        "C": "Chỉ pixel",
+        "D": "Centroids"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "MLM dùng context hai phía để dự đoán masked tokens."
+    },
+    {
+      "num": 26,
+      "question": "AUC gần 0.5 thường gợi ý:",
+      "options": {
+        "A": "Khả năng phân biệt gần random",
+        "B": "Perfect classifier",
+        "C": "Always 100% recall",
+        "D": "Regression perfect"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "AUC 0.5 gần random ranking; 1.0 là perfect ranking trong diễn giải chuẩn."
+    },
+    {
+      "num": 27,
+      "question": "Data augmentation trong image classification có thể gồm:",
+      "options": {
+        "A": "Flip/crop/noise",
+        "B": "Thay test labels",
+        "C": "Fit model trên test labels",
+        "D": "Xóa training data"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Augmentation tạo biến thể hợp lý của training examples."
+    },
+    {
+      "num": 28,
+      "question": "Một hidden layer có 10 units và input dimension 5, chưa tính bias, có bao nhiêu weights nối\ninput→hidden?",
+      "options": {
+        "A": "15",
+        "B": "50",
+        "C": "5",
+        "D": "10"
+      },
+      "answer": [
+        "B"
+      ],
+      "explanation": "Mỗi trong 10 units nhận 5 weights: 10×5=50."
+    },
+    {
+      "num": 29,
+      "question": "Softmax thường dùng để:",
+      "options": {
+        "A": "Biến logits thành phân phối xác suất qua các class",
+        "B": "Regression liên tục",
+        "C": "Impute missing values",
+        "D": "Tính PCA"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Softmax chuẩn hóa logits thành các giá trị dương có tổng bằng 1."
+    },
+    {
+      "num": 30,
+      "question": "Calibration của classifier liên quan đến:",
+      "options": {
+        "A": "Probability predicted có phù hợp với empirical frequency không",
+        "B": "Accuracy có bằng 100% không",
+        "C": "Feature scaling",
+        "D": "Number of trees"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Ví dụ among cases predicted 0.8, khoảng 80% nên thực sự positive nếu calibrated."
+    },
+    {
+      "num": 31,
+      "question": "Logistic regression binary thường biến logit thành probability bằng:",
+      "options": {
+        "A": "ReLU",
+        "B": "Sigmoid",
+        "C": "Softmax bắt buộc",
+        "D": "Tanh"
+      },
+      "answer": [
+        "B"
+      ],
+      "explanation": "Sigmoid ánh xạ real-valued logit vào (0,1)."
+    },
+    {
+      "num": 32,
+      "question": "Fairness metric nào quan tâm đến TPR giữa các nhóm?",
+      "options": {
+        "A": "Equal opportunity",
+        "B": "Mean squared error",
+        "C": "Silhouette score",
+        "D": "BLEU"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Equal opportunity yêu cầu equal TPR giữa protected groups trong formulation chuẩn."
+    },
+    {
+      "num": 33,
+      "question": "Phát biểu nào đúng về cosine similarity?",
+      "options": {
+        "A": "Chỉ phụ thuộc độ dài vector",
+        "B": "Bằng 1 khi hai vector cùng hướng",
+        "C": "Luôn nằm trong [0,1] với mọi vector thực",
+        "D": "Không thay đổi nếu một vector được nhân với một scalar dương"
+      },
+      "answer": [
+        "B",
+        "D"
+      ],
+      "explanation": "Cosine similarity đo góc giữa hai vector; cùng hướng cho 1 và nhân độ dài bởi scalar dương không đổi góc. Với\nvector thực, nó nằm trong [-1,1]."
+    },
+    {
+      "num": 34,
+      "question": "Convolutional layer trong CNN dùng:",
+      "options": {
+        "A": "Kernel/filter trượt trên input",
+        "B": "Bayes theorem",
+        "C": "Dendrogram",
+        "D": "Confusion matrix"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Kernel áp dụng local receptive fields để tạo feature maps."
+    },
+    {
+      "num": 35,
+      "question": "Recall cao nghĩa là:",
+      "options": {
+        "A": "Bắt được phần lớn actual positives",
+        "B": "False negatives thấp tương đối",
+        "C": "Precision chắc chắn cao",
+        "D": "Accuracy chắc chắn cao"
+      },
+      "answer": [
+        "A",
+        "B"
+      ],
+      "explanation": "Recall=TP/(TP+FN), nên recall cao nghĩa bỏ sót positive ít."
+    },
+    {
+      "num": 36,
+      "question": "Time-series split nên ưu tiên:",
+      "options": {
+        "A": "Train trên quá khứ, validate/test trên tương lai",
+        "B": "Random shuffle mọi timestamp luôn",
+        "C": "Train trên tương lai để predict quá khứ",
+        "D": "Fit scaler trên future"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Temporal forecasting phải tránh future information leakage."
+    },
+    {
+      "num": 37,
+      "question": "Out-of-bag samples trong bagging là:",
+      "options": {
+        "A": "Samples không được chọn vào bootstrap sample của một learner cụ thể",
+        "B": "Test set công khai",
+        "C": "Validation labels",
+        "D": "All duplicate rows"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Bootstrap sample không chứa một phần observations; chúng có thể dùng để OOB estimate."
+    },
+    {
+      "num": 38,
+      "question": "CLIP học:",
+      "options": {
+        "A": "Liên kết representation image và text",
+        "B": "Chỉ bounding boxes",
+        "C": "Chỉ audio",
+        "D": "PCA eigenvectors"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "CLIP học joint image-text embeddings bằng contrastive objective."
+    },
+    {
+      "num": 39,
+      "question": "Masking trong sequence model giúp:",
+      "options": {
+        "A": "Model bỏ qua padded positions khi attention/loss phù hợp",
+        "B": "Tăng leakage",
+        "C": "Xóa real tokens",
+        "D": "Thay optimizer"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Mask ngăn padding ảnh hưởng đến attention hoặc loss."
+    },
+    {
+      "num": 40,
+      "question": "Nested cross-validation hữu ích khi:",
+      "options": {
+        "A": "Muốn tách model selection khỏi unbiased performance estimation",
+        "B": "Muốn tăng test leakage",
+        "C": "Chỉ train một lần",
+        "D": "Không có hyperparameters"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Outer loop estimate generalization; inner loop tuning."
+    },
+    {
+      "num": 41,
+      "question": "Một pipeline đúng khi standardize và split train/test là:",
+      "options": {
+        "A": "Split trước, fit scaler trên train, transform train/test bằng scaler đó",
+        "B": "Fit scaler trên test rồi train",
+        "C": "Fit scaler trên toàn bộ data rồi split",
+        "D": "Scale labels bắt buộc"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Statistics của preprocessing phải được học từ training data."
+    },
+    {
+      "num": 42,
+      "question": "Transfer learning thường hữu ích vì:",
+      "options": {
+        "A": "Có thể tận dụng representation đã học từ pretrained model",
+        "B": "Luôn không cần data",
+        "C": "Luôn tránh overfitting hoàn toàn",
+        "D": "Không cần fine-tuning"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Pretrained representations có thể giảm data/compute cần thiết cho task mới."
+    },
+    {
+      "num": 43,
+      "question": "Pruning decision tree nhằm:",
+      "options": {
+        "A": "Giảm complexity/overfitting",
+        "B": "Tăng số leaves vô hạn",
+        "C": "Tạo embeddings",
+        "D": "Chuẩn hóa input"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Pruning loại bỏ các nhánh ít hữu ích để cải thiện generalization."
+    },
+    {
+      "num": 44,
+      "question": "Scaled dot-product attention sử dụng QKᵀ để:",
+      "options": {
+        "A": "Đo mức tương tác/similarity giữa queries và keys",
+        "B": "Tạo labels",
+        "C": "Tính PCA",
+        "D": "Tính MSE"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "QKᵀ tạo score matrix giữa các query và key."
+    },
+    {
+      "num": 45,
+      "question": "Mean imputation có thể:",
+      "options": {
+        "A": "Làm giảm variance của feature",
+        "B": "Làm thay đổi phân phối",
+        "C": "Luôn tốt hơn median",
+        "D": "Gây leakage nếu mean lấy từ toàn bộ dataset trước split"
+      },
+      "answer": [
+        "A",
+        "B",
+        "D"
+      ],
+      "explanation": "Mean imputation thường co dữ liệu về mean và phải fit trên training subset."
+    },
+    {
+      "num": 46,
+      "question": "Correlation bằng 0 có nghĩa chắc chắn rằng hai biến độc lập.",
+      "options": {
+        "A": "Đúng",
+        "B": "Sai",
+        "C": "Chỉ đúng với biến binary",
+        "D": "Chỉ đúng khi sample lớn"
+      },
+      "answer": [
+        "B"
+      ],
+      "explanation": "Zero correlation chỉ nói không có quan hệ tuyến tính; hai biến vẫn có thể phụ thuộc phi tuyến."
+    },
+    {
+      "num": 47,
+      "question": "Stratified split thường dùng để:",
+      "options": {
+        "A": "Giữ gần tỷ lệ class giữa các split",
+        "B": "Giữ mean feature chính xác tuyệt đối",
+        "C": "Tạo clusters",
+        "D": "Scale features"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Stratification đặc biệt hữu ích cho classification imbalance."
+    },
+    {
+      "num": 48,
+      "question": "Deepfake có thể gây rủi ro:",
+      "options": {
+        "A": "Misinformation/impersonation/fraud",
+        "B": "Chỉ giảm latency",
+        "C": "Chỉ tăng accuracy",
+        "D": "Không có ethical impact"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Synthetic media có thể bị lạm dụng cho giả mạo và thông tin sai lệch."
+    },
+    {
+      "num": 49,
+      "question": "Nếu cả training và validation accuracy đều thấp:",
+      "options": {
+        "A": "Có thể underfitting hoặc feature/data problem",
+        "B": "Chắc chắn overfitting",
+        "C": "Chắc chắn leakage",
+        "D": "Model hoàn hảo"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Low train và validation performance thường gợi ý high bias/underfitting hoặc dữ liệu/model không phù hợp."
+    },
+    {
+      "num": 50,
+      "question": "Nếu λ=0 trong L2 regularization:",
+      "options": {
+        "A": "Không có penalty L2",
+        "B": "Weights bắt buộc 0",
+        "C": "Model thành K-means",
+        "D": "Loss không thể tính"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Penalty λ||w||² biến mất khi λ=0."
+    },
+    {
+      "num": 51,
+      "question": "t-SNE chủ yếu được dùng để:",
+      "options": {
+        "A": "Visualization/dimensionality reduction",
+        "B": "Regression target prediction",
+        "C": "Data imputation",
+        "D": "Training CNN"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "t-SNE thường dùng để trực quan hóa cấu trúc local trong dữ liệu nhiều chiều."
+    },
+    {
+      "num": 52,
+      "question": "Human-in-the-loop nghĩa là:",
+      "options": {
+        "A": "Con người có vai trò giám sát/quyết định hoặc can thiệp phù hợp",
+        "B": "AI không được tự động hóa gì",
+        "C": "Con người chỉ thu thập data",
+        "D": "Model không cần evaluation"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Mức human oversight phụ thuộc risk và application."
+    },
+    {
+      "num": 53,
+      "question": "Scaling đặc biệt quan trọng với:",
+      "options": {
+        "A": "k-NN",
+        "B": "SVM với kernel/distance-based geometry",
+        "C": "Decision tree thuần túy",
+        "D": "Random Forest thuần túy"
+      },
+      "answer": [
+        "A",
+        "B"
+      ],
+      "explanation": "Distance/margin geometry nhạy với scale; tree split dựa threshold từng feature nên không cần standardization\ntheo cách k-NN cần."
+    },
+    {
+      "num": 54,
+      "question": "Một hệ thống facial recognition được triển khai mà không kiểm tra performance giữa các nhóm. Rủi\nro chính là:",
+      "options": {
+        "A": "Unmeasured subgroup bias/fairness issue",
+        "B": "PCA leakage",
+        "C": "K-means collapse",
+        "D": "Learning rate"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Performance aggregate có thể che giấu disparity giữa các subgroup."
+    },
+    {
+      "num": 55,
+      "question": "Linear regression thường dự đoán:",
+      "options": {
+        "A": "Nhãn liên tục",
+        "B": "Class probability bắt buộc",
+        "C": "Cluster ID",
+        "D": "Image patch"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Regression thường có target liên tục."
+    },
+    {
+      "num": 56,
+      "question": "k-NN là lazy learner vì:",
+      "options": {
+        "A": "Hầu hết computation xảy ra lúc prediction",
+        "B": "Không cần lưu training data",
+        "C": "Không bao giờ tính distance",
+        "D": "Luôn có ít parameter"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "k-NN giữ dữ liệu và tìm neighbors khi dự đoán; không xây một model parametric nặng ở training."
+    },
+    {
+      "num": 57,
+      "question": "Accuracy có thể gây hiểu lầm nhất khi:",
+      "options": {
+        "A": "Class imbalance nặng",
+        "B": "Classes cân bằng hoàn hảo",
+        "C": "Không có false positives",
+        "D": "Task là regression"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Ví dụ 99% class A: model đoán A mọi lúc vẫn accuracy 99%."
+    },
+    {
+      "num": 58,
+      "question": "Adversarial example là:",
+      "options": {
+        "A": "Input được thay đổi tinh vi để khiến model sai",
+        "B": "Một training example luôn đúng",
+        "C": "Một loại optimizer",
+        "D": "Một clustering method"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Adversarial perturbations có thể làm model misclassify dù thay đổi khó nhận biết với người."
+    },
+    {
+      "num": 59,
+      "question": "Fairness through unawareness, tức chỉ xóa sensitive attribute, không đủ vì:",
+      "options": {
+        "A": "Các proxy variables vẫn có thể chứa thông tin sensitive",
+        "B": "Model không thể train",
+        "C": "Accuracy luôn 0",
+        "D": "PCA bắt buộc"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Feature khác có thể encode sensitive attribute."
+    },
+    {
+      "num": 60,
+      "question": "Nếu model có high training accuracy và low validation accuracy:",
+      "options": {
+        "A": "Có dấu hiệu overfitting",
+        "B": "Có dấu hiệu underfitting chắc chắn",
+        "C": "Data không có labels",
+        "D": "PCA thất bại"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Generalization gap lớn thường là dấu hiệu overfitting."
+    },
+    {
+      "num": 61,
+      "question": "Stride tăng thường làm:",
+      "options": {
+        "A": "Output spatial resolution giảm nếu các yếu tố khác giữ nguyên",
+        "B": "Output luôn tăng",
+        "C": "Số class tăng",
+        "D": "Loss bằng 0"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Kernel bước lớn hơn lấy mẫu thưa hơn, thường giảm kích thước feature map."
+    },
+    {
+      "num": 62,
+      "question": "U-Net thường dùng cho:",
+      "options": {
+        "A": "Image segmentation",
+        "B": "Text tokenization",
+        "C": "Audio transcription only",
+        "D": "Clustering"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "U-Net là kiến trúc encoder-decoder nổi tiếng cho segmentation."
+    },
+    {
+      "num": 63,
+      "question": "Trong image patching của Vision Transformer:",
+      "options": {
+        "A": "Ảnh được chia thành patches rồi biến thành token-like embeddings",
+        "B": "Ảnh bắt buộc thành audio",
+        "C": "Patches là labels",
+        "D": "Không cần positional information"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "ViT đưa image patches vào Transformer như token sequence và cần positional information."
+    },
+    {
+      "num": 64,
+      "question": "Dropout là:",
+      "options": {
+        "A": "Randomly tắt một số units trong training",
+        "B": "Xóa test examples",
+        "C": "Tăng số class",
+        "D": "Một loss function"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Dropout là regularization bằng stochastic unit masking khi training."
+    },
+    {
+      "num": 65,
+      "question": "Explainability quan trọng đặc biệt khi:",
+      "options": {
+        "A": "AI hỗ trợ quyết định high-stakes",
+        "B": "Model chỉ tạo random numbers",
+        "C": "Không ai dùng output",
+        "D": "Task không có người bị ảnh hưởng"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "High-stakes decisions cần khả năng hiểu, audit và contest output."
+    },
+    {
+      "num": 66,
+      "question": "Chain rule đặc biệt quan trọng cho:",
+      "options": {
+        "A": "Backpropagation",
+        "B": "One-hot encoding",
+        "C": "Train/test split",
+        "D": "Confusion matrix"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Backprop dùng chain rule để tính gradient qua nhiều layer."
+    },
+    {
+      "num": 67,
+      "question": "Accountability trong AI nhấn mạnh:",
+      "options": {
+        "A": "Có chủ thể chịu trách nhiệm về thiết kế, triển khai và tác động của hệ thống",
+        "B": "AI tự chịu trách nhiệm pháp lý",
+        "C": "Không cần audit",
+        "D": "Chỉ cần accuracy"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Tổ chức/con người triển khai cần governance và accountability."
+    },
+    {
+      "num": 68,
+      "question": "Padding 'same' thường nhằm:",
+      "options": {
+        "A": "Giữ spatial size gần/đúng bằng input với stride 1 theo thiết kế",
+        "B": "Xóa channel",
+        "C": "Giảm batch size",
+        "D": "Chuẩn hóa labels"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Padding thêm biên để kiểm soát kích thước output."
+    },
+    {
+      "num": 69,
+      "question": "K-means nhạy với:",
+      "options": {
+        "A": "Initialization và scale/outliers",
+        "B": "Only labels",
+        "C": "Text grammar",
+        "D": "Confusion matrix"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Centroid-based Euclidean objective nhạy với initialization, scale và outliers."
+    },
+    {
+      "num": 70,
+      "question": "Responsible AI không chỉ tối ưu accuracy vì:",
+      "options": {
+        "A": "Tác động xã hội, fairness, privacy, safety và accountability cũng quan trọng",
+        "B": "Accuracy vô dụng",
+        "C": "Models không cần metrics",
+        "D": "AI ethics thay thế ML"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Responsible AI cân bằng performance với risk và societal impact."
+    },
+    {
+      "num": 71,
+      "question": "Một feature có scale 1–10 và feature khác 0–1. Với k-NN, vấn đề là:",
+      "options": {
+        "A": "Feature 1 có thể chi phối distance hơn",
+        "B": "Không bao giờ có vấn đề",
+        "C": "Tree split bị sai",
+        "D": "Target đổi"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Distance-based models nhạy với scale."
+    },
+    {
+      "num": 72,
+      "question": "Nếu p-value < α, cách kết luận chuẩn là:",
+      "options": {
+        "A": "H0 chắc chắn sai",
+        "B": "Reject H0",
+        "C": "H1 chắc chắn đúng",
+        "D": "Data chứng minh causation"
+      },
+      "answer": [
+        "B"
+      ],
+      "explanation": "Ta bác bỏ H0 theo mức ý nghĩa α; không nói H0 có xác suất bằng p-value."
+    },
+    {
+      "num": 73,
+      "question": "AI hallucination là:",
+      "options": {
+        "A": "Model tạo nội dung nghe hợp lý nhưng không được hỗ trợ bởi sự thật/data",
+        "B": "Model bị overclock",
+        "C": "Dataset bị missing",
+        "D": "Gradient bằng 0"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Hallucination là failure mode đặc biệt của generative models."
+    },
+    {
+      "num": 74,
+      "question": "Nếu ||x||₂ = 3 thì ||2x||₂ bằng:",
+      "options": {
+        "A": "3",
+        "B": "5",
+        "C": "6",
+        "D": "9"
+      },
+      "answer": [
+        "C"
+      ],
+      "explanation": "Norm L2 đồng nhất theo scalar: ||cx||₂ = |c| ||x||₂."
+    },
+    {
+      "num": 75,
+      "question": "Causal attention mask trong decoder giúp:",
+      "options": {
+        "A": "Ngăn vị trí hiện tại attend tới future positions",
+        "B": "Xóa padding luôn",
+        "C": "Chuẩn hóa embeddings",
+        "D": "Tạo class labels"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Causal masking bảo đảm autoregressive property."
+    },
+    {
+      "num": 76,
+      "question": "Parameter-efficient fine-tuning nhằm:",
+      "options": {
+        "A": "Thích nghi model bằng cách update ít parameters hơn",
+        "B": "Tăng dataset size",
+        "C": "Xóa pretrained knowledge",
+        "D": "Bắt buộc train from scratch"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "PEFT như adapters/LoRA giảm số parameters cần update."
+    },
+    {
+      "num": 77,
+      "question": "Boosting thường xây model:",
+      "options": {
+        "A": "Tuần tự, model sau tập trung vào lỗi của ensemble hiện tại",
+        "B": "Hoàn toàn độc lập như bagging",
+        "C": "Không dùng weak learners",
+        "D": "Chỉ cho clustering"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Boosting tuần tự xây learner để cải thiện ensemble."
+    },
+    {
+      "num": 78,
+      "question": "Một model có accuracy cao nhưng probability calibration kém có thể:",
+      "options": {
+        "A": "Dự đoán class đúng nhưng confidence không đáng tin",
+        "B": "Luôn overfit",
+        "C": "Không thể predict",
+        "D": "Không có logits"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Discrimination và calibration là hai khía cạnh khác nhau."
+    },
+    {
+      "num": 79,
+      "question": "Max pooling lấy:",
+      "options": {
+        "A": "Giá trị lớn nhất trong local window",
+        "B": "Giá trị trung bình toàn dataset",
+        "C": "Gradient lớn nhất",
+        "D": "Class có xác suất lớn nhất"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Max pooling là local downsampling bằng max."
+    },
+    {
+      "num": 80,
+      "question": "Decision tree có thể chọn split dựa trên:",
+      "options": {
+        "A": "Gini impurity",
+        "B": "Entropy/information gain",
+        "C": "Random labels bắt buộc",
+        "D": "Cosine similarity bắt buộc"
+      },
+      "answer": [
+        "A",
+        "B"
+      ],
+      "explanation": "Gini và entropy/information gain là các tiêu chí split phổ biến."
+    },
+    {
+      "num": 81,
+      "question": "F1 là:",
+      "options": {
+        "A": "Harmonic mean của precision và recall",
+        "B": "Arithmetic mean của accuracy và recall",
+        "C": "Metric chỉ cho regression",
+        "D": "Luôn cao hơn precision"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "F1 = 2PR/(P+R), cân bằng precision và recall."
+    },
+    {
+      "num": 82,
+      "question": "95% confidence interval không nên được diễn giải đơn giản là:",
+      "options": {
+        "A": "Một khoảng được xây bằng procedure có coverage 95% trong repeated sampling",
+        "B": "Có 95% xác suất fixed parameter nằm trong interval cụ thể sau khi quan sát dữ liệu",
+        "C": "Một khoảng ước lượng uncertainty",
+        "D": "Phụ thuộc vào dữ liệu mẫu"
+      },
+      "answer": [
+        "B"
+      ],
+      "explanation": "Trong frequentist interpretation, parameter được xem là cố định; 95% nói về procedure qua repeated samples."
+    },
+    {
+      "num": 83,
+      "question": "Trong regression, RMSE=3 và MAE=2.5 gợi ý:",
+      "options": {
+        "A": "Có một số lỗi lớn hơn mức trung bình có thể kéo RMSE lên",
+        "B": "Model perfect",
+        "C": "RMSE luôn nhỏ hơn MAE",
+        "D": "Không thể tính được"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "RMSE nhạy với large residuals hơn MAE."
+    },
+    {
+      "num": 84,
+      "question": "GPT theo kiến trúc phổ biến là:",
+      "options": {
+        "A": "Decoder-only autoregressive Transformer",
+        "B": "Encoder-only BERT clone",
+        "C": "CNN",
+        "D": "Decision tree"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "GPT-style models dùng decoder blocks cho autoregressive next-token prediction."
+    },
+    {
+      "num": 85,
+      "question": "Weight decay gần với ý tưởng:",
+      "options": {
+        "A": "L2 regularization",
+        "B": "L1 sparsity bắt buộc",
+        "C": "Data augmentation",
+        "D": "One-hot encoding"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Weight decay penalizes large weights, thường tương ứng/ gần tương đương L2 tùy optimizer."
+    },
+    {
+      "num": 86,
+      "question": "Standard deviation bằng:",
+      "options": {
+        "A": "Variance bình phương",
+        "B": "Căn bậc hai của variance",
+        "C": "Variance chia mean",
+        "D": "Mean chia variance"
+      },
+      "answer": [
+        "B"
+      ],
+      "explanation": "σ = √Var(X)."
+    },
+    {
+      "num": 87,
+      "question": "IQR được tính bằng:",
+      "options": {
+        "A": "Q3−Q1",
+        "B": "Q1−Q3",
+        "C": "Max−Min",
+        "D": "Mean−Median"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "IQR đo độ rộng 50% giữa của dữ liệu."
+    },
+    {
+      "num": 88,
+      "question": "Forward-fill phù hợp tự nhiên với:",
+      "options": {
+        "A": "Một số time series/sequence có missing theo thời gian",
+        "B": "Random image labels",
+        "C": "Unordered categorical dataset luôn",
+        "D": "Test labels"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Forward-fill sử dụng giá trị quan sát trước đó và cần giả định hợp lý về temporal continuity."
+    },
+    {
+      "num": 89,
+      "question": "Một model tuyển dụng có accuracy cao nhưng reject một nhóm nhân khẩu học thường xuyên hơn\nkhông có lý do hợp lệ. Vấn đề chính là:",
+      "options": {
+        "A": "Fairness/bias",
+        "B": "Overfitting chắc chắn",
+        "C": "PCA",
+        "D": "Underflow"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Hiệu năng tổng thể cao không đảm bảo công bằng giữa các nhóm."
+    },
+    {
+      "num": 90,
+      "question": "Một model có bias do label historical discrimination. Đây là:",
+      "options": {
+        "A": "Historical/label bias",
+        "B": "Learning rate issue",
+        "C": "PCA issue",
+        "D": "Underflow"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Labels phản ánh quyết định lịch sử không công bằng có thể truyền bias vào model."
+    },
+    {
+      "num": 91,
+      "question": "ROC curve biểu diễn:",
+      "options": {
+        "A": "TPR theo FPR ở nhiều thresholds",
+        "B": "Precision theo recall duy nhất một threshold",
+        "C": "MAE theo RMSE",
+        "D": "Loss theo epoch bắt buộc"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "ROC plots true positive rate vs false positive rate qua thresholds."
+    },
+    {
+      "num": 92,
+      "question": "Embedding là:",
+      "options": {
+        "A": "Vector representation của token/item/data",
+        "B": "Một loại optimizer",
+        "C": "Một metric",
+        "D": "Một loại missing value"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Embedding ánh xạ discrete item/token sang vector liên tục."
+    },
+    {
+      "num": 93,
+      "question": "SVM tìm decision boundary với mục tiêu kinh điển:",
+      "options": {
+        "A": "Maximize margin",
+        "B": "Minimize number of features về 0",
+        "C": "Maximize training loss",
+        "D": "Luôn dùng neural network"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Hard-margin SVM tối đa hóa margin; soft-margin cân bằng margin với violations qua C."
+    },
+    {
+      "num": 94,
+      "question": "Adam thuộc nhóm:",
+      "options": {
+        "A": "Optimizer",
+        "B": "Loss function",
+        "C": "Activation",
+        "D": "Evaluation metric"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Adam là optimizer adaptive, kết hợp ý tưởng momentum và adaptive learning rates."
+    },
+    {
+      "num": 95,
+      "question": "Bias cao thường liên quan đến:",
+      "options": {
+        "A": "Underfitting",
+        "B": "Model quá đơn giản",
+        "C": "Variance rất cao bắt buộc",
+        "D": "Sai lệch hệ thống của estimator/model"
+      },
+      "answer": [
+        "A",
+        "B",
+        "D"
+      ],
+      "explanation": "High bias thường đi với underfitting; bias cũng có nghĩa sai lệch hệ thống."
+    },
+    {
+      "num": 96,
+      "question": "Trong regression, MAE=2 nghĩa là:",
+      "options": {
+        "A": "Average absolute prediction error là 2 đơn vị target",
+        "B": "R²=2",
+        "C": "MSE=2 bắt buộc",
+        "D": "2% error"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "MAE cùng đơn vị với target và là average absolute error."
+    },
+    {
+      "num": 97,
+      "question": "ReLU(x) bằng:",
+      "options": {
+        "A": "max(0,x)",
+        "B": "1/(1+e^-x)",
+        "C": "tanh(x)",
+        "D": "x²"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "ReLU giữ phần dương và đưa phần âm về 0."
+    },
+    {
+      "num": 98,
+      "question": "Encoder-decoder architecture phù hợp tự nhiên với:",
+      "options": {
+        "A": "Machine translation/sequence-to-sequence",
+        "B": "Chỉ binary classification",
+        "C": "Chỉ clustering",
+        "D": "Chỉ PCA"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Encoder tạo representation input; decoder sinh output sequence."
+    },
+    {
+      "num": 99,
+      "question": "Precision cao nghĩa là:",
+      "options": {
+        "A": "Trong các predicted positives, tỷ lệ positives thật cao",
+        "B": "Trong các actual positives, recall cao",
+        "C": "False positives tương đối thấp",
+        "D": "False negatives chắc chắn bằng 0"
+      },
+      "answer": [
+        "A",
+        "C"
+      ],
+      "explanation": "Precision=TP/(TP+FP), nên precision cao liên quan FP thấp tương đối."
+    },
+    {
+      "num": 100,
+      "question": "Nếu A và B độc lập thì:",
+      "options": {
+        "A": "P(A∩B)=P(A)P(B)",
+        "B": "P(A|B)=P(A)",
+        "C": "P(B|A)=P(B)",
+        "D": "A và B chắc chắn mutually exclusive"
+      },
+      "answer": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "Independence cho phép nhân xác suất và làm conditional probability không đổi. Independent không có nghĩa\nmutually exclusive."
+    }
+  ],
+  "mock2": [
+    {
+      "num": 1,
+      "question": "Data leakage là:",
+      "options": {
+        "A": "Thông tin không hợp lệ từ validation/test/future lọt vào quá trình học",
+        "B": "Missing value",
+        "C": "Outlier",
+        "D": "Class imbalance"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Leakage làm performance estimate lạc quan và không phản ánh deployment."
+    },
+    {
+      "num": 2,
+      "question": "Differential privacy hướng tới:",
+      "options": {
+        "A": "Giới hạn ảnh hưởng của một cá nhân lên output/statistics của hệ thống",
+        "B": "Tăng accuracy tuyệt đối",
+        "C": "Xóa mọi noise",
+        "D": "Bảo đảm anonymity tuyệt đối"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "DP cung cấp guarantee toán học về thay đổi output khi một record được thêm/bớt, thường bằng randomization."
+    },
+    {
+      "num": 3,
+      "question": "Một distribution lệch phải thường có:",
+      "options": {
+        "A": "Mean > median",
+        "B": "Mean < median luôn",
+        "C": "Long tail về phía giá trị lớn",
+        "D": "Median luôn bằng mode"
+      },
+      "answer": [
+        "A",
+        "C"
+      ],
+      "explanation": "Right-skew thường kéo mean về phía đuôi phải; không có quy tắc bắt buộc về mode."
+    },
+    {
+      "num": 4,
+      "question": "Cross-entropy cho binary classification thường phạt mạnh khi:",
+      "options": {
+        "A": "Model rất tự tin nhưng sai",
+        "B": "Model đúng và tự tin",
+        "C": "Prediction đúng 0.5",
+        "D": "Không có label"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "−log(p_true) rất lớn khi p_true gần 0."
+    },
+    {
+      "num": 5,
+      "question": "Hyperparameter là:",
+      "options": {
+        "A": "Tham số được chọn/tune bên ngoài quá trình fit thông thường",
+        "B": "Luôn là learned weight",
+        "C": "Target label",
+        "D": "Test metric"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Ví dụ k, tree depth, learning rate, λ."
+    },
+    {
+      "num": 6,
+      "question": "Random search có lợi thế so với grid search khi:",
+      "options": {
+        "A": "Chỉ một số hyperparameters thực sự quan trọng và không gian lớn",
+        "B": "Không có hyperparameters",
+        "C": "Luôn cho optimum toàn cầu",
+        "D": "Không cần budget"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Random search có thể khám phá các dimensions quan trọng hiệu quả hơn grid khi budget hữu hạn."
+    },
+    {
+      "num": 7,
+      "question": "Tokenization làm gì?",
+      "options": {
+        "A": "Chia text thành units/token để model xử lý",
+        "B": "Chuẩn hóa ảnh",
+        "C": "Tính covariance",
+        "D": "Tạo confusion matrix"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Tokenizer biến chuỗi thành token IDs theo vocabulary."
+    },
+    {
+      "num": 8,
+      "question": "Trong GAN, generator muốn:",
+      "options": {
+        "A": "Tạo sample khiến discriminator tin là real",
+        "B": "Phân loại mọi ảnh đúng 100%",
+        "C": "Tối thiểu hóa accuracy discriminator trực tiếp trong mọi formulation",
+        "D": "Tạo PCA"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Generator được train để fool discriminator."
+    },
+    {
+      "num": 9,
+      "question": "Nếu TP=80, FP=20 thì precision bằng:",
+      "options": {
+        "A": "0.50",
+        "B": "0.67",
+        "C": "0.80",
+        "D": "0.90"
+      },
+      "answer": [
+        "C"
+      ],
+      "explanation": "Precision=80/(80+20)=0.8."
+    },
+    {
+      "num": 10,
+      "question": "Token vocabulary quá lớn có thể:",
+      "options": {
+        "A": "Tăng embedding/output parameter cost",
+        "B": "Luôn tăng accuracy",
+        "C": "Giảm memory bắt buộc",
+        "D": "Xóa need for tokenization"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Vocabulary size ảnh hưởng embedding và output projection size."
+    },
+    {
+      "num": 11,
+      "question": "Hierarchical clustering thường tạo:",
+      "options": {
+        "A": "Dendrogram",
+        "B": "Confusion matrix bắt buộc",
+        "C": "Neural network",
+        "D": "ROC curve"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Dendrogram biểu diễn cấu trúc gộp/tách theo ngưỡng khoảng cách."
+    },
+    {
+      "num": 12,
+      "question": "K-means cần biết trước:",
+      "options": {
+        "A": "Số cluster k",
+        "B": "Số feature bằng 1",
+        "C": "Labels của tất cả data",
+        "D": "Test labels"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "k là hyperparameter cần chọn trước hoặc bằng model-selection strategy."
+    },
+    {
+      "num": 13,
+      "question": "Logistic regression thường dùng cho:",
+      "options": {
+        "A": "Classification",
+        "B": "Clustering",
+        "C": "Dimensionality reduction",
+        "D": "Image compression"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Logistic regression mô hình hóa xác suất lớp qua logistic/sigmoid."
+    },
+    {
+      "num": 14,
+      "question": "Threshold classification tăng từ 0.5 lên 0.9 thường có xu hướng:",
+      "options": {
+        "A": "Giảm predicted positives",
+        "B": "Có thể giảm recall và tăng precision",
+        "C": "Luôn tăng accuracy",
+        "D": "Không thay đổi predictions"
+      },
+      "answer": [
+        "A",
+        "B"
+      ],
+      "explanation": "Threshold cao hơn khó gán positive: predicted positives giảm; thường precision tăng và recall giảm nhưng không\nđảm bảo mọi dataset."
+    },
+    {
+      "num": 15,
+      "question": "Parameter là:",
+      "options": {
+        "A": "Giá trị model học từ training data trong fitting",
+        "B": "Luôn do người dùng chọn trước",
+        "C": "Tên của test set",
+        "D": "Một metric"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Weights của linear model/neural network là parameters learned from data."
+    },
+    {
+      "num": 16,
+      "question": "Cross-validation hữu ích khi:",
+      "options": {
+        "A": "Muốn ước lượng performance ổn định hơn khi dữ liệu hạn chế",
+        "B": "Muốn dùng test labels trong training",
+        "C": "Muốn bỏ training set",
+        "D": "Muốn tránh mọi loại leakage tự động"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "CV tái sử dụng training data qua các folds để estimate model performance; preprocessing vẫn phải nằm trong\npipeline để tránh leakage."
+    },
+    {
+      "num": 17,
+      "question": "Một decision tree quá sâu thường có nguy cơ:",
+      "options": {
+        "A": "Overfitting",
+        "B": "Underfitting chắc chắn",
+        "C": "Không thể train",
+        "D": "Không có variance"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Tree depth lớn có thể fit noise/training idiosyncrasies."
+    },
+    {
+      "num": 18,
+      "question": "ResNet nổi tiếng với:",
+      "options": {
+        "A": "Residual/skip connections",
+        "B": "K-means clustering",
+        "C": "Only RNN cells",
+        "D": "Naive Bayes"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Residual connections giúp optimization mạng sâu dễ hơn."
+    },
+    {
+      "num": 19,
+      "question": "Diffusion model tạo ảnh bằng ý tưởng:",
+      "options": {
+        "A": "Học reverse process từ noisy data về clean sample",
+        "B": "Chỉ dùng decision trees",
+        "C": "Chỉ copy training images",
+        "D": "Dùng K-means centroid"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Diffusion models học denoising/reverse stochastic process để sample dữ liệu."
+    },
+    {
+      "num": 20,
+      "question": "ReLU được dùng phổ biến một phần vì:",
+      "options": {
+        "A": "Đơn giản và giảm một số vấn đề saturation so với sigmoid ở vùng dương",
+        "B": "Luôn bounded",
+        "C": "Có range (0,1)",
+        "D": "Không có derivative"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "ReLU không saturate ở phía dương như sigmoid/tanh; vẫn có caveats như dying ReLU."
+    },
+    {
+      "num": 21,
+      "question": "Nếu một dataset có duplicate records trong train và test, có thể gây:",
+      "options": {
+        "A": "Data leakage/overoptimistic test score",
+        "B": "Fairness tự động",
+        "C": "PCA tốt hơn",
+        "D": "Regularization"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Exact duplicates across splits làm test không còn độc lập."
+    },
+    {
+      "num": 22,
+      "question": "Random Forest thường kết hợp:",
+      "options": {
+        "A": "Bootstrap sampling",
+        "B": "Random subset of features",
+        "C": "Nhiều decision trees",
+        "D": "Sequential error correction như boosting"
+      },
+      "answer": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "Random Forest là ensemble của nhiều trees, thường bootstrap samples và random feature selection; không phải\nboosting."
+    },
+    {
+      "num": 23,
+      "question": "DBSCAN có ưu điểm:",
+      "options": {
+        "A": "Có thể tìm cluster hình dạng bất kỳ và nhận diện noise",
+        "B": "Luôn cần biết k",
+        "C": "Chỉ tạo cluster hình cầu",
+        "D": "Không dùng density"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "DBSCAN dựa trên density và có thể gán điểm noise."
+    },
+    {
+      "num": 24,
+      "question": "Positional information cần trong Transformer vì:",
+      "options": {
+        "A": "Self-attention thuần túy không tự chứa thứ tự token",
+        "B": "Transformer không có weights",
+        "C": "Embedding luôn mất class label",
+        "D": "Không có Q/K/V"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Attention có thể xử lý token như set nếu không bổ sung thông tin vị trí."
+    },
+    {
+      "num": 25,
+      "question": "PCA chủ yếu tìm các hướng:",
+      "options": {
+        "A": "Có variance lớn",
+        "B": "Có covariance với target lớn",
+        "C": "Giảm số chiều nhưng giữ nhiều variance nhất có thể",
+        "D": "Luôn tối ưu accuracy classification"
+      },
+      "answer": [
+        "A",
+        "C"
+      ],
+      "explanation": "PCA là unsupervised dimensionality reduction, tìm các principal directions giữ variance lớn nhất."
+    },
+    {
+      "num": 26,
+      "question": "Grid search:",
+      "options": {
+        "A": "Thử các tổ hợp hyperparameter trong một grid định trước",
+        "B": "Tự động chứng minh causal effect",
+        "C": "Chỉ dùng cho PCA",
+        "D": "Không cần validation"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Grid search exhaustively evaluates specified combinations, thường với CV."
+    },
+    {
+      "num": 27,
+      "question": "Một perceptron cơ bản tính:",
+      "options": {
+        "A": "wᵀx+b rồi qua activation/threshold",
+        "B": "PCA eigenvectors",
+        "C": "Confusion matrix",
+        "D": "K-means centroid bắt buộc"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Neuron tính weighted sum cộng bias rồi qua activation."
+    },
+    {
+      "num": 28,
+      "question": "Object detection khác image classification ở chỗ detection thường:",
+      "options": {
+        "A": "Vừa xác định class vừa localization objects",
+        "B": "Chỉ output một scalar",
+        "C": "Không dùng image",
+        "D": "Không cần training"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Detection thường dự đoán bounding boxes + class scores."
+    },
+    {
+      "num": 29,
+      "question": "Batch normalization thường:",
+      "options": {
+        "A": "Chuẩn hóa activations theo batch và có learnable scale/shift",
+        "B": "Là data augmentation",
+        "C": "Là test metric",
+        "D": "Chỉ dùng cho labels"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "BatchNorm normalize intermediate activations trong training với learned affine parameters."
+    },
+    {
+      "num": 30,
+      "question": "ROC-AUC ít phụ thuộc vào:",
+      "options": {
+        "A": "Một threshold cụ thể",
+        "B": "Ranking quality",
+        "C": "TPR/FPR curves",
+        "D": "Class scores"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "AUC tổng hợp performance qua nhiều thresholds."
+    },
+    {
+      "num": 31,
+      "question": "Sliding window feature trong time series có thể:",
+      "options": {
+        "A": "Tạo lag/rolling statistics từ các cửa sổ quá khứ",
+        "B": "Dùng future labels vào training bắt buộc",
+        "C": "Xóa temporal order",
+        "D": "Chỉ áp dụng cho ảnh"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Windowing tạo các đặc trưng cục bộ như rolling mean/std hoặc sequence segments."
+    },
+    {
+      "num": 32,
+      "question": "Nếu hai feature có correlation gần +1, điều nào có khả năng xảy ra?",
+      "options": {
+        "A": "Chúng có quan hệ tuyến tính mạnh",
+        "B": "Một feature chắc chắn gây ra feature kia",
+        "C": "Có multicollinearity khi cùng đưa vào một số model",
+        "D": "Có thể gây vấn đề cho diễn giải hệ số linear model"
+      },
+      "answer": [
+        "A",
+        "C",
+        "D"
+      ],
+      "explanation": "Correlation cao không chứng minh causation, nhưng có thể tạo multicollinearity và làm hệ số linear model khó ổn\nđịnh."
+    },
+    {
+      "num": 33,
+      "question": "AdamW khác Adam ở điểm nổi bật:",
+      "options": {
+        "A": "Weight decay được tách khỏi adaptive gradient update theo cách decoupled",
+        "B": "Không dùng learning rate",
+        "C": "Không dùng gradient",
+        "D": "Là activation"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "AdamW decouples weight decay from Adam's adaptive gradient update."
+    },
+    {
+      "num": 34,
+      "question": "Một model dùng ZIP code và vô tình tái tạo proxy cho race. Bài học là:",
+      "options": {
+        "A": "Loại bỏ sensitive feature không đảm bảo loại bỏ bias",
+        "B": "Proxy variables có thể encode sensitive information",
+        "C": "Chỉ model neural network mới có bias",
+        "D": "Accuracy sẽ phát hiện bias"
+      },
+      "answer": [
+        "A",
+        "B"
+      ],
+      "explanation": "Các feature tương quan với sensitive attributes có thể là proxies; fairness cần đánh giá theo context."
+    },
+    {
+      "num": 35,
+      "question": "Nếu feature scales rất khác nhau, PCA có thể bị chi phối bởi:",
+      "options": {
+        "A": "Feature có variance/scale lớn",
+        "B": "Feature có mean bằng 0",
+        "C": "Labels",
+        "D": "Test set"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "PCA maximize variance, nên scale lớn có thể dominate."
+    },
+    {
+      "num": 36,
+      "question": "Một objective convex có lợi thế lý thuyết là:",
+      "options": {
+        "A": "Local minimum là global minimum nếu tồn tại dưới điều kiện chuẩn",
+        "B": "Không cần dữ liệu",
+        "C": "Luôn có nghiệm duy nhất",
+        "D": "Không cần optimization"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Với convex objective, mọi local minimum là global minimum; uniqueness cần thêm strict convexity/điều kiện\nkhác."
+    },
+    {
+      "num": 37,
+      "question": "Softmax trong attention chủ yếu:",
+      "options": {
+        "A": "Biến attention scores thành weights có tổng 1 theo chiều chuẩn hóa",
+        "B": "Xóa tất cả negative values bằng ReLU",
+        "C": "Giảm dimension về 2",
+        "D": "Tạo embedding từ scratch"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Softmax tạo phân phối attention weights."
+    },
+    {
+      "num": 38,
+      "question": "Robustness trong AI đề cập gần nhất đến:",
+      "options": {
+        "A": "Khả năng duy trì performance khi input bị nhiễu/perturbation hợp lý",
+        "B": "Model có nhiều parameters",
+        "C": "Data có nhiều columns",
+        "D": "Training lâu"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Robust model ít nhạy với các thay đổi/nhiễu phù hợp."
+    },
+    {
+      "num": 39,
+      "question": "UMAP thường được dùng cho:",
+      "options": {
+        "A": "Nonlinear dimensionality reduction/visualization",
+        "B": "Only linear regression",
+        "C": "Label encoding bắt buộc",
+        "D": "Confusion matrix"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "UMAP là phương pháp nonlinear manifold learning."
+    },
+    {
+      "num": 40,
+      "question": "Mini-batch gradient descent thường là:",
+      "options": {
+        "A": "Dùng toàn bộ dataset mỗi bước",
+        "B": "Dùng một subset nhỏ mỗi bước",
+        "C": "Không có hyperparameter",
+        "D": "Chỉ dùng cho linear regression"
+      },
+      "answer": [
+        "B"
+      ],
+      "explanation": "Mini-batch là cách phổ biến trong deep learning."
+    },
+    {
+      "num": 41,
+      "question": "BERT nổi bật là:",
+      "options": {
+        "A": "Pre-trained bidirectional/encoder-style language model",
+        "B": "Decoder-only autoregressive model",
+        "C": "CNN image classifier",
+        "D": "K-means variant"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "BERT dùng Transformer encoder và pretraining hai chiều theo thiết kế gốc."
+    },
+    {
+      "num": 42,
+      "question": "Nếu validation set nhỏ, CV có thể:",
+      "options": {
+        "A": "Giảm variance của performance estimate so với một split duy nhất",
+        "B": "Tạo thêm test labels",
+        "C": "Loại bỏ mọi bias",
+        "D": "Đảm bảo causal inference"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "CV dùng nhiều validation folds, thường cho estimate ổn định hơn một split đơn."
+    },
+    {
+      "num": 43,
+      "question": "Trong self-attention, Q, K, V lần lượt là:",
+      "options": {
+        "A": "Query, Key, Value",
+        "B": "Quick, Kernel, Vector",
+        "C": "Query, Kernel, Variance",
+        "D": "Queue, Key, Vector"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Đây là ba ma trận chuẩn của attention."
+    },
+    {
+      "num": 44,
+      "question": "Data minimization nghĩa là:",
+      "options": {
+        "A": "Chỉ thu thập dữ liệu cần thiết cho mục đích hợp lệ",
+        "B": "Thu thập càng nhiều càng tốt",
+        "C": "Xóa training labels",
+        "D": "Luôn anonymize bằng cách đổi tên"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Data minimization giảm dữ liệu không cần thiết và rủi ro privacy."
+    },
+    {
+      "num": 45,
+      "question": "Kernel trick cho phép SVM:",
+      "options": {
+        "A": "Tính inner product trong feature space ngầm mà không nhất thiết tạo feature vector tường minh",
+        "B": "Luôn giảm số training examples",
+        "C": "Loại bỏ cần chọn C",
+        "D": "Chỉ chạy trên text"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Kernel cung cấp similarity/inner product tương ứng với một feature mapping."
+    },
+    {
+      "num": 46,
+      "question": "Nếu feature 'city' có 20 giá trị nominal, one-hot encoding cơ bản tạo khoảng:",
+      "options": {
+        "A": "20 binary columns (hoặc 19 nếu drop-first)",
+        "B": "1 continuous column bắt buộc",
+        "C": "20 target labels",
+        "D": "400 columns luôn"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "One-hot thường tạo một indicator cho mỗi category; drop-first có thể bỏ một cột để tránh redundancy trong\nlinear model."
+    },
+    {
+      "num": 47,
+      "question": "Regularization parameter λ tăng mạnh thường:",
+      "options": {
+        "A": "Phạt complexity mạnh hơn",
+        "B": "Luôn tăng training accuracy",
+        "C": "Luôn giảm bias",
+        "D": "Xóa test set"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Penalty lớn ép parameters nhỏ hơn; quá lớn có thể underfit."
+    },
+    {
+      "num": 48,
+      "question": "Một test bệnh có sensitivity 90%, nhưng bệnh chỉ có prevalence 1%. Điều nào cần chú ý?",
+      "options": {
+        "A": "PPV có thể thấp dù sensitivity cao",
+        "B": "P(test+|disease)=0.90",
+        "C": "Một positive test không tự động nghĩa là xác suất mắc bệnh 90%",
+        "D": "Cần base rate để tính xác suất hậu nghiệm"
+      },
+      "answer": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "Đây là base-rate effect: xác suất hậu nghiệm cần cả prevalence và đặc tính test."
+    },
+    {
+      "num": 49,
+      "question": "Backpropagation làm gì?",
+      "options": {
+        "A": "Tính gradients của loss đối với parameters",
+        "B": "Chọn test set",
+        "C": "Tạo labels",
+        "D": "Chuẩn hóa image"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Backprop truyền gradient ngược qua computational graph."
+    },
+    {
+      "num": 50,
+      "question": "Temperature trong softmax cao hơn thường:",
+      "options": {
+        "A": "Làm distribution mềm/đều hơn",
+        "B": "Làm một class chắc chắn 1",
+        "C": "Xóa logits",
+        "D": "Tạo labels"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Higher temperature flattens softmax; lower temperature sharpens it."
+    },
+    {
+      "num": 51,
+      "question": "One-hot encoding phù hợp với:",
+      "options": {
+        "A": "Categorical nominal variables",
+        "B": "Một feature continuous bắt buộc",
+        "C": "Labels test",
+        "D": "Image pixels only"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "One-hot biến mỗi category thành indicator, không áp thứ tự giả."
+    },
+    {
+      "num": 52,
+      "question": "Nếu learning rate quá lớn, điều gì có thể xảy ra?",
+      "options": {
+        "A": "Hội tụ chậm nhưng luôn ổn định",
+        "B": "Overshoot/divergence",
+        "C": "Gradient bằng 0 ngay",
+        "D": "Loss chắc chắn giảm ở mọi bước"
+      },
+      "answer": [
+        "B"
+      ],
+      "explanation": "Step quá lớn có thể vượt qua vùng optimum hoặc làm quá trình không ổn định."
+    },
+    {
+      "num": 53,
+      "question": "Whisper là:",
+      "options": {
+        "A": "Một mô hình speech recognition đa ngôn ngữ nổi tiếng",
+        "B": "Optimizer",
+        "C": "Image segmentation model",
+        "D": "Clustering algorithm"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Whisper là ASR model của OpenAI, nhận audio và sinh text."
+    },
+    {
+      "num": 54,
+      "question": "Eigenvector v của A với eigenvalue λ thỏa mãn:",
+      "options": {
+        "A": "Av=v+λ",
+        "B": "Av=λv",
+        "C": "A+v=λ",
+        "D": "A⁻¹v=λv luôn đúng"
+      },
+      "answer": [
+        "B"
+      ],
+      "explanation": "Định nghĩa eigenvector/eigenvalue là Av = λv."
+    },
+    {
+      "num": 55,
+      "question": "Pseudonymization khác anonymization vì:",
+      "options": {
+        "A": "Pseudonymized data vẫn có thể liên kết lại nếu có thông tin bổ sung",
+        "B": "Pseudonymization luôn tuyệt đối anonymous",
+        "C": "Anonymization luôn reversible",
+        "D": "Không có khác biệt"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Pseudonymization thay identifiers nhưng linkage có thể vẫn khả thi."
+    },
+    {
+      "num": 56,
+      "question": "Ma trận covariance đối xứng vì:",
+      "options": {
+        "A": "Cov(X,Y)=Cov(Y,X)",
+        "B": "Mọi matrix đều đối xứng",
+        "C": "Variance luôn bằng 0",
+        "D": "Covariance matrix chỉ có diagonal"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Cov(X,Y)=Cov(Y,X), nên covariance matrix là symmetric."
+    },
+    {
+      "num": 57,
+      "question": "Điều nào đúng về L1 regularization?",
+      "options": {
+        "A": "Phạt tổng bình phương trọng số",
+        "B": "Có xu hướng tạo trọng số bằng 0",
+        "C": "Luôn làm tất cả trọng số bằng 0",
+        "D": "Dùng |w_i| trong penalty"
+      },
+      "answer": [
+        "B",
+        "D"
+      ],
+      "explanation": "L1 dùng tổng |w_i| và thường tạo nghiệm sparse, tức một số trọng số đúng bằng 0."
+    },
+    {
+      "num": 58,
+      "question": "Nếu P(A)=0.7 thì P(Aᶜ) bằng:",
+      "options": {
+        "A": "0.1",
+        "B": "0.3",
+        "C": "0.7",
+        "D": "1.7"
+      },
+      "answer": [
+        "B"
+      ],
+      "explanation": "P(Aᶜ)=1-P(A)."
+    },
+    {
+      "num": 59,
+      "question": "Central Limit Theorem chủ yếu nói về:",
+      "options": {
+        "A": "Phân phối của sample mean khi sample đủ lớn có xu hướng gần normal",
+        "B": "Mọi dữ liệu gốc đều trở thành normal",
+        "C": "Mọi model đều unbiased",
+        "D": "Median luôn bằng mean"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "CLT liên quan đến sampling distribution của tổng/mean, dưới các điều kiện phù hợp."
+    },
+    {
+      "num": 60,
+      "question": "Self-supervised learning thường:",
+      "options": {
+        "A": "Tạo supervision signal từ chính dữ liệu",
+        "B": "Không có objective",
+        "C": "Luôn cần human labels",
+        "D": "Chỉ dùng cho regression"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Ví dụ masked-token prediction và contrastive learning tạo targets từ data."
+    },
+    {
+      "num": 61,
+      "question": "Nếu E[X]=4 và E[X²]=25 thì Var(X) bằng:",
+      "options": {
+        "A": "9",
+        "B": "16",
+        "C": "21",
+        "D": "29"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Var(X)=E[X²]−E[X]²=25−16=9."
+    },
+    {
+      "num": 62,
+      "question": "Fine-tuning toàn bộ pretrained model nghĩa là:",
+      "options": {
+        "A": "Update parameters của model pretrained trên task mới",
+        "B": "Đóng băng mọi parameter",
+        "C": "Chỉ train tokenizer",
+        "D": "Chỉ đổi test set"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Full fine-tuning updates most/all model parameters."
+    },
+    {
+      "num": 63,
+      "question": "Spectral clustering dựa nhiều vào:",
+      "options": {
+        "A": "Graph/Laplacian representation",
+        "B": "Gradient của neural network bắt buộc",
+        "C": "Decision stump",
+        "D": "Bayes theorem bắt buộc"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Spectral clustering dùng graph affinity và eigenvectors của graph Laplacian."
+    },
+    {
+      "num": 64,
+      "question": "Công thức Bayes đúng là:",
+      "options": {
+        "A": "P(A|B)=P(B|A)P(A)/P(B)",
+        "B": "P(A|B)=P(A)P(B)",
+        "C": "P(A|B)=P(A∩B)/P(A)",
+        "D": "P(A|B)=P(B|A)"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Bayes đổi chiều conditional probability bằng cách nhân likelihood với prior rồi chia evidence."
+    },
+    {
+      "num": 65,
+      "question": "Một model y tế được triển khai mà không có monitoring. Rủi ro là:",
+      "options": {
+        "A": "Drift/failure có thể không được phát hiện",
+        "B": "Accuracy tự tăng",
+        "C": "Bias tự biến mất",
+        "D": "Test set tự cập nhật"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Monitoring giúp phát hiện drift, data quality issues và performance degradation."
+    },
+    {
+      "num": 66,
+      "question": "R² âm trên test set có thể xảy ra khi:",
+      "options": {
+        "A": "Model tệ hơn baseline dự đoán mean theo định nghĩa R²",
+        "B": "Model luôn perfect",
+        "C": "MSE bằng 0",
+        "D": "Không có test data"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "R²=1−SSres/SStot; SSres>SStot làm R² âm."
+    },
+    {
+      "num": 67,
+      "question": "Early stopping giúp:",
+      "options": {
+        "A": "Dừng training khi validation performance ngừng cải thiện",
+        "B": "Tăng epochs vô hạn",
+        "C": "Loại test set",
+        "D": "Bắt buộc tăng model size"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Theo dõi validation metric để ngăn overfitting."
+    },
+    {
+      "num": 68,
+      "question": "Nếu một model output logits [2,1,0] cho 3 classes, class có probability lớn nhất là:",
+      "options": {
+        "A": "Class 1 tương ứng logit 2",
+        "B": "Class 2 tương ứng logit 1",
+        "C": "Class 3 tương ứng logit 0",
+        "D": "Không thể biết"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Softmax đơn điệu theo logits nên argmax(logits)=argmax(probabilities)."
+    },
+    {
+      "num": 69,
+      "question": "Một vector cột có shape (5, 1). Dot product của nó với một vector shape (5, 1) cho kết quả có shape\nnào?",
+      "options": {
+        "A": "(5, 1)",
+        "B": "(1, 5)",
+        "C": "(1, 1)",
+        "D": "(5, 5)"
+      },
+      "answer": [
+        "C"
+      ],
+      "explanation": "Dot product giữa hai vector cùng chiều cho một scalar, có thể biểu diễn như ma trận (1,1)."
+    },
+    {
+      "num": 70,
+      "question": "Nếu fit StandardScaler trên toàn bộ dataset trước khi cross-validation:",
+      "options": {
+        "A": "Có thể gây leakage",
+        "B": "Luôn đúng",
+        "C": "Validation folds ảnh hưởng statistics của scaler",
+        "D": "Có thể làm score lạc quan"
+      },
+      "answer": [
+        "A",
+        "C",
+        "D"
+      ],
+      "explanation": "Scaler phải fit riêng trong từng training fold; nếu fit toàn bộ data, validation information lọt vào preprocessing."
+    },
+    {
+      "num": 71,
+      "question": "Mean imputation phù hợp hơn median khi:",
+      "options": {
+        "A": "Distribution tương đối đối xứng và không có outlier mạnh",
+        "B": "Luôn luôn",
+        "C": "Feature categorical nominal",
+        "D": "Target bị thiếu"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Median thường robust hơn khi skew/outliers; mean hợp lý khi distribution phù hợp."
+    },
+    {
+      "num": 72,
+      "question": "Random feature selection trong Random Forest giúp:",
+      "options": {
+        "A": "Làm trees bớt correlated",
+        "B": "Đảm bảo mọi tree giống nhau",
+        "C": "Loại bỏ bootstrap",
+        "D": "Tạo labels"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Decorrelating trees làm averaging hiệu quả hơn."
+    },
+    {
+      "num": 73,
+      "question": "Nếu layer có 20 input units và 3 output units, tính cả bias, số parameters là:",
+      "options": {
+        "A": "60",
+        "B": "63",
+        "C": "23",
+        "D": "80"
+      },
+      "answer": [
+        "B"
+      ],
+      "explanation": "Weights=20×3=60; bias=3; tổng 63."
+    },
+    {
+      "num": 74,
+      "question": "K-means tối ưu trực tiếp mục tiêu gần với:",
+      "options": {
+        "A": "Tổng squared distance từ điểm tới centroid của cluster",
+        "B": "Cross entropy của classifier",
+        "C": "Margin SVM",
+        "D": "Reconstruction error của autoencoder"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "K-means minimize within-cluster sum of squared distances."
+    },
+    {
+      "num": 75,
+      "question": "Tanh có range:",
+      "options": {
+        "A": "(-1,1)",
+        "B": "(0,1)",
+        "C": "[0,∞)",
+        "D": "(-∞,∞)"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Tanh là hàm sigmoid-like zero-centered với range (-1,1)."
+    },
+    {
+      "num": 76,
+      "question": "Gradient descent cập nhật θ theo:",
+      "options": {
+        "A": "θ←θ+η∇L",
+        "B": "θ←θ−η∇L",
+        "C": "θ←η/∇L",
+        "D": "θ←θ−L"
+      },
+      "answer": [
+        "B"
+      ],
+      "explanation": "Ta đi ngược gradient để giảm loss."
+    },
+    {
+      "num": 77,
+      "question": "Bagging chủ yếu nhằm:",
+      "options": {
+        "A": "Giảm variance",
+        "B": "Tăng variance",
+        "C": "Tạo label mới",
+        "D": "Bắt buộc giảm bias"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Averaging many decorrelated learners chủ yếu giảm variance."
+    },
+    {
+      "num": 78,
+      "question": "Entropy của node bằng 0 khi:",
+      "options": {
+        "A": "Node hoàn toàn pure về class",
+        "B": "Các class cân bằng hoàn hảo",
+        "C": "Có vô hạn class",
+        "D": "Không có sample"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Entropy bằng 0 khi một class có xác suất 1."
+    },
+    {
+      "num": 79,
+      "question": "Distribution shift là:",
+      "options": {
+        "A": "Phân phối dữ liệu deployment khác đáng kể phân phối training",
+        "B": "Model có ít layers",
+        "C": "Learning rate giảm",
+        "D": "Labels luôn đúng"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Shift có thể làm generalization suy giảm sau deployment."
+    },
+    {
+      "num": 80,
+      "question": "Nếu learning rate quá nhỏ:",
+      "options": {
+        "A": "Training có thể rất chậm",
+        "B": "Có thể cần nhiều iterations",
+        "C": "Luôn overfit",
+        "D": "Không thể tính gradient"
+      },
+      "answer": [
+        "A",
+        "B"
+      ],
+      "explanation": "Step nhỏ làm convergence chậm; không đồng nghĩa với overfitting."
+    },
+    {
+      "num": 81,
+      "question": "Support vectors là:",
+      "options": {
+        "A": "Các điểm quyết định/ảnh hưởng mạnh đến boundary",
+        "B": "Mọi training point",
+        "C": "Chỉ các outlier",
+        "D": "Các hidden units"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Trong SVM, support vectors nằm sát hoặc vi phạm margin và xác định hyperplane."
+    },
+    {
+      "num": 82,
+      "question": "GAN gồm hai mạng chính:",
+      "options": {
+        "A": "Generator và discriminator",
+        "B": "Encoder và tokenizer",
+        "C": "Tree và forest",
+        "D": "Query và key"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Generator tạo samples; discriminator phân biệt real/fake trong GAN cổ điển."
+    },
+    {
+      "num": 83,
+      "question": "Với A có shape (3, 4) và B có shape (4, 2), shape của AB là:",
+      "options": {
+        "A": "(3,2)",
+        "B": "(4,3)",
+        "C": "(4,2)",
+        "D": "(3,4)"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Trong (m×n)(n×p), hai kích thước trong phải bằng nhau và kết quả là (m×p)."
+    },
+    {
+      "num": 84,
+      "question": "Feature selection có thể giúp:",
+      "options": {
+        "A": "Giảm noise/redundancy và complexity",
+        "B": "Đảm bảo causal inference",
+        "C": "Đảm bảo accuracy tăng mọi dataset",
+        "D": "Tạo thêm labels"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Feature selection có thể cải thiện generalization/interpretability nhưng không đảm bảo score tăng."
+    },
+    {
+      "num": 85,
+      "question": "Group-aware splitting hữu ích khi:",
+      "options": {
+        "A": "Samples cùng người/device/group có thể tương quan",
+        "B": "Mỗi row hoàn toàn độc lập chắc chắn",
+        "C": "Chỉ có một row",
+        "D": "Không có groups"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Giữ group không bị chia cả train và validation giúp tránh memorization leakage."
+    },
+    {
+      "num": 86,
+      "question": "Derivative của f(x)=x² tại x=3 là:",
+      "options": {
+        "A": "3",
+        "B": "6",
+        "C": "9",
+        "D": "12"
+      },
+      "answer": [
+        "B"
+      ],
+      "explanation": "f'(x)=2x nên f'(3)=6."
+    },
+    {
+      "num": 87,
+      "question": "Trong binary classification, confusion matrix có bao nhiêu ô cơ bản?",
+      "options": {
+        "A": "2",
+        "B": "3",
+        "C": "4",
+        "D": "8"
+      },
+      "answer": [
+        "C"
+      ],
+      "explanation": "Có TP, TN, FP, FN."
+    },
+    {
+      "num": 88,
+      "question": "Correlation giữa sensitive attribute và prediction không tự nó chứng minh:",
+      "options": {
+        "A": "Causation",
+        "B": "Existence of correlation",
+        "C": "Need for analysis",
+        "D": "Potential association"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Correlation không chứng minh causal relationship."
+    },
+    {
+      "num": 89,
+      "question": "SGD khác full-batch gradient descent ở chỗ:",
+      "options": {
+        "A": "SGD dùng một sample hoặc batch rất nhỏ cho update",
+        "B": "SGD không dùng gradient",
+        "C": "SGD luôn hội tụ tới global optimum",
+        "D": "Full-batch dùng toàn bộ training set cho mỗi update"
+      },
+      "answer": [
+        "A",
+        "D"
+      ],
+      "explanation": "SGD dùng stochastic/small batches; full-batch tính gradient trên toàn bộ training data mỗi bước."
+    },
+    {
+      "num": 90,
+      "question": "Missing value và outlier:",
+      "options": {
+        "A": "Là hai vấn đề khác nhau",
+        "B": "Luôn phải xử lý giống nhau",
+        "C": "Missing value không phải outlier",
+        "D": "Outlier luôn là lỗi dữ liệu"
+      },
+      "answer": [
+        "A",
+        "C"
+      ],
+      "explanation": "Missing là giá trị không có; outlier là quan sát cực trị/khác biệt. Outlier có thể là dữ liệu hợp lệ."
+    },
+    {
+      "num": 91,
+      "question": "Variance cao trong ML thường liên quan đến:",
+      "options": {
+        "A": "Overfitting",
+        "B": "Model quá nhạy với training sample",
+        "C": "Generalization kém",
+        "D": "Luôn do dữ liệu có variance thấp"
+      },
+      "answer": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "High variance nghĩa prediction/model fit thay đổi mạnh theo training sample, thường dẫn tới overfitting."
+    },
+    {
+      "num": 92,
+      "question": "PR-AUC thường hữu ích đặc biệt khi:",
+      "options": {
+        "A": "Positive class hiếm và quan tâm precision/recall",
+        "B": "Regression",
+        "C": "Không có labels",
+        "D": "Chỉ có continuous target"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Precision-recall curve tập trung vào positive class và thường informative hơn ROC trong severe imbalance."
+    },
+    {
+      "num": 93,
+      "question": "Nếu TP=80, FN=20 thì recall bằng:",
+      "options": {
+        "A": "0.50",
+        "B": "0.67",
+        "C": "0.80",
+        "D": "0.90"
+      },
+      "answer": [
+        "C"
+      ],
+      "explanation": "Recall=80/(80+20)=0.8."
+    },
+    {
+      "num": 94,
+      "question": "Transparency khác explainability ở chỗ:",
+      "options": {
+        "A": "Transparency rộng hơn về data/model/process; explainability tập trung giải thích outputs/behavior",
+        "B": "Hai khái niệm luôn trái nghĩa",
+        "C": "Transparency chỉ là accuracy",
+        "D": "Explainability chỉ là privacy"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Explainability là một phần/khía cạnh của transparency trong nhiều framework."
+    },
+    {
+      "num": 95,
+      "question": "PCA là linear dimensionality reduction vì:",
+      "options": {
+        "A": "Principal components là linear combinations của input features",
+        "B": "Nó luôn dùng neural network",
+        "C": "Nó chỉ xử lý categorical data",
+        "D": "Nó cần labels"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Components là tuyến tính theo input."
+    },
+    {
+      "num": 96,
+      "question": "Trong K-means, centroid mới thường được cập nhật bằng:",
+      "options": {
+        "A": "Mean của points được gán vào cluster",
+        "B": "Median của toàn dataset",
+        "C": "Gradient của classifier",
+        "D": "Mode của labels"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Lloyd's algorithm cập nhật centroid bằng mean."
+    },
+    {
+      "num": 97,
+      "question": "Standardization thường tạo feature có:",
+      "options": {
+        "A": "Mean gần 0 và std gần 1 trên tập fit",
+        "B": "Min=0 max=1 luôn",
+        "C": "Median=0 bắt buộc",
+        "D": "Integer values"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "z=(x−mean)/std; min/max không cố định."
+    },
+    {
+      "num": 98,
+      "question": "Theo quy tắc 1.5×IQR, một điểm có thể được xem là outlier nếu:",
+      "options": {
+        "A": "x<Q1−1.5IQR",
+        "B": "x>Q3+1.5IQR",
+        "C": "x=mean",
+        "D": "x=median"
+      },
+      "answer": [
+        "A",
+        "B"
+      ],
+      "explanation": "Đây là quy tắc boxplot phổ biến để flag potential outliers."
+    },
+    {
+      "num": 99,
+      "question": "Batch size tăng thường làm:",
+      "options": {
+        "A": "Mỗi update dùng nhiều examples hơn",
+        "B": "Luôn làm accuracy tăng",
+        "C": "Không ảnh hưởng memory",
+        "D": "Biến SGD thành PCA"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Larger batch cần nhiều memory và mỗi update dùng nhiều samples."
+    },
+    {
+      "num": 100,
+      "question": "Validation set dùng để:",
+      "options": {
+        "A": "Chọn model/hyperparameters",
+        "B": "Fit final answer label của test",
+        "C": "Thay thế training set hoàn toàn",
+        "D": "Tạo leakage"
+      },
+      "answer": [
+        "A"
+      ],
+      "explanation": "Validation hỗ trợ model selection và tuning."
+    }
+  ]
+}

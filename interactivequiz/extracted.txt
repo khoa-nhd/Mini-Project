@@ -1,0 +1,1946 @@
+==== PAGE 1 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 1
+ VAIO 2026 — TARGETED MOCK BANK
+200 câu trắc nghiệm • Mock 1 + Mock 2 • 100 câu / 180 phút
+mỗi đề
+Mục tiêu: mô phỏng sát Vòng 1 VAIO 2026 bằng cách giao thoa giữa syllabus VAIO 2026, syllabus IOAI 2026 và kinh
+nghiệm/đề VOAI 2025. Đây là bộ đề biên soạn mới, không phải đề chính thức.
+Format mô phỏng: mỗi câu có 4 lựa chọn và có thể có một hoặc nhiều đáp án đúng, giống mô tả chính thức của
+VAIO Vòng 1. Thời gian 180 phút cho 100 câu. Khi mock thật, nên làm phần câu hỏi trước và chỉ xem đáp án sau.
+Cấu trúc ưu tiên: classical ML + data processing + evaluation + neural networks là lõi; math/theory được cài xuyên
+suốt; CV/NLP/audio và AI ethics xuất hiện ở mức conceptual để phản ánh phạm vi IOAI 2026 nhưng vẫn ưu tiên khả
+năng sát VAIO.
+Nguồn nền: VAIO 2026 official Round 1; IOAI 2026 official syllabus; VOAI 2025 public exam analysis/reference.
+Syllabus IOAI 2026 phân loại Theory / Practice / Both và bao phủ Python/data handling, classical ML, data
+processing, neural networks, CV, NLP/audio. VAIO 2026 chính thức nêu AI/ML, logic toán và AI ethics, với trọng tâm
+supervised/unsupervised learning, neural networks, preprocessing/feature engineering, model evaluation và
+practical AI problem solving.
+Lưu ý: “sát VAIO” là đánh giá chiến lược dựa trên các nguồn trên, không phải dự đoán chính xác câu hỏi thật.
+Cách sử dụng
+1) Mock 1: 180 phút, không tra cứu. 2) Chấm và phân loại lỗi theo category. 3) Đọc giải thích, không chỉ đáp án. 4)
+Sau 1–3 ngày làm Mock 2. 5) Mục tiêu tốt là ≥80% và không có lỗ hổng nghiêm trọng ở probability/statistics,
+evaluation, leakage, classical ML và NN fundamentals.
+
+==== PAGE 2 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 2
+MOCK 1 — 100 CÂU / 180 PHÚT
+ Nhóm
+Số câu
+AI Ethics
+12
+Evaluation
+9
+Computer Vision
+7
+Data Processing
+7
+Thống kê
+7
+NLP
+6
+Neural Networks
+5
+Classical ML
+4
+Deep Learning
+4
+Decision Tree
+3
+Regression Metrics
+3
+Regularization
+3
+Đại số tuyến tính
+3
+AI Safety
+2
+Ensemble
+2
+Feature Engineering
+2
+Giải tích
+2
+Model Selection
+2
+Uncertainty
+2
+Attention
+1
+Autoencoder
+1
+Clustering
+1
+Cross-Validation
+1
+Data Leakage
+1
+Dimensionality Reduction
+1
+Generative AI Ethics
+1
+Loss
+1
+Multimodal AI
+1
+NLP/Data Processing
+1
+PCA
+1
+Representation
+1
+SVM
+1
+Tối ưu hóa
+1
+Xác suất
+1
+PHẦN ĐỀ
+Câu 1. Privacy risk trong ML có thể gồm:
+ A. Membership inference
+ B. Model inversion
+ 
+==== PAGE 3 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 3
+C. Re-identification
+ D. Không bao giờ có nếu xóa tên
+ Đáp án: A, B, C
+ Giải thích: Privacy attacks có thể suy luận membership hoặc thuộc tính/đặc trưng; bỏ tên không đảm bảo privacy.
+Câu 2. Subtract cùng một constant khỏi mọi logits trước softmax:
+ A. Không đổi probability distribution
+ B. Đổi hoàn toàn probabilities
+ C. Làm tất cả bằng 0
+ D. Biến thành ReLU
+ Đáp án: A
+ Giải thích: Softmax invariant với việc cộng/trừ cùng constant vì numerator và denominator cùng nhân một factor.
+Câu 3. Gradient của một scalar-valued function nhiều biến chỉ hướng:
+ A. Giảm nhanh nhất
+ B. Tăng nhanh nhất tại điểm đó
+ C. Ngẫu nhiên
+ D. Luôn về global minimum
+ Đáp án: B
+ Giải thích: Gradient chỉ hướng steepest ascent; gradient descent đi ngược nó.
+Câu 4. Nếu det(A)=0 thì điều nào đúng?
+ A. A chắc chắn khả nghịch
+ B. A singular
+ C. A có inverse duy nhất
+ D. Các cột của A phụ thuộc tuyến tính
+ Đáp án: B, D
+ Giải thích: Determinant bằng 0 nghĩa là ma trận singular; các vector hàng/cột phụ thuộc tuyến tính và không có inverse.
+Câu 5. Autoencoder học bằng cách:
+ A. Encode input thành latent representation rồi reconstruct input
+ B. Dự đoán class bắt buộc
+ C. Tính ROC
+ D. Tạo decision tree
+ Đáp án: A
+ Giải thích: Encoder-decoder được train để reconstruction; bottleneck có thể học representation.
+Câu 6. Language modeling thường dự đoán:
+ A. Token tiếp theo hoặc token bị che tùy objective
+ B. Cluster ID
+ C. Bounding box
+ D. PCA component
+ Đáp án: A
+ Giải thích: Autoregressive LM dự đoán next token; masked LM dự đoán masked token.
+Câu 7. Information gain của split là:
+ A. Impurity giảm sau split
+ B. Accuracy của test set
+ 
+==== PAGE 4 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 4
+C. Số feature còn lại
+ D. Learning rate
+ Đáp án: A
+ Giải thích: IG đo mức giảm entropy/impurity nhờ split.
+Câu 8. Padding variable-length sequences nhằm:
+ A. Đưa sequences về kích thước batch phù hợp
+ B. Tạo thêm labels
+ C. Giảm số classes
+ D. Tính ROC
+ Đáp án: A
+ Giải thích: Padding làm các sequence có cùng tensor shape; thường đi kèm mask để bỏ qua padding.
+Câu 9. MSE nhạy với outlier vì:
+ A. Residual được bình phương
+ B. Residual bị lấy dấu
+ C. Không dùng target
+ D. Luôn dùng log
+ Đáp án: A
+ Giải thích: Bình phương làm lỗi lớn đóng góp disproportionate.
+Câu 10. Autoregressive language model phải tránh:
+ A. Nhìn token tương lai khi dự đoán token hiện tại
+ B. Dùng embeddings
+ C. Dùng cross entropy
+ D. Dùng attention
+ Đáp án: A
+ Giải thích: Causal mask ngăn information leakage từ future tokens.
+Câu 11. PCA cần centering dữ liệu vì:
+ A. Principal directions thường được phân tích quanh mean
+ B. Để tạo labels
+ C. Để tăng classes
+ D. Để làm mọi variance bằng 1 bắt buộc
+ Đáp án: A
+ Giải thích: Standard PCA thường center data; scaling là tùy dữ liệu.
+Câu 12. Nếu categorical feature có thứ tự thật như 'small < medium < large', có thể cân nhắc:
+ A. Ordinal encoding
+ B. One-hot bắt buộc trong mọi trường hợp
+ C. Drop feature luôn
+ D. PCA trước encoding
+ Đáp án: A
+ Giải thích: Ordinal encoding có thể phản ánh thứ tự; cần cân nhắc assumption của model.
+Câu 13. RMSE khác MAE ở chỗ:
+ A. RMSE phạt lỗi lớn mạnh hơn do bình phương
+ B. MAE luôn lớn hơn RMSE
+ 
+==== PAGE 5 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 5
+C. RMSE không có đơn vị target
+ D. MAE chỉ dùng cho classification
+ Đáp án: A
+ Giải thích: Bình phương residual làm RMSE nhạy hơn với lỗi lớn.
+Câu 14. Khi dự đoán giá nhà tại thời điểm t, dùng giá trung bình của toàn bộ tương lai để tạo feature là:
+ A. Potential target/future leakage
+ B. Luôn feature engineering hợp lệ
+ C. Data augmentation
+ D. Regularization
+ Đáp án: A
+ Giải thích: Future information không có lúc prediction sẽ làm validation/test score giả tạo.
+Câu 15. Một model credit scoring nên được audit vì:
+ A. Sai lệch có thể ảnh hưởng trực tiếp đến quyền lợi tài chính của người dùng
+ B. AI luôn đúng
+ C. Accuracy không liên quan
+ D. Không có data
+ Đáp án: A
+ Giải thích: High-stakes applications cần fairness, explainability, monitoring và governance.
+Câu 16. Epoch là:
+ A. Một lượt model đi qua toàn bộ training dataset
+ B. Một sample
+ C. Một neuron
+ D. Một feature
+ Đáp án: A
+ Giải thích: Một epoch = một full pass qua training data, thường qua nhiều batches.
+Câu 17. Normalization min-max thường đưa dữ liệu về:
+ A. Một khoảng như [0,1] nếu chọn công thức chuẩn
+ B. Mean 0 std 1 bắt buộc
+ C. Binary
+ D. Probability bắt buộc
+ Đáp án: A
+ Giải thích: Min-max scaling thường về [0,1] theo min/max training.
+Câu 18. Vanishing gradients thường gây vấn đề vì:
+ A. Gradient rất nhỏ làm layer trước học cực chậm
+ B. Model luôn overfit
+ C. Accuracy luôn 100%
+ D. Input không có variance
+ Đáp án: A
+ Giải thích: Gradient nhỏ lan ngược khiến early layers cập nhật rất ít.
+Câu 19. Sigmoid có range:
+ A. (0,1)
+ B. (-∞,∞)
+ 
+==== PAGE 6 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 6
+C. [-1,1]
+ D. [0,∞)
+ Đáp án: A
+ Giải thích: Sigmoid 1/(1+e^-x) nằm giữa 0 và 1.
+Câu 20. Test set nên được dùng chủ yếu để:
+ A. Đánh giá cuối cùng sau khi quyết định model
+ B. Tuning hyperparameters liên tục
+ C. Fit scaler
+ D. Impute missing values bằng statistics của test
+ Đáp án: A
+ Giải thích: Test set cần giữ độc lập để ước lượng generalization sau model selection.
+Câu 21. Nếu precision=1 và recall=1 thì F1:
+ A. 0
+ B. 0.5
+ C. 1
+ D. Không xác định
+ Đáp án: C
+ Giải thích: Harmonic mean của 1 và 1 là 1.
+Câu 22. Nếu all predictions đều là negative trong dataset 95% negative, accuracy có thể:
+ A. 95%
+ B. 5%
+ C. 0%
+ D. 100% bắt buộc
+ Đáp án: A
+ Giải thích: 95/100 predictions đúng nếu 95 negative thật.
+Câu 23. Type I error là:
+ A. Fail to reject H0 khi H0 sai
+ B. Reject H0 khi H0 đúng
+ C. False negative
+ D. Luôn nghiêm trọng hơn Type II
+ Đáp án: B
+ Giải thích: Type I = false positive: bác bỏ H0 trong khi H0 đúng.
+Câu 24. Distribution shift có thể xảy ra khi:
+ A. Dữ liệu người dùng sau triển khai khác dữ liệu training
+ B. Training loss giảm
+ C. Batch size cố định
+ D. Model có bias term
+ Đáp án: A
+ Giải thích: Covariate/label/concept shift đều là dạng distribution shift.
+Câu 25. BERT-style masked language modeling học từ:
+ A. Ngữ cảnh hai phía quanh token bị mask trong thiết kế pretraining
+ B. Chỉ token tương lai
+ 
+==== PAGE 7 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 7
+C. Chỉ pixel
+ D. Centroids
+ Đáp án: A
+ Giải thích: MLM dùng context hai phía để dự đoán masked tokens.
+Câu 26. AUC gần 0.5 thường gợi ý:
+ A. Khả năng phân biệt gần random
+ B. Perfect classifier
+ C. Always 100% recall
+ D. Regression perfect
+ Đáp án: A
+ Giải thích: AUC 0.5 gần random ranking; 1.0 là perfect ranking trong diễn giải chuẩn.
+Câu 27. Data augmentation trong image classification có thể gồm:
+ A. Flip/crop/noise
+ B. Thay test labels
+ C. Fit model trên test labels
+ D. Xóa training data
+ Đáp án: A
+ Giải thích: Augmentation tạo biến thể hợp lý của training examples.
+Câu 28. Một hidden layer có 10 units và input dimension 5, chưa tính bias, có bao nhiêu weights nối
+input→hidden?
+ A. 15
+ B. 50
+ C. 5
+ D. 10
+ Đáp án: B
+ Giải thích: Mỗi trong 10 units nhận 5 weights: 10×5=50.
+Câu 29. Softmax thường dùng để:
+ A. Biến logits thành phân phối xác suất qua các class
+ B. Regression liên tục
+ C. Impute missing values
+ D. Tính PCA
+ Đáp án: A
+ Giải thích: Softmax chuẩn hóa logits thành các giá trị dương có tổng bằng 1.
+Câu 30. Calibration của classifier liên quan đến:
+ A. Probability predicted có phù hợp với empirical frequency không
+ B. Accuracy có bằng 100% không
+ C. Feature scaling
+ D. Number of trees
+ Đáp án: A
+ Giải thích: Ví dụ among cases predicted 0.8, khoảng 80% nên thực sự positive nếu calibrated.
+Câu 31. Logistic regression binary thường biến logit thành probability bằng:
+ A. ReLU
+ B. Sigmoid
+ 
+==== PAGE 8 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 8
+C. Softmax bắt buộc
+ D. Tanh
+ Đáp án: B
+ Giải thích: Sigmoid ánh xạ real-valued logit vào (0,1).
+Câu 32. Fairness metric nào quan tâm đến TPR giữa các nhóm?
+ A. Equal opportunity
+ B. Mean squared error
+ C. Silhouette score
+ D. BLEU
+ Đáp án: A
+ Giải thích: Equal opportunity yêu cầu equal TPR giữa protected groups trong formulation chuẩn.
+Câu 33. Phát biểu nào đúng về cosine similarity?
+ A. Chỉ phụ thuộc độ dài vector
+ B. Bằng 1 khi hai vector cùng hướng
+ C. Luôn nằm trong [0,1] với mọi vector thực
+ D. Không thay đổi nếu một vector được nhân với một scalar dương
+ Đáp án: B, D
+ Giải thích: Cosine similarity đo góc giữa hai vector; cùng hướng cho 1 và nhân độ dài bởi scalar dương không đổi góc. Với
+vector thực, nó nằm trong [-1,1].
+Câu 34. Convolutional layer trong CNN dùng:
+ A. Kernel/filter trượt trên input
+ B. Bayes theorem
+ C. Dendrogram
+ D. Confusion matrix
+ Đáp án: A
+ Giải thích: Kernel áp dụng local receptive fields để tạo feature maps.
+Câu 35. Recall cao nghĩa là:
+ A. Bắt được phần lớn actual positives
+ B. False negatives thấp tương đối
+ C. Precision chắc chắn cao
+ D. Accuracy chắc chắn cao
+ Đáp án: A, B
+ Giải thích: Recall=TP/(TP+FN), nên recall cao nghĩa bỏ sót positive ít.
+Câu 36. Time-series split nên ưu tiên:
+ A. Train trên quá khứ, validate/test trên tương lai
+ B. Random shuffle mọi timestamp luôn
+ C. Train trên tương lai để predict quá khứ
+ D. Fit scaler trên future
+ Đáp án: A
+ Giải thích: Temporal forecasting phải tránh future information leakage.
+Câu 37. Out-of-bag samples trong bagging là:
+ A. Samples không được chọn vào bootstrap sample của một learner cụ thể
+ B. Test set công khai
+ 
+==== PAGE 9 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 9
+C. Validation labels
+ D. All duplicate rows
+ Đáp án: A
+ Giải thích: Bootstrap sample không chứa một phần observations; chúng có thể dùng để OOB estimate.
+Câu 38. CLIP học:
+ A. Liên kết representation image và text
+ B. Chỉ bounding boxes
+ C. Chỉ audio
+ D. PCA eigenvectors
+ Đáp án: A
+ Giải thích: CLIP học joint image-text embeddings bằng contrastive objective.
+Câu 39. Masking trong sequence model giúp:
+ A. Model bỏ qua padded positions khi attention/loss phù hợp
+ B. Tăng leakage
+ C. Xóa real tokens
+ D. Thay optimizer
+ Đáp án: A
+ Giải thích: Mask ngăn padding ảnh hưởng đến attention hoặc loss.
+Câu 40. Nested cross-validation hữu ích khi:
+ A. Muốn tách model selection khỏi unbiased performance estimation
+ B. Muốn tăng test leakage
+ C. Chỉ train một lần
+ D. Không có hyperparameters
+ Đáp án: A
+ Giải thích: Outer loop estimate generalization; inner loop tuning.
+Câu 41. Một pipeline đúng khi standardize và split train/test là:
+ A. Split trước, fit scaler trên train, transform train/test bằng scaler đó
+ B. Fit scaler trên test rồi train
+ C. Fit scaler trên toàn bộ data rồi split
+ D. Scale labels bắt buộc
+ Đáp án: A
+ Giải thích: Statistics của preprocessing phải được học từ training data.
+Câu 42. Transfer learning thường hữu ích vì:
+ A. Có thể tận dụng representation đã học từ pretrained model
+ B. Luôn không cần data
+ C. Luôn tránh overfitting hoàn toàn
+ D. Không cần fine-tuning
+ Đáp án: A
+ Giải thích: Pretrained representations có thể giảm data/compute cần thiết cho task mới.
+Câu 43. Pruning decision tree nhằm:
+ A. Giảm complexity/overfitting
+ B. Tăng số leaves vô hạn
+ 
+==== PAGE 10 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 10
+C. Tạo embeddings
+ D. Chuẩn hóa input
+ Đáp án: A
+ Giải thích: Pruning loại bỏ các nhánh ít hữu ích để cải thiện generalization.
+Câu 44. Scaled dot-product attention sử dụng QKᵀ để:
+ A. Đo mức tương tác/similarity giữa queries và keys
+ B. Tạo labels
+ C. Tính PCA
+ D. Tính MSE
+ Đáp án: A
+ Giải thích: QKᵀ tạo score matrix giữa các query và key.
+Câu 45. Mean imputation có thể:
+ A. Làm giảm variance của feature
+ B. Làm thay đổi phân phối
+ C. Luôn tốt hơn median
+ D. Gây leakage nếu mean lấy từ toàn bộ dataset trước split
+ Đáp án: A, B, D
+ Giải thích: Mean imputation thường co dữ liệu về mean và phải fit trên training subset.
+Câu 46. Correlation bằng 0 có nghĩa chắc chắn rằng hai biến độc lập.
+ A. Đúng
+ B. Sai
+ C. Chỉ đúng với biến binary
+ D. Chỉ đúng khi sample lớn
+ Đáp án: B
+ Giải thích: Zero correlation chỉ nói không có quan hệ tuyến tính; hai biến vẫn có thể phụ thuộc phi tuyến.
+Câu 47. Stratified split thường dùng để:
+ A. Giữ gần tỷ lệ class giữa các split
+ B. Giữ mean feature chính xác tuyệt đối
+ C. Tạo clusters
+ D. Scale features
+ Đáp án: A
+ Giải thích: Stratification đặc biệt hữu ích cho classification imbalance.
+Câu 48. Deepfake có thể gây rủi ro:
+ A. Misinformation/impersonation/fraud
+ B. Chỉ giảm latency
+ C. Chỉ tăng accuracy
+ D. Không có ethical impact
+ Đáp án: A
+ Giải thích: Synthetic media có thể bị lạm dụng cho giả mạo và thông tin sai lệch.
+Câu 49. Nếu cả training và validation accuracy đều thấp:
+ A. Có thể underfitting hoặc feature/data problem
+ B. Chắc chắn overfitting
+ 
+==== PAGE 11 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 11
+C. Chắc chắn leakage
+ D. Model hoàn hảo
+ Đáp án: A
+ Giải thích: Low train và validation performance thường gợi ý high bias/underfitting hoặc dữ liệu/model không phù hợp.
+Câu 50. Nếu λ=0 trong L2 regularization:
+ A. Không có penalty L2
+ B. Weights bắt buộc 0
+ C. Model thành K-means
+ D. Loss không thể tính
+ Đáp án: A
+ Giải thích: Penalty λ||w||² biến mất khi λ=0.
+Câu 51. t-SNE chủ yếu được dùng để:
+ A. Visualization/dimensionality reduction
+ B. Regression target prediction
+ C. Data imputation
+ D. Training CNN
+ Đáp án: A
+ Giải thích: t-SNE thường dùng để trực quan hóa cấu trúc local trong dữ liệu nhiều chiều.
+Câu 52. Human-in-the-loop nghĩa là:
+ A. Con người có vai trò giám sát/quyết định hoặc can thiệp phù hợp
+ B. AI không được tự động hóa gì
+ C. Con người chỉ thu thập data
+ D. Model không cần evaluation
+ Đáp án: A
+ Giải thích: Mức human oversight phụ thuộc risk và application.
+Câu 53. Scaling đặc biệt quan trọng với:
+ A. k-NN
+ B. SVM với kernel/distance-based geometry
+ C. Decision tree thuần túy
+ D. Random Forest thuần túy
+ Đáp án: A, B
+ Giải thích: Distance/margin geometry nhạy với scale; tree split dựa threshold từng feature nên không cần standardization
+theo cách k-NN cần.
+Câu 54. Một hệ thống facial recognition được triển khai mà không kiểm tra performance giữa các nhóm. Rủi
+ro chính là:
+ A. Unmeasured subgroup bias/fairness issue
+ B. PCA leakage
+ C. K-means collapse
+ D. Learning rate
+ Đáp án: A
+ Giải thích: Performance aggregate có thể che giấu disparity giữa các subgroup.
+Câu 55. Linear regression thường dự đoán:
+ A. Nhãn liên tục
+ 
+==== PAGE 12 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 12
+B. Class probability bắt buộc
+ C. Cluster ID
+ D. Image patch
+ Đáp án: A
+ Giải thích: Regression thường có target liên tục.
+Câu 56. k-NN là lazy learner vì:
+ A. Hầu hết computation xảy ra lúc prediction
+ B. Không cần lưu training data
+ C. Không bao giờ tính distance
+ D. Luôn có ít parameter
+ Đáp án: A
+ Giải thích: k-NN giữ dữ liệu và tìm neighbors khi dự đoán; không xây một model parametric nặng ở training.
+Câu 57. Accuracy có thể gây hiểu lầm nhất khi:
+ A. Class imbalance nặng
+ B. Classes cân bằng hoàn hảo
+ C. Không có false positives
+ D. Task là regression
+ Đáp án: A
+ Giải thích: Ví dụ 99% class A: model đoán A mọi lúc vẫn accuracy 99%.
+Câu 58. Adversarial example là:
+ A. Input được thay đổi tinh vi để khiến model sai
+ B. Một training example luôn đúng
+ C. Một loại optimizer
+ D. Một clustering method
+ Đáp án: A
+ Giải thích: Adversarial perturbations có thể làm model misclassify dù thay đổi khó nhận biết với người.
+Câu 59. Fairness through unawareness, tức chỉ xóa sensitive attribute, không đủ vì:
+ A. Các proxy variables vẫn có thể chứa thông tin sensitive
+ B. Model không thể train
+ C. Accuracy luôn 0
+ D. PCA bắt buộc
+ Đáp án: A
+ Giải thích: Feature khác có thể encode sensitive attribute.
+Câu 60. Nếu model có high training accuracy và low validation accuracy:
+ A. Có dấu hiệu overfitting
+ B. Có dấu hiệu underfitting chắc chắn
+ C. Data không có labels
+ D. PCA thất bại
+ Đáp án: A
+ Giải thích: Generalization gap lớn thường là dấu hiệu overfitting.
+Câu 61. Stride tăng thường làm:
+ A. Output spatial resolution giảm nếu các yếu tố khác giữ nguyên
+ 
+==== PAGE 13 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 13
+B. Output luôn tăng
+ C. Số class tăng
+ D. Loss bằng 0
+ Đáp án: A
+ Giải thích: Kernel bước lớn hơn lấy mẫu thưa hơn, thường giảm kích thước feature map.
+Câu 62. U-Net thường dùng cho:
+ A. Image segmentation
+ B. Text tokenization
+ C. Audio transcription only
+ D. Clustering
+ Đáp án: A
+ Giải thích: U-Net là kiến trúc encoder-decoder nổi tiếng cho segmentation.
+Câu 63. Trong image patching của Vision Transformer:
+ A. Ảnh được chia thành patches rồi biến thành token-like embeddings
+ B. Ảnh bắt buộc thành audio
+ C. Patches là labels
+ D. Không cần positional information
+ Đáp án: A
+ Giải thích: ViT đưa image patches vào Transformer như token sequence và cần positional information.
+Câu 64. Dropout là:
+ A. Randomly tắt một số units trong training
+ B. Xóa test examples
+ C. Tăng số class
+ D. Một loss function
+ Đáp án: A
+ Giải thích: Dropout là regularization bằng stochastic unit masking khi training.
+Câu 65. Explainability quan trọng đặc biệt khi:
+ A. AI hỗ trợ quyết định high-stakes
+ B. Model chỉ tạo random numbers
+ C. Không ai dùng output
+ D. Task không có người bị ảnh hưởng
+ Đáp án: A
+ Giải thích: High-stakes decisions cần khả năng hiểu, audit và contest output.
+Câu 66. Chain rule đặc biệt quan trọng cho:
+ A. Backpropagation
+ B. One-hot encoding
+ C. Train/test split
+ D. Confusion matrix
+ Đáp án: A
+ Giải thích: Backprop dùng chain rule để tính gradient qua nhiều layer.
+Câu 67. Accountability trong AI nhấn mạnh:
+ A. Có chủ thể chịu trách nhiệm về thiết kế, triển khai và tác động của hệ thống
+ 
+==== PAGE 14 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 14
+B. AI tự chịu trách nhiệm pháp lý
+ C. Không cần audit
+ D. Chỉ cần accuracy
+ Đáp án: A
+ Giải thích: Tổ chức/con người triển khai cần governance và accountability.
+Câu 68. Padding 'same' thường nhằm:
+ A. Giữ spatial size gần/đúng bằng input với stride 1 theo thiết kế
+ B. Xóa channel
+ C. Giảm batch size
+ D. Chuẩn hóa labels
+ Đáp án: A
+ Giải thích: Padding thêm biên để kiểm soát kích thước output.
+Câu 69. K-means nhạy với:
+ A. Initialization và scale/outliers
+ B. Only labels
+ C. Text grammar
+ D. Confusion matrix
+ Đáp án: A
+ Giải thích: Centroid-based Euclidean objective nhạy với initialization, scale và outliers.
+Câu 70. Responsible AI không chỉ tối ưu accuracy vì:
+ A. Tác động xã hội, fairness, privacy, safety và accountability cũng quan trọng
+ B. Accuracy vô dụng
+ C. Models không cần metrics
+ D. AI ethics thay thế ML
+ Đáp án: A
+ Giải thích: Responsible AI cân bằng performance với risk và societal impact.
+Câu 71. Một feature có scale 1–10 và feature khác 0–1. Với k-NN, vấn đề là:
+ A. Feature 1 có thể chi phối distance hơn
+ B. Không bao giờ có vấn đề
+ C. Tree split bị sai
+ D. Target đổi
+ Đáp án: A
+ Giải thích: Distance-based models nhạy với scale.
+Câu 72. Nếu p-value < α, cách kết luận chuẩn là:
+ A. H0 chắc chắn sai
+ B. Reject H0
+ C. H1 chắc chắn đúng
+ D. Data chứng minh causation
+ Đáp án: B
+ Giải thích: Ta bác bỏ H0 theo mức ý nghĩa α; không nói H0 có xác suất bằng p-value.
+Câu 73. AI hallucination là:
+ A. Model tạo nội dung nghe hợp lý nhưng không được hỗ trợ bởi sự thật/data
+ 
+==== PAGE 15 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 15
+B. Model bị overclock
+ C. Dataset bị missing
+ D. Gradient bằng 0
+ Đáp án: A
+ Giải thích: Hallucination là failure mode đặc biệt của generative models.
+Câu 74. Nếu ||x||₂ = 3 thì ||2x||₂ bằng:
+ A. 3
+ B. 5
+ C. 6
+ D. 9
+ Đáp án: C
+ Giải thích: Norm L2 đồng nhất theo scalar: ||cx||₂ = |c| ||x||₂.
+Câu 75. Causal attention mask trong decoder giúp:
+ A. Ngăn vị trí hiện tại attend tới future positions
+ B. Xóa padding luôn
+ C. Chuẩn hóa embeddings
+ D. Tạo class labels
+ Đáp án: A
+ Giải thích: Causal masking bảo đảm autoregressive property.
+Câu 76. Parameter-efficient fine-tuning nhằm:
+ A. Thích nghi model bằng cách update ít parameters hơn
+ B. Tăng dataset size
+ C. Xóa pretrained knowledge
+ D. Bắt buộc train from scratch
+ Đáp án: A
+ Giải thích: PEFT như adapters/LoRA giảm số parameters cần update.
+Câu 77. Boosting thường xây model:
+ A. Tuần tự, model sau tập trung vào lỗi của ensemble hiện tại
+ B. Hoàn toàn độc lập như bagging
+ C. Không dùng weak learners
+ D. Chỉ cho clustering
+ Đáp án: A
+ Giải thích: Boosting tuần tự xây learner để cải thiện ensemble.
+Câu 78. Một model có accuracy cao nhưng probability calibration kém có thể:
+ A. Dự đoán class đúng nhưng confidence không đáng tin
+ B. Luôn overfit
+ C. Không thể predict
+ D. Không có logits
+ Đáp án: A
+ Giải thích: Discrimination và calibration là hai khía cạnh khác nhau.
+Câu 79. Max pooling lấy:
+ A. Giá trị lớn nhất trong local window
+ 
+==== PAGE 16 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 16
+B. Giá trị trung bình toàn dataset
+ C. Gradient lớn nhất
+ D. Class có xác suất lớn nhất
+ Đáp án: A
+ Giải thích: Max pooling là local downsampling bằng max.
+Câu 80. Decision tree có thể chọn split dựa trên:
+ A. Gini impurity
+ B. Entropy/information gain
+ C. Random labels bắt buộc
+ D. Cosine similarity bắt buộc
+ Đáp án: A, B
+ Giải thích: Gini và entropy/information gain là các tiêu chí split phổ biến.
+Câu 81. F1 là:
+ A. Harmonic mean của precision và recall
+ B. Arithmetic mean của accuracy và recall
+ C. Metric chỉ cho regression
+ D. Luôn cao hơn precision
+ Đáp án: A
+ Giải thích: F1 = 2PR/(P+R), cân bằng precision và recall.
+Câu 82. 95% confidence interval không nên được diễn giải đơn giản là:
+ A. Một khoảng được xây bằng procedure có coverage 95% trong repeated sampling
+ B. Có 95% xác suất fixed parameter nằm trong interval cụ thể sau khi quan sát dữ liệu
+ C. Một khoảng ước lượng uncertainty
+ D. Phụ thuộc vào dữ liệu mẫu
+ Đáp án: B
+ Giải thích: Trong frequentist interpretation, parameter được xem là cố định; 95% nói về procedure qua repeated samples.
+Câu 83. Trong regression, RMSE=3 và MAE=2.5 gợi ý:
+ A. Có một số lỗi lớn hơn mức trung bình có thể kéo RMSE lên
+ B. Model perfect
+ C. RMSE luôn nhỏ hơn MAE
+ D. Không thể tính được
+ Đáp án: A
+ Giải thích: RMSE nhạy với large residuals hơn MAE.
+Câu 84. GPT theo kiến trúc phổ biến là:
+ A. Decoder-only autoregressive Transformer
+ B. Encoder-only BERT clone
+ C. CNN
+ D. Decision tree
+ Đáp án: A
+ Giải thích: GPT-style models dùng decoder blocks cho autoregressive next-token prediction.
+Câu 85. Weight decay gần với ý tưởng:
+ A. L2 regularization
+ 
+==== PAGE 17 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 17
+B. L1 sparsity bắt buộc
+ C. Data augmentation
+ D. One-hot encoding
+ Đáp án: A
+ Giải thích: Weight decay penalizes large weights, thường tương ứng/ gần tương đương L2 tùy optimizer.
+Câu 86. Standard deviation bằng:
+ A. Variance bình phương
+ B. Căn bậc hai của variance
+ C. Variance chia mean
+ D. Mean chia variance
+ Đáp án: B
+ Giải thích: σ = √Var(X).
+Câu 87. IQR được tính bằng:
+ A. Q3−Q1
+ B. Q1−Q3
+ C. Max−Min
+ D. Mean−Median
+ Đáp án: A
+ Giải thích: IQR đo độ rộng 50% giữa của dữ liệu.
+Câu 88. Forward-fill phù hợp tự nhiên với:
+ A. Một số time series/sequence có missing theo thời gian
+ B. Random image labels
+ C. Unordered categorical dataset luôn
+ D. Test labels
+ Đáp án: A
+ Giải thích: Forward-fill sử dụng giá trị quan sát trước đó và cần giả định hợp lý về temporal continuity.
+Câu 89. Một model tuyển dụng có accuracy cao nhưng reject một nhóm nhân khẩu học thường xuyên hơn
+không có lý do hợp lệ. Vấn đề chính là:
+ A. Fairness/bias
+ B. Overfitting chắc chắn
+ C. PCA
+ D. Underflow
+ Đáp án: A
+ Giải thích: Hiệu năng tổng thể cao không đảm bảo công bằng giữa các nhóm.
+Câu 90. Một model có bias do label historical discrimination. Đây là:
+ A. Historical/label bias
+ B. Learning rate issue
+ C. PCA issue
+ D. Underflow
+ Đáp án: A
+ Giải thích: Labels phản ánh quyết định lịch sử không công bằng có thể truyền bias vào model.
+Câu 91. ROC curve biểu diễn:
+ A. TPR theo FPR ở nhiều thresholds
+ 
+==== PAGE 18 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 18
+B. Precision theo recall duy nhất một threshold
+ C. MAE theo RMSE
+ D. Loss theo epoch bắt buộc
+ Đáp án: A
+ Giải thích: ROC plots true positive rate vs false positive rate qua thresholds.
+Câu 92. Embedding là:
+ A. Vector representation của token/item/data
+ B. Một loại optimizer
+ C. Một metric
+ D. Một loại missing value
+ Đáp án: A
+ Giải thích: Embedding ánh xạ discrete item/token sang vector liên tục.
+Câu 93. SVM tìm decision boundary với mục tiêu kinh điển:
+ A. Maximize margin
+ B. Minimize number of features về 0
+ C. Maximize training loss
+ D. Luôn dùng neural network
+ Đáp án: A
+ Giải thích: Hard-margin SVM tối đa hóa margin; soft-margin cân bằng margin với violations qua C.
+Câu 94. Adam thuộc nhóm:
+ A. Optimizer
+ B. Loss function
+ C. Activation
+ D. Evaluation metric
+ Đáp án: A
+ Giải thích: Adam là optimizer adaptive, kết hợp ý tưởng momentum và adaptive learning rates.
+Câu 95. Bias cao thường liên quan đến:
+ A. Underfitting
+ B. Model quá đơn giản
+ C. Variance rất cao bắt buộc
+ D. Sai lệch hệ thống của estimator/model
+ Đáp án: A, B, D
+ Giải thích: High bias thường đi với underfitting; bias cũng có nghĩa sai lệch hệ thống.
+Câu 96. Trong regression, MAE=2 nghĩa là:
+ A. Average absolute prediction error là 2 đơn vị target
+ B. R²=2
+ C. MSE=2 bắt buộc
+ D. 2% error
+ Đáp án: A
+ Giải thích: MAE cùng đơn vị với target và là average absolute error.
+Câu 97. ReLU(x) bằng:
+ A. max(0,x)
+ 
+==== PAGE 19 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 19
+B. 1/(1+e^-x)
+ C. tanh(x)
+ D. x²
+ Đáp án: A
+ Giải thích: ReLU giữ phần dương và đưa phần âm về 0.
+Câu 98. Encoder-decoder architecture phù hợp tự nhiên với:
+ A. Machine translation/sequence-to-sequence
+ B. Chỉ binary classification
+ C. Chỉ clustering
+ D. Chỉ PCA
+ Đáp án: A
+ Giải thích: Encoder tạo representation input; decoder sinh output sequence.
+Câu 99. Precision cao nghĩa là:
+ A. Trong các predicted positives, tỷ lệ positives thật cao
+ B. Trong các actual positives, recall cao
+ C. False positives tương đối thấp
+ D. False negatives chắc chắn bằng 0
+ Đáp án: A, C
+ Giải thích: Precision=TP/(TP+FP), nên precision cao liên quan FP thấp tương đối.
+Câu 100. Nếu A và B độc lập thì:
+ A. P(A∩B)=P(A)P(B)
+ B. P(A|B)=P(A)
+ C. P(B|A)=P(B)
+ D. A và B chắc chắn mutually exclusive
+ Đáp án: A, B, C
+ Giải thích: Independence cho phép nhân xác suất và làm conditional probability không đổi. Independent không có nghĩa
+mutually exclusive.
+
+==== PAGE 20 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 20
+MOCK 2 — 100 CÂU / 180 PHÚT
+ Nhóm
+Số câu
+Evaluation
+8
+Đại số tuyến tính
+7
+AI Ethics
+6
+Clustering
+6
+Data Processing
+6
+Neural Networks
+6
+Tối ưu hóa
+6
+Thống kê
+5
+Feature Engineering
+4
+Generative AI
+4
+Model Selection
+4
+AI Safety
+3
+Deep Learning
+3
+Ensemble
+3
+NLP
+3
+Xác suất
+3
+Computer Vision
+2
+Decision Tree
+2
+PCA
+2
+Regularization
+2
+SVM
+2
+Transformers
+2
+Attention
+1
+Audio
+1
+Classical ML
+1
+Cross-Validation
+1
+Data Leakage
+1
+Dimensionality Reduction
+1
+Giải tích
+1
+Learning Paradigms
+1
+Loss
+1
+Optimization
+1
+Regression Metrics
+1
+PHẦN ĐỀ
+Câu 1. Data leakage là:
+ A. Thông tin không hợp lệ từ validation/test/future lọt vào quá trình học
+ B. Missing value
+ C. Outlier
+ 
+==== PAGE 21 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 21
+D. Class imbalance
+ Đáp án: A
+ Giải thích: Leakage làm performance estimate lạc quan và không phản ánh deployment.
+Câu 2. Differential privacy hướng tới:
+ A. Giới hạn ảnh hưởng của một cá nhân lên output/statistics của hệ thống
+ B. Tăng accuracy tuyệt đối
+ C. Xóa mọi noise
+ D. Bảo đảm anonymity tuyệt đối
+ Đáp án: A
+ Giải thích: DP cung cấp guarantee toán học về thay đổi output khi một record được thêm/bớt, thường bằng randomization.
+Câu 3. Một distribution lệch phải thường có:
+ A. Mean > median
+ B. Mean < median luôn
+ C. Long tail về phía giá trị lớn
+ D. Median luôn bằng mode
+ Đáp án: A, C
+ Giải thích: Right-skew thường kéo mean về phía đuôi phải; không có quy tắc bắt buộc về mode.
+Câu 4. Cross-entropy cho binary classification thường phạt mạnh khi:
+ A. Model rất tự tin nhưng sai
+ B. Model đúng và tự tin
+ C. Prediction đúng 0.5
+ D. Không có label
+ Đáp án: A
+ Giải thích: −log(p_true) rất lớn khi p_true gần 0.
+Câu 5. Hyperparameter là:
+ A. Tham số được chọn/tune bên ngoài quá trình fit thông thường
+ B. Luôn là learned weight
+ C. Target label
+ D. Test metric
+ Đáp án: A
+ Giải thích: Ví dụ k, tree depth, learning rate, λ.
+Câu 6. Random search có lợi thế so với grid search khi:
+ A. Chỉ một số hyperparameters thực sự quan trọng và không gian lớn
+ B. Không có hyperparameters
+ C. Luôn cho optimum toàn cầu
+ D. Không cần budget
+ Đáp án: A
+ Giải thích: Random search có thể khám phá các dimensions quan trọng hiệu quả hơn grid khi budget hữu hạn.
+Câu 7. Tokenization làm gì?
+ A. Chia text thành units/token để model xử lý
+ B. Chuẩn hóa ảnh
+ C. Tính covariance
+ 
+==== PAGE 22 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 22
+D. Tạo confusion matrix
+ Đáp án: A
+ Giải thích: Tokenizer biến chuỗi thành token IDs theo vocabulary.
+Câu 8. Trong GAN, generator muốn:
+ A. Tạo sample khiến discriminator tin là real
+ B. Phân loại mọi ảnh đúng 100%
+ C. Tối thiểu hóa accuracy discriminator trực tiếp trong mọi formulation
+ D. Tạo PCA
+ Đáp án: A
+ Giải thích: Generator được train để fool discriminator.
+Câu 9. Nếu TP=80, FP=20 thì precision bằng:
+ A. 0.50
+ B. 0.67
+ C. 0.80
+ D. 0.90
+ Đáp án: C
+ Giải thích: Precision=80/(80+20)=0.8.
+Câu 10. Token vocabulary quá lớn có thể:
+ A. Tăng embedding/output parameter cost
+ B. Luôn tăng accuracy
+ C. Giảm memory bắt buộc
+ D. Xóa need for tokenization
+ Đáp án: A
+ Giải thích: Vocabulary size ảnh hưởng embedding và output projection size.
+Câu 11. Hierarchical clustering thường tạo:
+ A. Dendrogram
+ B. Confusion matrix bắt buộc
+ C. Neural network
+ D. ROC curve
+ Đáp án: A
+ Giải thích: Dendrogram biểu diễn cấu trúc gộp/tách theo ngưỡng khoảng cách.
+Câu 12. K-means cần biết trước:
+ A. Số cluster k
+ B. Số feature bằng 1
+ C. Labels của tất cả data
+ D. Test labels
+ Đáp án: A
+ Giải thích: k là hyperparameter cần chọn trước hoặc bằng model-selection strategy.
+Câu 13. Logistic regression thường dùng cho:
+ A. Classification
+ B. Clustering
+ C. Dimensionality reduction
+ 
+==== PAGE 23 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 23
+D. Image compression
+ Đáp án: A
+ Giải thích: Logistic regression mô hình hóa xác suất lớp qua logistic/sigmoid.
+Câu 14. Threshold classification tăng từ 0.5 lên 0.9 thường có xu hướng:
+ A. Giảm predicted positives
+ B. Có thể giảm recall và tăng precision
+ C. Luôn tăng accuracy
+ D. Không thay đổi predictions
+ Đáp án: A, B
+ Giải thích: Threshold cao hơn khó gán positive: predicted positives giảm; thường precision tăng và recall giảm nhưng không
+đảm bảo mọi dataset.
+Câu 15. Parameter là:
+ A. Giá trị model học từ training data trong fitting
+ B. Luôn do người dùng chọn trước
+ C. Tên của test set
+ D. Một metric
+ Đáp án: A
+ Giải thích: Weights của linear model/neural network là parameters learned from data.
+Câu 16. Cross-validation hữu ích khi:
+ A. Muốn ước lượng performance ổn định hơn khi dữ liệu hạn chế
+ B. Muốn dùng test labels trong training
+ C. Muốn bỏ training set
+ D. Muốn tránh mọi loại leakage tự động
+ Đáp án: A
+ Giải thích: CV tái sử dụng training data qua các folds để estimate model performance; preprocessing vẫn phải nằm trong
+pipeline để tránh leakage.
+Câu 17. Một decision tree quá sâu thường có nguy cơ:
+ A. Overfitting
+ B. Underfitting chắc chắn
+ C. Không thể train
+ D. Không có variance
+ Đáp án: A
+ Giải thích: Tree depth lớn có thể fit noise/training idiosyncrasies.
+Câu 18. ResNet nổi tiếng với:
+ A. Residual/skip connections
+ B. K-means clustering
+ C. Only RNN cells
+ D. Naive Bayes
+ Đáp án: A
+ Giải thích: Residual connections giúp optimization mạng sâu dễ hơn.
+Câu 19. Diffusion model tạo ảnh bằng ý tưởng:
+ A. Học reverse process từ noisy data về clean sample
+ B. Chỉ dùng decision trees
+ 
+==== PAGE 24 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 24
+C. Chỉ copy training images
+ D. Dùng K-means centroid
+ Đáp án: A
+ Giải thích: Diffusion models học denoising/reverse stochastic process để sample dữ liệu.
+Câu 20. ReLU được dùng phổ biến một phần vì:
+ A. Đơn giản và giảm một số vấn đề saturation so với sigmoid ở vùng dương
+ B. Luôn bounded
+ C. Có range (0,1)
+ D. Không có derivative
+ Đáp án: A
+ Giải thích: ReLU không saturate ở phía dương như sigmoid/tanh; vẫn có caveats như dying ReLU.
+Câu 21. Nếu một dataset có duplicate records trong train và test, có thể gây:
+ A. Data leakage/overoptimistic test score
+ B. Fairness tự động
+ C. PCA tốt hơn
+ D. Regularization
+ Đáp án: A
+ Giải thích: Exact duplicates across splits làm test không còn độc lập.
+Câu 22. Random Forest thường kết hợp:
+ A. Bootstrap sampling
+ B. Random subset of features
+ C. Nhiều decision trees
+ D. Sequential error correction như boosting
+ Đáp án: A, B, C
+ Giải thích: Random Forest là ensemble của nhiều trees, thường bootstrap samples và random feature selection; không phải
+boosting.
+Câu 23. DBSCAN có ưu điểm:
+ A. Có thể tìm cluster hình dạng bất kỳ và nhận diện noise
+ B. Luôn cần biết k
+ C. Chỉ tạo cluster hình cầu
+ D. Không dùng density
+ Đáp án: A
+ Giải thích: DBSCAN dựa trên density và có thể gán điểm noise.
+Câu 24. Positional information cần trong Transformer vì:
+ A. Self-attention thuần túy không tự chứa thứ tự token
+ B. Transformer không có weights
+ C. Embedding luôn mất class label
+ D. Không có Q/K/V
+ Đáp án: A
+ Giải thích: Attention có thể xử lý token như set nếu không bổ sung thông tin vị trí.
+Câu 25. PCA chủ yếu tìm các hướng:
+ A. Có variance lớn
+ B. Có covariance với target lớn
+ 
+==== PAGE 25 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 25
+C. Giảm số chiều nhưng giữ nhiều variance nhất có thể
+ D. Luôn tối ưu accuracy classification
+ Đáp án: A, C
+ Giải thích: PCA là unsupervised dimensionality reduction, tìm các principal directions giữ variance lớn nhất.
+Câu 26. Grid search:
+ A. Thử các tổ hợp hyperparameter trong một grid định trước
+ B. Tự động chứng minh causal effect
+ C. Chỉ dùng cho PCA
+ D. Không cần validation
+ Đáp án: A
+ Giải thích: Grid search exhaustively evaluates specified combinations, thường với CV.
+Câu 27. Một perceptron cơ bản tính:
+ A. wᵀx+b rồi qua activation/threshold
+ B. PCA eigenvectors
+ C. Confusion matrix
+ D. K-means centroid bắt buộc
+ Đáp án: A
+ Giải thích: Neuron tính weighted sum cộng bias rồi qua activation.
+Câu 28. Object detection khác image classification ở chỗ detection thường:
+ A. Vừa xác định class vừa localization objects
+ B. Chỉ output một scalar
+ C. Không dùng image
+ D. Không cần training
+ Đáp án: A
+ Giải thích: Detection thường dự đoán bounding boxes + class scores.
+Câu 29. Batch normalization thường:
+ A. Chuẩn hóa activations theo batch và có learnable scale/shift
+ B. Là data augmentation
+ C. Là test metric
+ D. Chỉ dùng cho labels
+ Đáp án: A
+ Giải thích: BatchNorm normalize intermediate activations trong training với learned affine parameters.
+Câu 30. ROC-AUC ít phụ thuộc vào:
+ A. Một threshold cụ thể
+ B. Ranking quality
+ C. TPR/FPR curves
+ D. Class scores
+ Đáp án: A
+ Giải thích: AUC tổng hợp performance qua nhiều thresholds.
+Câu 31. Sliding window feature trong time series có thể:
+ A. Tạo lag/rolling statistics từ các cửa sổ quá khứ
+ B. Dùng future labels vào training bắt buộc
+ 
+==== PAGE 26 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 26
+C. Xóa temporal order
+ D. Chỉ áp dụng cho ảnh
+ Đáp án: A
+ Giải thích: Windowing tạo các đặc trưng cục bộ như rolling mean/std hoặc sequence segments.
+Câu 32. Nếu hai feature có correlation gần +1, điều nào có khả năng xảy ra?
+ A. Chúng có quan hệ tuyến tính mạnh
+ B. Một feature chắc chắn gây ra feature kia
+ C. Có multicollinearity khi cùng đưa vào một số model
+ D. Có thể gây vấn đề cho diễn giải hệ số linear model
+ Đáp án: A, C, D
+ Giải thích: Correlation cao không chứng minh causation, nhưng có thể tạo multicollinearity và làm hệ số linear model khó ổn
+định.
+Câu 33. AdamW khác Adam ở điểm nổi bật:
+ A. Weight decay được tách khỏi adaptive gradient update theo cách decoupled
+ B. Không dùng learning rate
+ C. Không dùng gradient
+ D. Là activation
+ Đáp án: A
+ Giải thích: AdamW decouples weight decay from Adam's adaptive gradient update.
+Câu 34. Một model dùng ZIP code và vô tình tái tạo proxy cho race. Bài học là:
+ A. Loại bỏ sensitive feature không đảm bảo loại bỏ bias
+ B. Proxy variables có thể encode sensitive information
+ C. Chỉ model neural network mới có bias
+ D. Accuracy sẽ phát hiện bias
+ Đáp án: A, B
+ Giải thích: Các feature tương quan với sensitive attributes có thể là proxies; fairness cần đánh giá theo context.
+Câu 35. Nếu feature scales rất khác nhau, PCA có thể bị chi phối bởi:
+ A. Feature có variance/scale lớn
+ B. Feature có mean bằng 0
+ C. Labels
+ D. Test set
+ Đáp án: A
+ Giải thích: PCA maximize variance, nên scale lớn có thể dominate.
+Câu 36. Một objective convex có lợi thế lý thuyết là:
+ A. Local minimum là global minimum nếu tồn tại dưới điều kiện chuẩn
+ B. Không cần dữ liệu
+ C. Luôn có nghiệm duy nhất
+ D. Không cần optimization
+ Đáp án: A
+ Giải thích: Với convex objective, mọi local minimum là global minimum; uniqueness cần thêm strict convexity/điều kiện
+khác.
+Câu 37. Softmax trong attention chủ yếu:
+ A. Biến attention scores thành weights có tổng 1 theo chiều chuẩn hóa
+ 
+==== PAGE 27 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 27
+B. Xóa tất cả negative values bằng ReLU
+ C. Giảm dimension về 2
+ D. Tạo embedding từ scratch
+ Đáp án: A
+ Giải thích: Softmax tạo phân phối attention weights.
+Câu 38. Robustness trong AI đề cập gần nhất đến:
+ A. Khả năng duy trì performance khi input bị nhiễu/perturbation hợp lý
+ B. Model có nhiều parameters
+ C. Data có nhiều columns
+ D. Training lâu
+ Đáp án: A
+ Giải thích: Robust model ít nhạy với các thay đổi/nhiễu phù hợp.
+Câu 39. UMAP thường được dùng cho:
+ A. Nonlinear dimensionality reduction/visualization
+ B. Only linear regression
+ C. Label encoding bắt buộc
+ D. Confusion matrix
+ Đáp án: A
+ Giải thích: UMAP là phương pháp nonlinear manifold learning.
+Câu 40. Mini-batch gradient descent thường là:
+ A. Dùng toàn bộ dataset mỗi bước
+ B. Dùng một subset nhỏ mỗi bước
+ C. Không có hyperparameter
+ D. Chỉ dùng cho linear regression
+ Đáp án: B
+ Giải thích: Mini-batch là cách phổ biến trong deep learning.
+Câu 41. BERT nổi bật là:
+ A. Pre-trained bidirectional/encoder-style language model
+ B. Decoder-only autoregressive model
+ C. CNN image classifier
+ D. K-means variant
+ Đáp án: A
+ Giải thích: BERT dùng Transformer encoder và pretraining hai chiều theo thiết kế gốc.
+Câu 42. Nếu validation set nhỏ, CV có thể:
+ A. Giảm variance của performance estimate so với một split duy nhất
+ B. Tạo thêm test labels
+ C. Loại bỏ mọi bias
+ D. Đảm bảo causal inference
+ Đáp án: A
+ Giải thích: CV dùng nhiều validation folds, thường cho estimate ổn định hơn một split đơn.
+Câu 43. Trong self-attention, Q, K, V lần lượt là:
+ A. Query, Key, Value
+ 
+==== PAGE 28 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 28
+B. Quick, Kernel, Vector
+ C. Query, Kernel, Variance
+ D. Queue, Key, Vector
+ Đáp án: A
+ Giải thích: Đây là ba ma trận chuẩn của attention.
+Câu 44. Data minimization nghĩa là:
+ A. Chỉ thu thập dữ liệu cần thiết cho mục đích hợp lệ
+ B. Thu thập càng nhiều càng tốt
+ C. Xóa training labels
+ D. Luôn anonymize bằng cách đổi tên
+ Đáp án: A
+ Giải thích: Data minimization giảm dữ liệu không cần thiết và rủi ro privacy.
+Câu 45. Kernel trick cho phép SVM:
+ A. Tính inner product trong feature space ngầm mà không nhất thiết tạo feature vector tường minh
+ B. Luôn giảm số training examples
+ C. Loại bỏ cần chọn C
+ D. Chỉ chạy trên text
+ Đáp án: A
+ Giải thích: Kernel cung cấp similarity/inner product tương ứng với một feature mapping.
+Câu 46. Nếu feature 'city' có 20 giá trị nominal, one-hot encoding cơ bản tạo khoảng:
+ A. 20 binary columns (hoặc 19 nếu drop-first)
+ B. 1 continuous column bắt buộc
+ C. 20 target labels
+ D. 400 columns luôn
+ Đáp án: A
+ Giải thích: One-hot thường tạo một indicator cho mỗi category; drop-first có thể bỏ một cột để tránh redundancy trong
+linear model.
+Câu 47. Regularization parameter λ tăng mạnh thường:
+ A. Phạt complexity mạnh hơn
+ B. Luôn tăng training accuracy
+ C. Luôn giảm bias
+ D. Xóa test set
+ Đáp án: A
+ Giải thích: Penalty lớn ép parameters nhỏ hơn; quá lớn có thể underfit.
+Câu 48. Một test bệnh có sensitivity 90%, nhưng bệnh chỉ có prevalence 1%. Điều nào cần chú ý?
+ A. PPV có thể thấp dù sensitivity cao
+ B. P(test+|disease)=0.90
+ C. Một positive test không tự động nghĩa là xác suất mắc bệnh 90%
+ D. Cần base rate để tính xác suất hậu nghiệm
+ Đáp án: A, B, C, D
+ Giải thích: Đây là base-rate effect: xác suất hậu nghiệm cần cả prevalence và đặc tính test.
+Câu 49. Backpropagation làm gì?
+ A. Tính gradients của loss đối với parameters
+ 
+==== PAGE 29 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 29
+B. Chọn test set
+ C. Tạo labels
+ D. Chuẩn hóa image
+ Đáp án: A
+ Giải thích: Backprop truyền gradient ngược qua computational graph.
+Câu 50. Temperature trong softmax cao hơn thường:
+ A. Làm distribution mềm/đều hơn
+ B. Làm một class chắc chắn 1
+ C. Xóa logits
+ D. Tạo labels
+ Đáp án: A
+ Giải thích: Higher temperature flattens softmax; lower temperature sharpens it.
+Câu 51. One-hot encoding phù hợp với:
+ A. Categorical nominal variables
+ B. Một feature continuous bắt buộc
+ C. Labels test
+ D. Image pixels only
+ Đáp án: A
+ Giải thích: One-hot biến mỗi category thành indicator, không áp thứ tự giả.
+Câu 52. Nếu learning rate quá lớn, điều gì có thể xảy ra?
+ A. Hội tụ chậm nhưng luôn ổn định
+ B. Overshoot/divergence
+ C. Gradient bằng 0 ngay
+ D. Loss chắc chắn giảm ở mọi bước
+ Đáp án: B
+ Giải thích: Step quá lớn có thể vượt qua vùng optimum hoặc làm quá trình không ổn định.
+Câu 53. Whisper là:
+ A. Một mô hình speech recognition đa ngôn ngữ nổi tiếng
+ B. Optimizer
+ C. Image segmentation model
+ D. Clustering algorithm
+ Đáp án: A
+ Giải thích: Whisper là ASR model của OpenAI, nhận audio và sinh text.
+Câu 54. Eigenvector v của A với eigenvalue λ thỏa mãn:
+ A. Av=v+λ
+ B. Av=λv
+ C. A+v=λ
+ D. A⁻¹v=λv luôn đúng
+ Đáp án: B
+ Giải thích: Định nghĩa eigenvector/eigenvalue là Av = λv.
+Câu 55. Pseudonymization khác anonymization vì:
+ A. Pseudonymized data vẫn có thể liên kết lại nếu có thông tin bổ sung
+ 
+==== PAGE 30 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 30
+B. Pseudonymization luôn tuyệt đối anonymous
+ C. Anonymization luôn reversible
+ D. Không có khác biệt
+ Đáp án: A
+ Giải thích: Pseudonymization thay identifiers nhưng linkage có thể vẫn khả thi.
+Câu 56. Ma trận covariance đối xứng vì:
+ A. Cov(X,Y)=Cov(Y,X)
+ B. Mọi matrix đều đối xứng
+ C. Variance luôn bằng 0
+ D. Covariance matrix chỉ có diagonal
+ Đáp án: A
+ Giải thích: Cov(X,Y)=Cov(Y,X), nên covariance matrix là symmetric.
+Câu 57. Điều nào đúng về L1 regularization?
+ A. Phạt tổng bình phương trọng số
+ B. Có xu hướng tạo trọng số bằng 0
+ C. Luôn làm tất cả trọng số bằng 0
+ D. Dùng |w_i| trong penalty
+ Đáp án: B, D
+ Giải thích: L1 dùng tổng |w_i| và thường tạo nghiệm sparse, tức một số trọng số đúng bằng 0.
+Câu 58. Nếu P(A)=0.7 thì P(Aᶜ) bằng:
+ A. 0.1
+ B. 0.3
+ C. 0.7
+ D. 1.7
+ Đáp án: B
+ Giải thích: P(Aᶜ)=1-P(A).
+Câu 59. Central Limit Theorem chủ yếu nói về:
+ A. Phân phối của sample mean khi sample đủ lớn có xu hướng gần normal
+ B. Mọi dữ liệu gốc đều trở thành normal
+ C. Mọi model đều unbiased
+ D. Median luôn bằng mean
+ Đáp án: A
+ Giải thích: CLT liên quan đến sampling distribution của tổng/mean, dưới các điều kiện phù hợp.
+Câu 60. Self-supervised learning thường:
+ A. Tạo supervision signal từ chính dữ liệu
+ B. Không có objective
+ C. Luôn cần human labels
+ D. Chỉ dùng cho regression
+ Đáp án: A
+ Giải thích: Ví dụ masked-token prediction và contrastive learning tạo targets từ data.
+Câu 61. Nếu E[X]=4 và E[X²]=25 thì Var(X) bằng:
+ A. 9
+ 
+==== PAGE 31 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 31
+B. 16
+ C. 21
+ D. 29
+ Đáp án: A
+ Giải thích: Var(X)=E[X²]−E[X]²=25−16=9.
+Câu 62. Fine-tuning toàn bộ pretrained model nghĩa là:
+ A. Update parameters của model pretrained trên task mới
+ B. Đóng băng mọi parameter
+ C. Chỉ train tokenizer
+ D. Chỉ đổi test set
+ Đáp án: A
+ Giải thích: Full fine-tuning updates most/all model parameters.
+Câu 63. Spectral clustering dựa nhiều vào:
+ A. Graph/Laplacian representation
+ B. Gradient của neural network bắt buộc
+ C. Decision stump
+ D. Bayes theorem bắt buộc
+ Đáp án: A
+ Giải thích: Spectral clustering dùng graph affinity và eigenvectors của graph Laplacian.
+Câu 64. Công thức Bayes đúng là:
+ A. P(A|B)=P(B|A)P(A)/P(B)
+ B. P(A|B)=P(A)P(B)
+ C. P(A|B)=P(A∩B)/P(A)
+ D. P(A|B)=P(B|A)
+ Đáp án: A
+ Giải thích: Bayes đổi chiều conditional probability bằng cách nhân likelihood với prior rồi chia evidence.
+Câu 65. Một model y tế được triển khai mà không có monitoring. Rủi ro là:
+ A. Drift/failure có thể không được phát hiện
+ B. Accuracy tự tăng
+ C. Bias tự biến mất
+ D. Test set tự cập nhật
+ Đáp án: A
+ Giải thích: Monitoring giúp phát hiện drift, data quality issues và performance degradation.
+Câu 66. R² âm trên test set có thể xảy ra khi:
+ A. Model tệ hơn baseline dự đoán mean theo định nghĩa R²
+ B. Model luôn perfect
+ C. MSE bằng 0
+ D. Không có test data
+ Đáp án: A
+ Giải thích: R²=1−SSres/SStot; SSres>SStot làm R² âm.
+Câu 67. Early stopping giúp:
+ A. Dừng training khi validation performance ngừng cải thiện
+ 
+==== PAGE 32 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 32
+B. Tăng epochs vô hạn
+ C. Loại test set
+ D. Bắt buộc tăng model size
+ Đáp án: A
+ Giải thích: Theo dõi validation metric để ngăn overfitting.
+Câu 68. Nếu một model output logits [2,1,0] cho 3 classes, class có probability lớn nhất là:
+ A. Class 1 tương ứng logit 2
+ B. Class 2 tương ứng logit 1
+ C. Class 3 tương ứng logit 0
+ D. Không thể biết
+ Đáp án: A
+ Giải thích: Softmax đơn điệu theo logits nên argmax(logits)=argmax(probabilities).
+Câu 69. Một vector cột có shape (5, 1). Dot product của nó với một vector shape (5, 1) cho kết quả có shape
+nào?
+ A. (5, 1)
+ B. (1, 5)
+ C. (1, 1)
+ D. (5, 5)
+ Đáp án: C
+ Giải thích: Dot product giữa hai vector cùng chiều cho một scalar, có thể biểu diễn như ma trận (1,1).
+Câu 70. Nếu fit StandardScaler trên toàn bộ dataset trước khi cross-validation:
+ A. Có thể gây leakage
+ B. Luôn đúng
+ C. Validation folds ảnh hưởng statistics của scaler
+ D. Có thể làm score lạc quan
+ Đáp án: A, C, D
+ Giải thích: Scaler phải fit riêng trong từng training fold; nếu fit toàn bộ data, validation information lọt vào preprocessing.
+Câu 71. Mean imputation phù hợp hơn median khi:
+ A. Distribution tương đối đối xứng và không có outlier mạnh
+ B. Luôn luôn
+ C. Feature categorical nominal
+ D. Target bị thiếu
+ Đáp án: A
+ Giải thích: Median thường robust hơn khi skew/outliers; mean hợp lý khi distribution phù hợp.
+Câu 72. Random feature selection trong Random Forest giúp:
+ A. Làm trees bớt correlated
+ B. Đảm bảo mọi tree giống nhau
+ C. Loại bỏ bootstrap
+ D. Tạo labels
+ Đáp án: A
+ Giải thích: Decorrelating trees làm averaging hiệu quả hơn.
+Câu 73. Nếu layer có 20 input units và 3 output units, tính cả bias, số parameters là:
+ A. 60
+ 
+==== PAGE 33 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 33
+B. 63
+ C. 23
+ D. 80
+ Đáp án: B
+ Giải thích: Weights=20×3=60; bias=3; tổng 63.
+Câu 74. K-means tối ưu trực tiếp mục tiêu gần với:
+ A. Tổng squared distance từ điểm tới centroid của cluster
+ B. Cross entropy của classifier
+ C. Margin SVM
+ D. Reconstruction error của autoencoder
+ Đáp án: A
+ Giải thích: K-means minimize within-cluster sum of squared distances.
+Câu 75. Tanh có range:
+ A. (-1,1)
+ B. (0,1)
+ C. [0,∞)
+ D. (-∞,∞)
+ Đáp án: A
+ Giải thích: Tanh là hàm sigmoid-like zero-centered với range (-1,1).
+Câu 76. Gradient descent cập nhật θ theo:
+ A. θ←θ+η∇L
+ B. θ←θ−η∇L
+ C. θ←η/∇L
+ D. θ←θ−L
+ Đáp án: B
+ Giải thích: Ta đi ngược gradient để giảm loss.
+Câu 77. Bagging chủ yếu nhằm:
+ A. Giảm variance
+ B. Tăng variance
+ C. Tạo label mới
+ D. Bắt buộc giảm bias
+ Đáp án: A
+ Giải thích: Averaging many decorrelated learners chủ yếu giảm variance.
+Câu 78. Entropy của node bằng 0 khi:
+ A. Node hoàn toàn pure về class
+ B. Các class cân bằng hoàn hảo
+ C. Có vô hạn class
+ D. Không có sample
+ Đáp án: A
+ Giải thích: Entropy bằng 0 khi một class có xác suất 1.
+Câu 79. Distribution shift là:
+ A. Phân phối dữ liệu deployment khác đáng kể phân phối training
+ 
+==== PAGE 34 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 34
+B. Model có ít layers
+ C. Learning rate giảm
+ D. Labels luôn đúng
+ Đáp án: A
+ Giải thích: Shift có thể làm generalization suy giảm sau deployment.
+Câu 80. Nếu learning rate quá nhỏ:
+ A. Training có thể rất chậm
+ B. Có thể cần nhiều iterations
+ C. Luôn overfit
+ D. Không thể tính gradient
+ Đáp án: A, B
+ Giải thích: Step nhỏ làm convergence chậm; không đồng nghĩa với overfitting.
+Câu 81. Support vectors là:
+ A. Các điểm quyết định/ảnh hưởng mạnh đến boundary
+ B. Mọi training point
+ C. Chỉ các outlier
+ D. Các hidden units
+ Đáp án: A
+ Giải thích: Trong SVM, support vectors nằm sát hoặc vi phạm margin và xác định hyperplane.
+Câu 82. GAN gồm hai mạng chính:
+ A. Generator và discriminator
+ B. Encoder và tokenizer
+ C. Tree và forest
+ D. Query và key
+ Đáp án: A
+ Giải thích: Generator tạo samples; discriminator phân biệt real/fake trong GAN cổ điển.
+Câu 83. Với A có shape (3, 4) và B có shape (4, 2), shape của AB là:
+ A. (3,2)
+ B. (4,3)
+ C. (4,2)
+ D. (3,4)
+ Đáp án: A
+ Giải thích: Trong (m×n)(n×p), hai kích thước trong phải bằng nhau và kết quả là (m×p).
+Câu 84. Feature selection có thể giúp:
+ A. Giảm noise/redundancy và complexity
+ B. Đảm bảo causal inference
+ C. Đảm bảo accuracy tăng mọi dataset
+ D. Tạo thêm labels
+ Đáp án: A
+ Giải thích: Feature selection có thể cải thiện generalization/interpretability nhưng không đảm bảo score tăng.
+Câu 85. Group-aware splitting hữu ích khi:
+ A. Samples cùng người/device/group có thể tương quan
+ 
+==== PAGE 35 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 35
+B. Mỗi row hoàn toàn độc lập chắc chắn
+ C. Chỉ có một row
+ D. Không có groups
+ Đáp án: A
+ Giải thích: Giữ group không bị chia cả train và validation giúp tránh memorization leakage.
+Câu 86. Derivative của f(x)=x² tại x=3 là:
+ A. 3
+ B. 6
+ C. 9
+ D. 12
+ Đáp án: B
+ Giải thích: f'(x)=2x nên f'(3)=6.
+Câu 87. Trong binary classification, confusion matrix có bao nhiêu ô cơ bản?
+ A. 2
+ B. 3
+ C. 4
+ D. 8
+ Đáp án: C
+ Giải thích: Có TP, TN, FP, FN.
+Câu 88. Correlation giữa sensitive attribute và prediction không tự nó chứng minh:
+ A. Causation
+ B. Existence of correlation
+ C. Need for analysis
+ D. Potential association
+ Đáp án: A
+ Giải thích: Correlation không chứng minh causal relationship.
+Câu 89. SGD khác full-batch gradient descent ở chỗ:
+ A. SGD dùng một sample hoặc batch rất nhỏ cho update
+ B. SGD không dùng gradient
+ C. SGD luôn hội tụ tới global optimum
+ D. Full-batch dùng toàn bộ training set cho mỗi update
+ Đáp án: A, D
+ Giải thích: SGD dùng stochastic/small batches; full-batch tính gradient trên toàn bộ training data mỗi bước.
+Câu 90. Missing value và outlier:
+ A. Là hai vấn đề khác nhau
+ B. Luôn phải xử lý giống nhau
+ C. Missing value không phải outlier
+ D. Outlier luôn là lỗi dữ liệu
+ Đáp án: A, C
+ Giải thích: Missing là giá trị không có; outlier là quan sát cực trị/khác biệt. Outlier có thể là dữ liệu hợp lệ.
+Câu 91. Variance cao trong ML thường liên quan đến:
+ A. Overfitting
+ 
+==== PAGE 36 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 36
+B. Model quá nhạy với training sample
+ C. Generalization kém
+ D. Luôn do dữ liệu có variance thấp
+ Đáp án: A, B, C
+ Giải thích: High variance nghĩa prediction/model fit thay đổi mạnh theo training sample, thường dẫn tới overfitting.
+Câu 92. PR-AUC thường hữu ích đặc biệt khi:
+ A. Positive class hiếm và quan tâm precision/recall
+ B. Regression
+ C. Không có labels
+ D. Chỉ có continuous target
+ Đáp án: A
+ Giải thích: Precision-recall curve tập trung vào positive class và thường informative hơn ROC trong severe imbalance.
+Câu 93. Nếu TP=80, FN=20 thì recall bằng:
+ A. 0.50
+ B. 0.67
+ C. 0.80
+ D. 0.90
+ Đáp án: C
+ Giải thích: Recall=80/(80+20)=0.8.
+Câu 94. Transparency khác explainability ở chỗ:
+ A. Transparency rộng hơn về data/model/process; explainability tập trung giải thích outputs/behavior
+ B. Hai khái niệm luôn trái nghĩa
+ C. Transparency chỉ là accuracy
+ D. Explainability chỉ là privacy
+ Đáp án: A
+ Giải thích: Explainability là một phần/khía cạnh của transparency trong nhiều framework.
+Câu 95. PCA là linear dimensionality reduction vì:
+ A. Principal components là linear combinations của input features
+ B. Nó luôn dùng neural network
+ C. Nó chỉ xử lý categorical data
+ D. Nó cần labels
+ Đáp án: A
+ Giải thích: Components là tuyến tính theo input.
+Câu 96. Trong K-means, centroid mới thường được cập nhật bằng:
+ A. Mean của points được gán vào cluster
+ B. Median của toàn dataset
+ C. Gradient của classifier
+ D. Mode của labels
+ Đáp án: A
+ Giải thích: Lloyd's algorithm cập nhật centroid bằng mean.
+Câu 97. Standardization thường tạo feature có:
+ A. Mean gần 0 và std gần 1 trên tập fit
+ 
+==== PAGE 37 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 37
+B. Min=0 max=1 luôn
+ C. Median=0 bắt buộc
+ D. Integer values
+ Đáp án: A
+ Giải thích: z=(x−mean)/std; min/max không cố định.
+Câu 98. Theo quy tắc 1.5×IQR, một điểm có thể được xem là outlier nếu:
+ A. x<Q1−1.5IQR
+ B. x>Q3+1.5IQR
+ C. x=mean
+ D. x=median
+ Đáp án: A, B
+ Giải thích: Đây là quy tắc boxplot phổ biến để flag potential outliers.
+Câu 99. Batch size tăng thường làm:
+ A. Mỗi update dùng nhiều examples hơn
+ B. Luôn làm accuracy tăng
+ C. Không ảnh hưởng memory
+ D. Biến SGD thành PCA
+ Đáp án: A
+ Giải thích: Larger batch cần nhiều memory và mỗi update dùng nhiều samples.
+Câu 100. Validation set dùng để:
+ A. Chọn model/hyperparameters
+ B. Fit final answer label của test
+ C. Thay thế training set hoàn toàn
+ D. Tạo leakage
+ Đáp án: A
+ Giải thích: Validation hỗ trợ model selection và tuning.
+
+==== PAGE 38 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 38
+ĐÁP ÁN NHANH
+Mock 1
+1:1 ABC
+1:2 A
+1:3 B
+1:4 BD
+1:5 A
+1:6 A
+1:7 A
+1:8 A
+1:9 A
+1:10 A
+1:11 A
+1:12 A
+1:13 A
+1:14 A
+1:15 A
+1:16 A
+1:17 A
+1:18 A
+1:19 A
+1:20 A
+1:21 C
+1:22 A
+1:23 B
+1:24 A
+1:25 A
+1:26 A
+1:27 A
+1:28 B
+1:29 A
+1:30 A
+1:31 B
+1:32 A
+1:33 BD
+1:34 A
+1:35 AB
+1:36 A
+1:37 A
+1:38 A
+1:39 A
+1:40 A
+1:41 A
+1:42 A
+1:43 A
+1:44 A
+1:45 ABD
+1:46 B
+1:47 A
+1:48 A
+1:49 A
+1:50 A
+1:51 A
+1:52 A
+1:53 AB
+1:54 A
+1:55 A
+1:56 A
+1:57 A
+1:58 A
+1:59 A
+1:60 A
+1:61 A
+1:62 A
+1:63 A
+1:64 A
+1:65 A
+1:66 A
+1:67 A
+1:68 A
+1:69 A
+1:70 A
+1:71 A
+1:72 B
+1:73 A
+1:74 C
+1:75 A
+1:76 A
+1:77 A
+1:78 A
+1:79 A
+1:80 AB
+1:81 A
+1:82 B
+1:83 A
+1:84 A
+1:85 A
+1:86 B
+1:87 A
+1:88 A
+1:89 A
+1:90 A
+1:91 A
+1:92 A
+1:93 A
+1:94 A
+1:95 ABD
+1:96 A
+1:97 A
+1:98 A
+1:99 AC
+1:100 ABC
+Mock 2
+2:1 A
+2:2 A
+2:3 AC
+2:4 A
+2:5 A
+2:6 A
+2:7 A
+2:8 A
+2:9 C
+2:10 A
+2:11 A
+2:12 A
+2:13 A
+2:14 AB
+2:15 A
+2:16 A
+2:17 A
+2:18 A
+2:19 A
+2:20 A
+2:21 A
+2:22 ABC
+2:23 A
+2:24 A
+2:25 AC
+2:26 A
+2:27 A
+2:28 A
+2:29 A
+2:30 A
+2:31 A
+2:32 ACD
+2:33 A
+2:34 AB
+2:35 A
+2:36 A
+2:37 A
+2:38 A
+2:39 A
+2:40 B
+2:41 A
+2:42 A
+2:43 A
+2:44 A
+2:45 A
+2:46 A
+2:47 A
+2:48 ABCD
+2:49 A
+2:50 A
+2:51 A
+2:52 B
+2:53 A
+2:54 B
+2:55 A
+2:56 A
+2:57 BD
+2:58 B
+2:59 A
+2:60 A
+2:61 A
+2:62 A
+2:63 A
+2:64 A
+2:65 A
+2:66 A
+2:67 A
+2:68 A
+2:69 C
+2:70 ACD
+2:71 A
+2:72 A
+2:73 B
+2:74 A
+2:75 A
+2:76 B
+2:77 A
+2:78 A
+2:79 A
+2:80 AB
+2:81 A
+2:82 A
+2:83 A
+2:84 A
+2:85 A
+2:86 B
+2:87 C
+2:88 A
+2:89 AD
+2:90 AC
+2:91 ABC
+2:92 A
+2:93 C
+2:94 A
+2:95 A
+2:96 A
+2:97 A
+2:98 AB
+2:99 A
+2:100 A
+
+==== PAGE 39 ====
+VAIO 2026 — Targeted Mock Bank
+Trang 39
+MAP KIẾN THỨC & CHIẾN LƯỢC ÔN VAIO
+Tier 1 — phải cực chắc: probability/Bayes, mean-variance-covariance-correlation, vector/matrix/norm,
+derivative/gradient/chain rule, train-validation-test, cross-validation, leakage, metrics, overfitting/underfitting,
+regularization, linear/logistic regression, k-NN, trees, Random Forest/boosting, K-means/PCA,
+perceptron/backprop/activation/loss.
+Tier 2: SVM, DBSCAN/hierarchical/spectral clustering, t-SNE/UMAP, embeddings, attention/Transformer,
+CNN/pooling, autoencoder, transfer learning, calibration/uncertainty.
+Tier 3: object detection, U-Net, CLIP, diffusion, BERT/GPT, encoder-decoder, audio models. Với VAIO Vòng 1, nên
+nắm conceptual và nhận diện đúng phương pháp; không cần đào sâu như một đề practical IOAI.
+AI Ethics: fairness/bias, privacy, PII, data minimization, anonymization vs pseudonymization, explainability,
+accountability, human oversight, robustness, distribution shift, hallucination/deepfake và responsible AI.
+Nguồn tham khảo chính thức: VAIO 2026 Vòng 1 và IOAI 2026 syllabus. VOAI 2025 được dùng như nguồn tham
+khảo về phong cách/phạm vi của kỳ thi Việt Nam, không coi là syllabus VAIO 2026.
