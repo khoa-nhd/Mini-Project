@@ -1,6 +1,6 @@
 import json
 
-data = json.load(open(r'D:\DangKhoa\project\mini\interactivequiz\questions.json', encoding='utf-8'))
+data = json.load(open(r'D:\DangKhoa\project\mini\Mini-Project\interactivequiz\questions.json', encoding='utf-8'))
 data_js = json.dumps(data, ensure_ascii=False)
 
 template = r'''<!DOCTYPE html>
@@ -75,11 +75,13 @@ let state = loadState() || {
   selected:[],
   submitted:false,
   results:[],
+  drafts:[],
   startTime:null,
   elapsed:0,
   timerEnabled:true
 };
 if(state.timerEnabled===undefined) state.timerEnabled=true;
+if(!state.drafts) state.drafts=[];
 let timerHandle=null;
 
 function saveState(){ try{localStorage.setItem('quiz_state_v1', JSON.stringify(state));}catch(e){} }
@@ -157,10 +159,10 @@ function homeHTML(){
 }
 
 function resumeQuiz(){ render(); }
-function discardSaved(){ clearState(); state={screen:'home',mock:null,index:0,selected:[],submitted:false,results:[],startTime:null,elapsed:0,timerEnabled:(state&&state.timerEnabled!==undefined)?state.timerEnabled:true}; render(); }
+function discardSaved(){ clearState(); state={screen:'home',mock:null,index:0,selected:[],submitted:false,results:[],drafts:[],startTime:null,elapsed:0,timerEnabled:(state&&state.timerEnabled!==undefined)?state.timerEnabled:true}; render(); }
 
 function startMock(mock){
-  state={screen:'quiz',mock, index:0, selected:[], submitted:false, results:[], startTime:Date.now(), elapsed:0, timerEnabled:(state&&state.timerEnabled!==undefined)?state.timerEnabled:true};
+  state={screen:'quiz',mock, index:0, selected:[], submitted:false, results:[], drafts:[], startTime:Date.now(), elapsed:0, timerEnabled:(state&&state.timerEnabled!==undefined)?state.timerEnabled:true};
   saveState(); render();
 }
 
@@ -202,7 +204,8 @@ function quizHTML(){
     ${multi?'<div style="color:var(--muted);font-size:13px;margin-bottom:8px">Chọn một hoặc nhiều đáp án.</div>':''}
     <div id="opts">${optionsHTML}</div>
     <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
-      ${!isSubmitted?`<button class="btn btn-primary" onclick="submitAnswer()">Kiểm tra</button>`:`<button class="btn btn-primary" onclick="nextQuestion()">${state.index+1<total?'Câu tiếp theo':'Xem kết quả'}</button>`}
+      <button class="btn btn-ghost" onclick="prevQuestion()" ${state.index===0?'disabled':''}>← Câu trước</button>
+      ${!isSubmitted?`<button class="btn btn-primary" onclick="submitAnswer()">Kiểm tra</button>`:`<button class="btn btn-primary" onclick="nextQuestion()">${state.index+1<total?'Câu tiếp theo →':'Xem kết quả'}</button>`}
       <button class="btn btn-ghost" onclick="goHome()">Trang chủ</button>
     </div>
     ${feedbackHTML}
@@ -221,19 +224,39 @@ function onSelect(letter, checked, multi){
   saveState();
 }
 
+function saveDraft(){ state.drafts[state.index]=[...state.selected]; }
+
+function restoreQuestion(){
+  const r=state.results[state.index];
+  if(r){ state.selected=[...r.selected]; state.submitted=true; }
+  else { state.selected=state.drafts[state.index]?[...state.drafts[state.index]]:[]; state.submitted=false; }
+}
+
 function submitAnswer(){
   if(state.selected.length===0){ alert('Vui lòng chọn ít nhất một đáp án.'); return; }
   const q=currentQ();
   const ok=arraysEqual([...state.selected].sort(), [...q.answer].sort());
   state.results[state.index]={selected:[...state.selected], correct:ok};
+  state.drafts[state.index]=[...state.selected];
   state.submitted=true;
+  saveState(); render();
+}
+
+function prevQuestion(){
+  if(state.index<=0) return;
+  saveDraft();
+  state.index--;
+  restoreQuestion();
   saveState(); render();
 }
 
 function nextQuestion(){
   const total=qs(state.mock).length;
+  saveDraft();
   if(state.index+1<total){
-    state.index++; state.selected=[]; state.submitted=false; saveState(); render();
+    state.index++;
+    restoreQuestion();
+    saveState(); render();
   } else {
     state.screen='finish'; saveState(); render();
   }
@@ -261,11 +284,11 @@ function finishHTML(){
 
 function retryMock(){
   const m=state.mock;
-  state={screen:'quiz',mock:m,index:0,selected:[],submitted:false,results:[],startTime:Date.now(),elapsed:0,timerEnabled:(state&&state.timerEnabled!==undefined)?state.timerEnabled:true};
+  state={screen:'quiz',mock:m,index:0,selected:[],submitted:false,results:[],drafts:[],startTime:Date.now(),elapsed:0,timerEnabled:(state&&state.timerEnabled!==undefined)?state.timerEnabled:true};
   saveState(); render();
 }
 
-function goHomeClean(){ clearState(); state={screen:'home',mock:null,index:0,selected:[],submitted:false,results:[],startTime:null,elapsed:0,timerEnabled:(state&&state.timerEnabled!==undefined)?state.timerEnabled:true}; render(); }
+function goHomeClean(){ clearState(); state={screen:'home',mock:null,index:0,selected:[],submitted:false,results:[],drafts:[],startTime:null,elapsed:0,timerEnabled:(state&&state.timerEnabled!==undefined)?state.timerEnabled:true}; render(); }
 
 function reviewHTML(){
   const total=qs(state.mock).length;
@@ -299,6 +322,6 @@ render();
 '''
 
 html = template.replace('__DATA_PLACEHOLDER__', data_js)
-out = r'D:\DangKhoa\project\mini\interactivequiz\index.html'
+out = r'D:\DangKhoa\project\mini\Mini-Project\interactivequiz\index.html'
 open(out, 'w', encoding='utf-8').write(html)
 print('written', out, len(html))
