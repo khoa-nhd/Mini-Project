@@ -1,0 +1,361 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-18T00:00:00.000Z",
+  "title": "Design System: QuickNotes",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Deep Teal",
+        "canonical": "oklch(52% 0.15 180)",
+        "tonalRamp": ["#042f2e", "#06403e", "#08524f", "#0a6360", "#0c7572", "#0d9488", "#14b8a6", "#2dd4bf", "#5eead4", "#99f6e4", "#ccfbf1", "#e6fffa", "#f0fdfa", "#ffffff"]
+      },
+      "primary-foreground": {
+        "role": "primary",
+        "displayName": "Primary Foreground",
+        "canonical": "#000000",
+        "tonalRamp": ["#000000", "#1a1a1a", "#333333", "#4d4d4d", "#666666", "#808080", "#999999", "#b3b3b3", "#cccccc", "#e6e6e6", "#f2f2f2", "#ffffff"]
+      },
+      "secondary": {
+        "role": "secondary",
+        "displayName": "Light Teal",
+        "canonical": "oklch(65% 0.15 180)",
+        "tonalRamp": ["#043d3c", "#06504e", "#086360", "#0a7772", "#0c8a85", "#14b8a6", "#2dd4bf", "#5eead4", "#99f6e4", "#ccfbf1", "#e6fffa", "#f0fdfa", "#ffffff"]
+      },
+      "accent": {
+        "role": "accent",
+        "displayName": "Vivid Orange",
+        "canonical": "oklch(63% 0.22 40)",
+        "tonalRamp": ["#3b1000", "#4d1500", "#611b00", "#752100", "#8a2700", "#a12d00", "#b83400", "#d03a00", "#ea580c", "#f97316", "#fb923c", "#fdba74", "#fed7aa", "#fff7ed", "#ffffff"]
+      },
+      "background": {
+        "role": "neutral",
+        "displayName": "Teal Paper",
+        "canonical": "oklch(97% 0.01 180)",
+        "tonalRamp": ["#0f172a", "#134e4a", "#16655a", "#0d9488", "#14b8a6", "#2dd4bf", "#5eead4", "#99f6e4", "#ccfbf1", "#e8f1f4", "#f0fdfa", "#f8fdfc", "#ffffff"]
+      },
+      "foreground": {
+        "role": "neutral",
+        "displayName": "Teal Ink",
+        "canonical": "oklch(25% 0.08 180)",
+        "tonalRamp": ["#000000", "#0a1a18", "#134e4a", "#1a635a", "#22786d", "#2d8e82", "#3aa497", "#49baac", "#5dd0c1", "#7ee6d6", "#9ffceb", "#c0fdff", "#ffffff"]
+      },
+      "card": {
+        "role": "neutral",
+        "displayName": "Teal Card",
+        "canonical": "#ffffff",
+        "tonalRamp": ["#0f172a", "#134e4a", "#1e3a38", "#2d5a56", "#3d7a76", "#4d9a96", "#5ebaba", "#7edbdc", "#9efdfe", "#beffff", "#deffff", "#efffff", "#ffffff"]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Teal Mist",
+        "canonical": "oklch(92% 0.02 180)",
+        "tonalRamp": ["#0a1615", "#0d2120", "#102c2a", "#143734", "#17423e", "#1b4d48", "#1e5852", "#22635c", "#256e66", "#297970", "#2c847a", "#308f84", "#339a8e"]
+      },
+      "muted-foreground": {
+        "role": "neutral",
+        "displayName": "Slate Dim",
+        "canonical": "oklch(45% 0.02 240)",
+        "tonalRamp": ["#0f172a", "#1e293b", "#334155", "#475569", "#64748b", "#94a3b8", "#cbd5e1", "#e2e8f0", "#f1f5f9", "#f8fafc", "#ffffff"]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Teal Haze",
+        "canonical": "oklch(85% 0.12 180)",
+        "tonalRamp": ["#062322", "#08302f", "#0a3e3d", "#0c4b4a", "#0f5958", "#116665", "#147473", "#168180", "#198f8e", "#2dd4bf", "#5eead4", "#99f6e4", "#ccfbf1", "#e6fffa", "#f0fdfa", "#ffffff"]
+      },
+      "destructive": {
+        "role": "destructive",
+        "displayName": "Error Red",
+        "canonical": "oklch(57% 0.24 25)",
+        "tonalRamp": ["#3b0000", "#4d0000", "#610000", "#750000", "#8a0000", "#9e0000", "#b30000", "#c70000", "#dc2626", "#ef4444", "#f87171", "#fca5a5", "#fecaca", "#fee2e2", "#fff1f2", "#ffffff"]
+      },
+      "background-dark": {
+        "role": "neutral",
+        "displayName": "Obsidian",
+        "canonical": "oklch(8% 0.02 240)",
+        "tonalRamp": ["#000000", "#030712", "#060c24", "#091136", "#0c1648", "#0f1b5a", "#12206c", "#15257e", "#182a90", "#1b2fa2", "#1e34b4", "#2139c6", "#243ed8"]
+      },
+      "foreground-dark": {
+        "role": "neutral",
+        "displayName": "Teal Snow",
+        "canonical": "oklch(97% 0.01 180)",
+        "tonalRamp": ["#0f172a", "#134e4a", "#16655a", "#0d9488", "#14b8a6", "#2dd4bf", "#5eead4", "#99f6e4", "#ccfbf1", "#e8f1f4", "#f0fdfa", "#f8fdfc", "#ffffff"]
+      },
+      "card-dark": {
+        "role": "neutral",
+        "displayName": "Teal Slate",
+        "canonical": "oklch(18% 0.06 180)",
+        "tonalRamp": ["#000000", "#041312", "#082624", "#0c3936", "#104c48", "#134e4a", "#17615c", "#1b746e", "#1f8780", "#2dd4bf", "#5eead4", "#99f6e4", "#ccfbf1"]
+      },
+      "muted-dark": {
+        "role": "neutral",
+        "displayName": "Teal Dim",
+        "canonical": "oklch(18% 0.06 180)",
+        "tonalRamp": ["#000000", "#041312", "#082624", "#0c3936", "#104c48", "#134e4a", "#17615c", "#1b746e", "#1f8780", "#2dd4bf", "#5eead4", "#99f6e4", "#ccfbf1"]
+      },
+      "muted-foreground-dark": {
+        "role": "neutral",
+        "displayName": "Teal Glow",
+        "canonical": "oklch(85% 0.12 180)",
+        "tonalRamp": ["#062322", "#08302f", "#0a3e3d", "#0c4b4a", "#0f5958", "#116665", "#147473", "#168180", "#198f8e", "#2dd4bf", "#5eead4", "#99f6e4", "#ccfbf1", "#e6fffa", "#f0fdfa", "#ffffff"]
+      },
+      "border-dark": {
+        "role": "neutral",
+        "displayName": "Teal Border Dark",
+        "canonical": "oklch(18% 0.06 180)",
+        "tonalRamp": ["#000000", "#041312", "#082624", "#0c3936", "#104c48", "#134e4a", "#17615c", "#1b746e", "#1f8780", "#2dd4bf", "#5eead4", "#99f6e4", "#ccfbf1"]
+      },
+      "destructive-dark": {
+        "role": "destructive",
+        "displayName": "Error Red Dark",
+        "canonical": "oklch(60% 0.25 25)",
+        "tonalRamp": ["#3b0000", "#4d0000", "#610000", "#750000", "#8a0000", "#9e0000", "#b30000", "#c70000", "#dc2626", "#ef4444", "#f87171", "#fca5a5", "#fecaca", "#fee2e2", "#fff1f2", "#ffffff"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Auth page headline only. Never used in app chrome."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Modal titles, section headers in Settings, empty state headlines."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Card titles, folder names in sidebar (expanded), note titles in list."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Note content, paragraph text, descriptions, helper text."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Section dividers in note list (PINNED, NOTES), toast/status labels."
+      }
+    },
+    "shadows": [
+      {
+        "name": "ambient-low",
+        "value": "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+        "purpose": "Resting cards, note items. Barely perceptible — grounds the surface."
+      },
+      {
+        "name": "ambient-raised",
+        "value": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+        "purpose": "Card hover, note item drag preview. Signals interactivity."
+      },
+      {
+        "name": "modal-float",
+        "value": "0 25px 50px -12px rgb(0 0 0 / 0.25)",
+        "purpose": "Modal content only. The single 'deep' shadow in the system — creates focus capture."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Default easing for state transitions."
+      },
+      {
+        "name": "duration-fast",
+        "value": "150ms",
+        "purpose": "Button hover, focus, input focus, tooltip show."
+      },
+      {
+        "name": "duration-normal",
+        "value": "200ms",
+        "purpose": "Modal enter/exit, sidebar collapse, card hover shadow."
+      },
+      {
+        "name": "duration-slow",
+        "value": "300ms",
+        "purpose": "Page transitions, drawer animations."
+      },
+      {
+        "name": "animate-in",
+        "value": "animate-in 0.2s ease-out",
+        "purpose": "Modal, dropdown, toast enter — fade + translateY(4px)."
+      },
+      {
+        "name": "animate-out",
+        "value": "animate-out 0.15s ease-in",
+        "purpose": "Modal, dropdown, toast exit — fade + translateY(-4px)."
+      },
+      {
+        "name": "slide-in-right",
+        "value": "slide-in-right 0.2s ease-out",
+        "purpose": "Sidebar drawer, action sheet enter — fade + translateX(20px)."
+      },
+      {
+        "name": "slide-out-right",
+        "value": "slide-out-right 0.15s ease-in",
+        "purpose": "Sidebar drawer, action sheet exit — fade + translateX(20px)."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" },
+      { "name": "2xl", "value": "1536px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Primary action button — teal background, black text. Used for main CTAs.",
+      "html": "<button class=\"ds-btn-primary\">Save</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: 500; font-size: 0.875rem; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; border-radius: 8px; padding: 8px 16px; background-color: var(--color-primary); color: var(--color-primary-foreground); border: none; cursor: pointer; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1); outline: none; } .ds-btn-primary:hover { background-color: color-mix(in srgb, var(--color-primary) 90%, transparent); } .ds-btn-primary:active { background-color: var(--color-primary); } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--color-background), 0 0 0 4px var(--color-ring); } .ds-btn-primary:disabled { opacity: 0.5; pointer-events: none; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Secondary action button — light teal background, dark slate text.",
+      "html": "<button class=\"ds-btn-secondary\">Cancel</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: 500; font-size: 0.875rem; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; border-radius: 8px; padding: 8px 16px; background-color: var(--color-secondary); color: var(--color-secondary-foreground); border: none; cursor: pointer; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); outline: none; } .ds-btn-secondary:hover { background-color: color-mix(in srgb, var(--color-secondary) 90%, transparent); } .ds-btn-secondary:active { background-color: var(--color-secondary); } .ds-btn-secondary:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--color-background), 0 0 0 4px var(--color-ring); } .ds-btn-secondary:disabled { opacity: 0.5; pointer-events: none; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Subtle action button — transparent background, muted text. Hover reveals muted background.",
+      "html": "<button class=\"ds-btn-ghost\">New Folder</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: 500; font-size: 0.875rem; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; border-radius: 8px; padding: 8px 16px; background-color: transparent; color: var(--color-foreground); border: none; cursor: pointer; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), color 150ms cubic-bezier(0.4, 0, 0.2, 1); outline: none; } .ds-btn-ghost:hover { background-color: var(--color-muted); color: var(--color-foreground); } .ds-btn-ghost:active { background-color: var(--color-muted); } .ds-btn-ghost:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--color-background), 0 0 0 4px var(--color-ring); } .ds-btn-ghost:disabled { opacity: 0.5; pointer-events: none; }"
+    },
+    {
+      "name": "Destructive Button",
+      "kind": "button",
+      "refersTo": "button-destructive",
+      "description": "Destructive action button — red background, white text. Used for delete confirmations.",
+      "html": "<button class=\"ds-btn-destructive\">Delete</button>",
+      "css": ".ds-btn-destructive { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: 500; font-size: 0.875rem; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; border-radius: 8px; padding: 8px 16px; background-color: var(--color-destructive); color: var(--color-destructive-foreground); border: none; cursor: pointer; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); outline: none; } .ds-btn-destructive:hover { background-color: color-mix(in srgb, var(--color-destructive) 90%, transparent); } .ds-btn-destructive:active { background-color: var(--color-destructive); } .ds-btn-destructive:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--color-background), 0 0 0 4px var(--color-destructive); } .ds-btn-destructive:disabled { opacity: 0.5; pointer-events: none; }"
+    },
+    {
+      "name": "Input Field",
+      "kind": "input",
+      "refersTo": "input-base",
+      "description": "Standard text input — background surface, border, strong focus ring.",
+      "html": "<div class=\"ds-input-wrapper\"><label class=\"ds-input-label\" for=\"email\">Email</label><input class=\"ds-input\" id=\"email\" type=\"email\" placeholder=\"you@example.com\" /><p class=\"ds-input-helper\">We'll never share your email</p></div>",
+      "css": ".ds-input-wrapper { width: 100%; display: flex; flex-direction: column; gap: 4px; } .ds-input-label { font-size: 0.875rem; font-weight: 500; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: var(--color-foreground); } .ds-input { width: 100%; padding: 8px 12px; font-size: 1rem; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background-color: var(--color-background); border: 1px solid var(--color-border); border-radius: 8px; color: var(--color-foreground); transition: border-color 150ms, box-shadow 150ms; outline: none; } .ds-input::placeholder { color: var(--color-muted-foreground); } .ds-input:focus-visible { border-color: var(--color-ring); box-shadow: 0 0 0 2px var(--color-ring); } .ds-input.ds-input-error { border-color: var(--color-destructive); } .ds-input.ds-input-error:focus-visible { box-shadow: 0 0 0 2px var(--color-destructive); } .ds-input-helper { font-size: 0.875rem; color: var(--color-muted-foreground); } .ds-input-error-text { font-size: 0.875rem; color: var(--color-destructive); }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card-base",
+      "description": "Flat container with subtle border and hover shadow elevation.",
+      "html": "<div class=\"ds-card ds-card-hover\"><div class=\"ds-card-header\"><h3 class=\"ds-card-title\">Note Title</h3><p class=\"ds-card-description\">Last updated 2 hours ago</p></div><div class=\"ds-card-content\">Note content preview...</div></div>",
+      "css": ".ds-card { background-color: var(--color-card); color: var(--color-card-foreground); border-radius: 12px; border: 1px solid var(--color-border); box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1); transition: box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1); padding: 16px; } .ds-card-hover:hover { box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); } .ds-card-header { margin-bottom: 16px; } .ds-card-title { font-size: 1.125rem; font-weight: 600; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: var(--color-card-foreground); line-height: 1.4; margin: 0; } .ds-card-description { font-size: 0.875rem; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: var(--color-muted-foreground); margin: 4px 0 0; } .ds-card-content { font-size: 1rem; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: var(--color-card-foreground); line-height: 1.6; }"
+    },
+    {
+      "name": "Folder Pill (Navigation)",
+      "kind": "custom",
+      "refersTo": "folder-pill-active",
+      "description": "Sidebar folder navigation item — pill shape, active/inactive states.",
+      "html": "<button class=\"ds-folder-pill ds-folder-pill-active\" aria-current=\"true\"><svg class=\"ds-folder-icon\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><path d=\"M20 21a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h16z\"/><path d=\"M4 10h16\"/></svg><span>Inbox</span></button>",
+      "css": ".ds-folder-pill { display: flex; align-items: center; gap: 0.5rem; padding: 6px 12px; border-radius: 9999px; font-size: 0.875rem; font-weight: 500; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; cursor: pointer; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), color 150ms cubic-bezier(0.4, 0, 0.2, 1); border: none; background: none; width: 100%; text-align: left; } .ds-folder-pill-active { background-color: var(--color-primary); color: var(--color-primary-foreground); } .ds-folder-pill-inactive { background-color: var(--color-muted); color: var(--color-muted-foreground); } .ds-folder-pill-inactive:hover { background-color: color-mix(in srgb, var(--color-muted) 80%, transparent); } .ds-folder-icon { flex-shrink: 0; width: 16px; height: 16px; }"
+    },
+    {
+      "name": "Note Item",
+      "kind": "custom",
+      "refersTo": "note-item-base",
+      "description": "Note list item — dense, scannable, with hover/swipe actions and pinned state.",
+      "html": "<div class=\"ds-note-item ds-note-item-pinned\"><div class=\"ds-note-drag-handle\" aria-label=\"Drag to reorder\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><circle cx=\"12\" cy=\"5\" r=\"1\"/><circle cx=\"12\" cy=\"12\" r=\"1\"/><circle cx=\"12\" cy=\"19\" r=\"1\"/></svg></div><div class=\"ds-note-content\"><div class=\"ds-note-header\"><svg class=\"ds-pin-icon\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><path d=\"M12 17v5\"/><path d=\"M9 17H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-2\"/></svg><div><p class=\"ds-note-title\">Meeting notes from standup</p><p class=\"ds-note-preview\">Discussed sprint goals, blockers, and timeline adjustments...</p></div></div><div class=\"ds-note-meta\"><span><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M12 6v6l4 2\"/></svg>2 hours ago</span><span><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"/><polyline points=\"14 2 14 8 20 8\"/></svg>42 words</span></div></div></div>",
+      "css": ".ds-note-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px; border-radius: 12px; background-color: var(--color-card); border: 1px solid var(--color-border); transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), border-color 150ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; position: relative; } .ds-note-item:hover { background-color: color-mix(in srgb, var(--color-muted) 50%, transparent); } .ds-note-item-selected { box-shadow: 0 0 0 2px var(--color-background), 0 0 0 4px var(--color-ring); } .ds-note-item-pinned { border-color: color-mix(in srgb, var(--color-primary) 50%, transparent); background-color: color-mix(in srgb, var(--color-primary) 5%, transparent); } .ds-note-drag-handle { color: var(--color-muted-foreground); transition: color 150ms; cursor: grab; padding: 4px; display: flex; align-items: center; justify-content: center; } .ds-note-drag-handle:hover { color: var(--color-foreground); } .ds-note-drag-handle:active { cursor: grabbing; } .ds-note-content { flex: 1; min-width: 0; } .ds-note-header { display: flex; align-items: flex-start; gap: 8px; } .ds-pin-icon { color: var(--color-accent); flex-shrink: 0; margin-top: 2px; } .ds-note-title { font-weight: 500; font-size: 1rem; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: var(--color-card-foreground); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; } .ds-note-preview { font-size: 0.875rem; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: var(--color-muted-foreground); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 2px 0 0; } .ds-note-meta { display: flex; align-items: center; gap: 12px; margin-top: 8px; font-size: 0.75rem; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: var(--color-muted-foreground); } .ds-note-meta span { display: flex; align-items: center; gap: 4px; } .ds-note-meta svg { flex-shrink: 0; }"
+    },
+    {
+      "name": "Modal Dialog",
+      "kind": "custom",
+      "refersTo": "card-base",
+      "description": "Focus-trapping modal with backdrop blur, animated enter/exit, multiple sizes.",
+      "html": "<div class=\"ds-modal-overlay\"><div class=\"ds-modal-content\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"modal-title\"><div class=\"ds-modal-header\"><h2 id=\"modal-title\" class=\"ds-modal-title\">Delete Folder</h2><button class=\"ds-modal-close\" aria-label=\"Close\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"/><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"/></svg></button></div><p class=\"ds-modal-body\">Are you sure you want to delete this folder? Notes will be moved to Uncategorized.</p><div class=\"ds-modal-footer\"><button class=\"ds-btn-ghost\">Cancel</button><button class=\"ds-btn-destructive\">Delete</button></div></div></div>",
+      "css": ".ds-modal-overlay { position: fixed; inset: 0; background-color: color-mix(in srgb, black 50%, transparent); backdrop-filter: blur(4px); z-index: 40; animation: ds-fade-in 0.15s ease-out; } .ds-modal-content { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 100%; max-width: 32rem; background-color: var(--color-card); border-radius: 16px; border: 1px solid var(--color-border); box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25); padding: 24px; z-index: 50; animation: ds-animate-in 0.2s ease-out; } .ds-modal-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; } .ds-modal-title { font-size: 1.125rem; font-weight: 600; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: var(--color-card-foreground); line-height: 1.4; } .ds-modal-close { padding: 4px; border-radius: 8px; color: var(--color-muted-foreground); background: transparent; border: none; cursor: pointer; transition: color 150ms, background-color 150ms; display: flex; align-items: center; justify-content: center; } .ds-modal-close:hover { color: var(--color-foreground); background-color: var(--color-muted); } .ds-modal-body { font-size: 1rem; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: var(--color-card-foreground); line-height: 1.6; margin: 0 0 24px; } .ds-modal-footer { display: flex; justify-content: flex-end; gap: 12px; } @keyframes ds-fade-in { from { opacity: 0; } to { opacity: 1; } } @keyframes ds-animate-in { from { opacity: 0; transform: translate(-50%, -50%) translateY(4px); } to { opacity: 1; transform: translate(-50%, -50%) translateY(0); } }"
+    },
+    {
+      "name": "Badge",
+      "kind": "chip",
+      "refersTo": "badge-primary",
+      "description": "Compact status indicator — pill shape, three variants (primary, accent, muted).",
+      "html": "<span class=\"ds-badge ds-badge-primary\">Synced</span>",
+      "css": ".ds-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; font-size: 0.75rem; font-weight: 500; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; border-radius: 9999px; } .ds-badge-primary { background-color: color-mix(in srgb, var(--color-primary) 10%, transparent); color: var(--color-primary); } .ds-badge-accent { background-color: color-mix(in srgb, var(--color-accent) 10%, transparent); color: var(--color-accent); } .ds-badge-muted { background-color: var(--color-muted); color: var(--color-muted-foreground); }"
+    },
+    {
+      "name": "Toolbar Button",
+      "kind": "button",
+      "refersTo": "toolbar-btn",
+      "description": "Compact icon button for toolbars — ghost base, active state with primary tint.",
+      "html": "<button class=\"ds-toolbar-btn ds-toolbar-btn-active\" aria-label=\"Bold\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\"><path d=\"M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z\"/><path d=\"M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z\"/></svg></button>",
+      "css": ".ds-toolbar-btn { display: inline-flex; align-items: center; justify-content: center; padding: 8px; border-radius: 8px; color: var(--color-muted-foreground); background: transparent; border: none; cursor: pointer; transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1), background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-toolbar-btn:hover { color: var(--color-foreground); background-color: var(--color-muted); } .ds-toolbar-btn:active { background-color: var(--color-muted); } .ds-toolbar-btn-active { color: var(--color-primary); background-color: color-mix(in srgb, var(--color-primary) 10%, transparent); } .ds-toolbar-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--color-background), 0 0 0 4px var(--color-ring); }"
+    },
+    {
+      "name": "Toggle Switch",
+      "kind": "custom",
+      "refersTo": "folder-pill-active",
+      "description": "Settings toggle switch — animated thumb, primary track when on.",
+      "html": "<label class=\"ds-toggle\"><input type=\"checkbox\" class=\"ds-toggle-input\" checked /><span class=\"ds-toggle-track\"><span class=\"ds-toggle-thumb\"></span></span><span class=\"ds-toggle-label\">Keyboard Shortcuts</span></label>",
+      "css": ".ds-toggle { display: inline-flex; align-items: center; gap: 12px; cursor: pointer; } .ds-toggle-input { position: absolute; opacity: 0; width: 0; height: 0; } .ds-toggle-track { position: relative; width: 44px; height: 24px; border-radius: 9999px; background-color: var(--color-muted); transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-toggle-input:checked + .ds-toggle-track { background-color: var(--color-primary); } .ds-toggle-thumb { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 9999px; background-color: white; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1); transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-toggle-input:checked + .ds-toggle-track .ds-toggle-thumb { transform: translateX(22px); } .ds-toggle-label { font-size: 0.875rem; font-weight: 500; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: var(--color-foreground); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Telegraph Office",
+    "overview": "QuickNotes embodies the telegraph office: purposeful, immediate, and unadorned. Every pixel serves the act of capture. The visual language is Flat Design — no gratuitous depth, no decorative gradients, no skeuomorphic nostalgia. Color is functional: teal signals primary actions and identity, orange marks urgency (pin, archive, destructive), and the neutral canvas recedes so content remains the protagonist.\n\nThe system prioritizes perceived speed over visual flourish. Transitions are 150ms by default — fast enough to feel instant, slow enough to orient. Interactions are keyboard-first; the mouse is optional. Dark mode is not an afterthought; it's a first-class citizen with its own calibrated palette that preserves the teal/orange tension.",
+    "keyCharacteristics": [
+      "Flat Design with tonal layering (no shadow stacks)",
+      "Teal primary (#0D9488) + Orange accent (#EA580C) — high contrast, colorblind-safe",
+      "Plus Jakarta Sans — geometric humanist, optimized for UI legibility",
+      "4px base spacing unit, 8px radius baseline — consistent, scalable",
+      "150ms default transition — sub-second perceived latency",
+      "Full dark/light parity with semantic tokens",
+      "WCAG 2.1 AA contrast in both themes"
+    ],
+    "rules": [
+      { "name": "The One Voice Rule", "body": "The primary teal appears on ≤10% of any given screen. Its rarity is the signal.", "section": "colors" },
+      { "name": "The Urgency Rule", "body": "Orange is reserved for pin, archive, and destructive actions only. It never appears in decorative contexts.", "section": "colors" },
+      { "name": "The Theme Parity Rule", "body": "Every light token has a dark counterpart with equivalent semantic role. No \"dark mode only\" colors.", "section": "colors" },
+      { "name": "The Contrast Floor", "body": "All text/background pairs meet 4.5:1 (AA) in both themes. Placeholder text meets 3:1 minimum.", "section": "colors" },
+      { "name": "The No-Display-In-Chrome Rule", "body": "Display size lives only on the Auth landing page. Inside the app, Headline is the largest size.", "section": "typography" },
+      { "name": "The Measure Rule", "body": "Note content renders at ~65ch max-width via container constraints. Long lines hurt readability; the editor enforces this.", "section": "typography" },
+      { "name": "The Mono Rejection Rule", "body": "No monospace font anywhere. Notes are plain text, not code. If users want code blocks, they export to Obsidian.", "section": "typography" },
+      { "name": "The Flat-By-Default Rule", "body": "Surfaces are flat at rest. Shadows appear only on hover, drag, or modal focus. No persistent shadow stacks.", "section": "elevation" },
+      { "name": "The Border-Over-Shadow Rule", "body": "Card boundaries use 1px borders (teal-200 light / teal-900 dark) rather than shadows for separation. Borders are cheaper, sharper, and theme-stable.", "section": "elevation" },
+      { "name": "The Overlay Rule", "body": "Modal overlay uses backdrop-filter: blur(4px) + bg-black/50 — not a shadow. The blur signals \"world behind is paused.\"", "section": "elevation" }
+    ],
+    "dos": [
+      "Do use semantic color tokens exclusively (var(--color-primary), bg-primary, etc.). Never hardcode hex values in components.",
+      "Do keep transitions at 150ms (fast) for state changes, 200ms (normal) for layout shifts, 300ms (slow) for modal enter/exit.",
+      "Do apply the One Voice Rule: primary teal on ≤10% of screen pixels.",
+      "Do use the Urgency Rule: orange only for pin, archive, destructive.",
+      "Do enforce 4.5:1 contrast for all text in both themes — test with actual content lengths.",
+      "Do use Plus Jakarta Sans with font-feature-settings (\"cv02\", \"cv03\", \"cv04\", \"cv11\") everywhere.",
+      "Do prefer tonal layering (background → card → muted) over shadows for depth.",
+      "Do use 1px semantic borders for card separation, not shadows.",
+      "Do make every interactive element keyboard-accessible with visible focus-visible rings.",
+      "Do respect prefers-reduced-motion — disable all transitions/animations when set.",
+      "Do use the 4px base spacing unit — all spacing values are multiples of 4px.",
+      "Do use Radius Md (8px) as the default for buttons, inputs, toolbar items.",
+      "Do use Radius Lg (12px) for cards, note items, modals (Sm/Md).",
+      "Do use Radius Full for pills, badges, toggles, avatars.",
+      "Do expand Tailwind utilities to literal CSS in design tokens — the system is token-native, not utility-dependent."
+    ],
+    "donts": [
+      "Don't introduce new colors outside the defined palette. If a new semantic role emerges, add it to the token system first.",
+      "Don't use shadows for resting elevation — only for hover, drag, modal.",
+      "Don't use gradient text, glassmorphism, or decorative blur. The world is flat.",
+      "Don't use colored borders >1px on cards, list items, or alerts. The Zero-Blur Block Shadow is a costume, not a depth system.",
+      "Don't use monospace as a costume for \"technical\" — notes are plain text, not code.",
+      "Don't use Unicode glyphs or emoji for icons. Icons are Lucide SVG, 1.5 stroke weight, consistent sizing.",
+      "Don't add kickers/eyebrows above headings. The heading carries its own weight.",
+      "Don't use section numbers (01/02/03) unless the sequence carries information.",
+      "Don't use a modal for a task that needs neither interruption nor protected focus.",
+      "Don't create one-off component variants. If a pattern repeats, promote to a shared component or token.",
+      "Don't hardcode spacing values — use the spacing scale tokens.",
+      "Don't mix light-theme tokens in dark mode or vice versa. The .dark class swap handles all semantic tokens.",
+      "Don't animate layout properties (width, height, top, left) — only transform, opacity, color, shadow.",
+      "Don't exceed 10% primary color coverage on any screen. If you need more emphasis, use weight/size, not color volume."
+    ]
+  }
+}
