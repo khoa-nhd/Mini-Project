@@ -1,17 +1,41 @@
-import { useState } from 'react';
-import { Download, Upload, FileText, Archive, AlertCircle, CheckCircle } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Download, Upload, FileText, Archive, AlertCircle } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { Button } from './ui/Button';
 import { Modal } from './ui/Modal';
 import { useAppStore } from '../stores/appStore';
 import { useToast } from './ui/Toast';
 import { exportAllData, importData } from '../services/firebaseSync';
+import type { Folder, Note } from '../types';
 import { saveAs } from 'file-saver';
 import JSZip from 'jszip';
 
+/** Read a JSON export or a ZIP export (notes.json + folders.json). */
+async function readImportFile(file: File): Promise<{ folders: Folder[]; notes: Note[] }> {
+  if (file.name.toLowerCase().endsWith('.zip')) {
+    const zip = await JSZip.loadAsync(file);
+    const notesFile = zip.file('notes.json');
+    const foldersFile = zip.file('folders.json');
+    if (!notesFile) throw new Error('notes.json not found in ZIP');
+    return {
+      notes: JSON.parse(await notesFile.async('string')),
+      folders: foldersFile ? JSON.parse(await foldersFile.async('string')) : [],
+    };
+  }
+  const data = JSON.parse(await file.text());
+  return { folders: data.folders ?? [], notes: data.notes ?? [] };
+}
+
+function safeFileName(name: string, fallback: string): string {
+  // Strip characters that are invalid in file names (slashes, : * ? " < > | and control chars)
+  return name.replace(/[/\\:*?"<>|\u0000-\u001f]/g, '-').trim().slice(0, 50) || fallback;
+}
+
 export function ExportImportModal() {
-  const { showInstallPrompt, setShowInstallPrompt } = useAppStore();
+  const showExportImport = useAppStore((state) => state.showExportImport);
+  const setShowExportImport = useAppStore((state) => state.setShowExportImport);
   const { showToast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [importProgress, setImportProgress] = useState('');
@@ -51,9 +75,8 @@ export function ExportImportModal() {
         // Add markdown files
         const foldersFolder = zip.folder('folders');
         if (foldersFolder) {
-          for (const folder of data.folders) {
-            if (folder.isInbox || folder.isArchive) continue;
-            const folderNotes = data.notes.filter((n: any) => n.folderId === folder.id);
+          for (const folder of data.folders as Folder[]) {
+            const folderNotes = (data.notes as Note[]).filter((n) => n.folderId === folder.id);
             for (const note of folderNotes) {
               const frontmatter = {
                 title: note.title,
@@ -63,8 +86,8 @@ export function ExportImportModal() {
                 tags: note.tags || [],
               };
               const mdContent = `---\n${Object.entries(frontmatter).map(([k, v]) => `${k}: ${JSON.stringify(v)}`).join('\n')}\n---\n\n${note.content}`;
-              const safeName = note.title.replace(/[^a-zA-Z0-9]/g, '-').slice(0, 50) || 'untitled';
-              foldersFolder.file(`${folder.name}/${safeName}-${note.id}.md`, mdContent);
+              const safeName = safeFileName(note.title, 'untitled');
+              foldersFolder.file(`${safeFileName(folder.name, 'folder')}/${safeName}-${note.id}.md`, mdContent);
             }
           }
         }
@@ -83,6 +106,8 @@ export function ExportImportModal() {
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    // Reset so choosing the same file again still triggers onChange
+    e.target.value = '';
     if (file) {
       setImportFile(file);
       setShowImportConfirm(true);
@@ -96,15 +121,15 @@ export function ExportImportModal() {
     setImportProgress('Reading file...');
     
     try {
-      const text = await importFile.text();
+      const data = await readImportFile(importFile);
       setImportProgress('Importing data...');
-      await importData(text, importOptions);
-      showToast('success', 'Import completed successfully');
+      const result = await importData(data, importOptions);
+      showToast('success', `Imported ${result.notes} notes and ${result.folders} folders`);
       setShowImportConfirm(false);
       setImportFile(null);
     } catch (error) {
       console.error('Import failed:', error);
-      showToast('error', 'Import failed. Please check the file format.');
+      showToast('error', `Import failed: ${error instanceof Error ? error.message : 'check the file format'}`);
     } finally {
       setIsImporting(false);
       setImportProgress('');
@@ -114,8 +139,8 @@ export function ExportImportModal() {
   return (
     <>
       <Modal
-        isOpen={showInstallPrompt}
-        onClose={() => setShowInstallPrompt(false)}
+        isOpen={showExportImport}
+        onClose={() => setShowExportImport(false)}
         title="Export / Import Data"
         size="md"
       >
@@ -217,9 +242,9 @@ export function ExportImportModal() {
                     )}>
                       <div className="font-medium text-foreground capitalize">{strategy}</div>
                       <div className="text-xs text-muted-foreground mt-1">
-                        {strategy === 'merge' && 'Add new, update existing (by ID)'}
-                        {strategy === 'replace' && 'Delete all current data, use import only'}
-                        {strategy === 'skip' && 'Only add new, never update existing'}
+                        {strategy === 'merge' && 'Add new notes, overwrite notes with the same ID'}
+                        {strategy === 'replace' && 'Delete all current notes and folders first'}
+                        {strategy === 'skip' && 'Only add new notes, keep existing ones untouched'}
                       </div>
                     </div>
                   </label>
@@ -228,6 +253,7 @@ export function ExportImportModal() {
             </div>
 
             <input
+              ref={fileInputRef}
               type="file"
               id="importFile"
               accept=".json,.zip"
@@ -237,7 +263,7 @@ export function ExportImportModal() {
             />
             <Button
               variant="ghost"
-              onClick={() => document.getElementById('importFile')?.click()}
+              onClick={() => fileInputRef.current?.click()}
               disabled={isImporting}
               className="w-full"
             >

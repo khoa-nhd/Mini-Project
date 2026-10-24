@@ -37,7 +37,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={{ toasts, showToast, dismissToast }}>
       {children}
-      <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none">
+      <div className="fixed bottom-24 right-4 left-4 sm:left-auto z-50 flex flex-col items-end gap-2 pointer-events-none" aria-live="polite">
         {toasts.map((toast) => (
           <ToastItem key={toast.id} toast={toast} onDismiss={dismissToast} />
         ))}
@@ -55,7 +55,7 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: (id: string)
   };
   const Icon = icons[toast.type];
 
-  const baseStyles = 'flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg min-w-[280px] max-w-md pointer-events-auto animate-in slide-in-right';
+  const baseStyles = 'flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg w-full sm:w-auto sm:min-w-[280px] max-w-md pointer-events-auto animate-in slide-in-right';
   const typeStyles = {
     success: 'bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-300 border border-green-200 dark:border-green-800',
     error: 'bg-red-50 text-red-800 dark:bg-red-900/30 dark:text-red-300 border border-red-200 dark:border-red-800',

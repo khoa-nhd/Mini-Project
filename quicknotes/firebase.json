@@ -18,7 +18,7 @@
     ],
     "headers": [
       {
-        "source": "**/*.@(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2)",
+        "source": "/assets/**",
         "headers": [
           {
             "key": "Cache-Control",
@@ -40,11 +40,11 @@
         ]
       },
       {
-        "source": "/manifest.webmanifest",
+        "source": "/@(index.html|manifest.webmanifest|registerSW.js)",
         "headers": [
           {
             "key": "Cache-Control",
-            "value": "max-age=31536000, immutable"
+            "value": "no-cache"
           }
         ]
       }

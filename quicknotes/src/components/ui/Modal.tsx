@@ -1,4 +1,4 @@
-import { Fragment, ReactNode, useEffect, useRef } from 'react';
+import { ReactNode, useEffect, useId, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '../../lib/utils';
 import { X } from 'lucide-react';
@@ -27,18 +27,24 @@ export function Modal({
   const overlayRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
+  const onCloseRef = useRef(onClose);
+  const titleId = useId();
+  const descriptionId = useId();
 
   useEffect(() => {
-    if (isOpen) {
-      previousActiveElement.current = document.activeElement as HTMLElement;
-      document.body.style.overflow = 'hidden';
-      contentRef.current?.focus();
-    } else {
-      document.body.style.overflow = '';
-      previousActiveElement.current?.focus();
-    }
+    onCloseRef.current = onClose;
+  });
+
+  useEffect(() => {
+    if (!isOpen) return;
+    previousActiveElement.current = document.activeElement as HTMLElement;
+    document.body.style.overflow = 'hidden';
+    // Focus the first field if there is one, otherwise the dialog itself
+    const firstField = contentRef.current?.querySelector<HTMLElement>('input:not([type="hidden"]):not(.sr-only), textarea');
+    (firstField ?? contentRef.current)?.focus();
     return () => {
       document.body.style.overflow = '';
+      previousActiveElement.current?.focus?.();
     };
   }, [isOpen]);
 
@@ -47,13 +53,14 @@ export function Modal({
     
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        onClose();
+        event.stopPropagation();
+        onCloseRef.current();
       }
     };
-    
+
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, closeOnEscape, onClose]);
+  }, [isOpen, closeOnEscape]);
 
   if (!isOpen) return null;
 
@@ -76,8 +83,8 @@ export function Modal({
         className={cn('modal-content animate-in-modal', sizes[size])}
         role="dialog"
         aria-modal="true"
-        aria-labelledby={title ? 'modal-title' : undefined}
-        aria-describedby={description ? 'modal-description' : undefined}
+        aria-labelledby={title ? titleId : undefined}
+        aria-describedby={description ? descriptionId : undefined}
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
       >
@@ -85,12 +92,12 @@ export function Modal({
           <div className="flex items-start justify-between mb-4">
             <div>
               {title && (
-                <h2 id="modal-title" className="text-2xl font-semibold text-foreground">
+                <h2 id={titleId} className="text-xl font-semibold text-foreground">
                   {title}
                 </h2>
               )}
               {description && (
-                <p id="modal-description" className="mt-1 text-sm text-muted-foreground">
+                <p id={descriptionId} className="mt-1 text-sm text-muted-foreground">
                   {description}
                 </p>
               )}
@@ -109,7 +116,6 @@ export function Modal({
     </div>
   );
 
-  if (typeof window === 'undefined') return null;
   return createPortal(modalContent, document.body);
 }
 

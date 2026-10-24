@@ -61,14 +61,13 @@ A lightweight quiz site made while studying. Questions are loaded from JSON, ans
 ## 🚀 How to Explore
 
 ```bash
-# QuickNotes
 cd quicknotes
 npm install
-npm run dev        # localhost:3000
-npm run deploy     # build + Firebase deploy
+npm run dev         # localhost:3000
+npm run deploy      # build + Firebase deploy
 
-# Interactive Quiz
-open interactivequiz/index.html
+cd ../interactivequiz
+open index.html
 ```
 
 ---
