@@ -4,8 +4,8 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-primary: #0D9488;
-  --color-primary-foreground: #000000;
+  --color-primary: #001B36;
+  --color-primary-foreground: #FFFFFF;
   --color-secondary: #14B8A6;
   --color-secondary-foreground: #0F172A;
   --color-accent: #EA580C;
@@ -41,14 +41,15 @@
 @layer base {
   :root {
     /* Light theme colors (default) */
-    --color-primary: #0D9488;
-    --color-primary-foreground: #000000;
-    --color-secondary: #14B8A6;
+    --color-primary: #001B36;
+    --color-primary-foreground: #FFFFFF;
+    --color-secondary: #142850;
+    --color-secondary-foreground: #FFFFFF;
     --color-secondary-foreground: #0F172A;
-    --color-accent: #EA580C;
-    --color-accent-foreground: #000000;
-    --color-background: #F0FDFA;
-    --color-foreground: #134E4A;
+    --color-accent: #142850;
+    --color-accent-foreground: #FFFFFF;
+    --color-background: #0a1128;
+    --color-foreground: #dde4f0;
     --color-card: #FFFFFF;
     --color-card-foreground: #134E4A;
     --color-muted: #E8F1F4;
@@ -56,16 +57,17 @@
     --color-border: #99F6E4;
     --color-destructive: #DC2626;
     --color-destructive-foreground: #FFFFFF;
-    --color-ring: #0D9488;
+    --color-ring: #001B36;
   }
 
   .dark {
-    --color-primary: #14B8A6;
-    --color-primary-foreground: #0F172A;
-    --color-secondary: #0D9488;
-    --color-secondary-foreground: #000000;
-    --color-accent: #F97316;
-    --color-accent-foreground: #000000;
+    --color-primary: #142850;
+    --color-primary-foreground: #FFFFFF;
+    --color-secondary: #142850;
+    --color-secondary-foreground: #FFFFFF;
+    --color-secondary-foreground: #FFFFFF;
+    --color-accent: #142850;
+    --color-accent-foreground: #FFFFFF;
     --color-background: #0F172A;
     --color-foreground: #F0FDFA;
     --color-card: #134E4A;
