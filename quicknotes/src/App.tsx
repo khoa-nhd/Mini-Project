@@ -1,73 +1,34 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { Plus } from 'lucide-react';
 import { Sidebar } from './components/Sidebar';
 import { NoteList } from './components/NoteList';
 import { NoteEditor } from './components/NoteEditor';
 import { SettingsModal } from './components/Settings';
 import { Button } from './components/ui/Button';
+import { ConfirmDialog } from './components/ui/Modal';
 import { ToastProvider } from './components/ui/Toast';
-import { useAuth } from './hooks/useAuth';
+import { useAuth, useAuthListener, getAuthErrorMessage } from './hooks/useAuth';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useTheme } from './hooks/useTheme';
 import { useAppStore } from './stores/appStore';
-import { startRealtimeSync, stopRealtimeSync, processSyncQueue } from './services/firebaseSync';
+import { processSyncQueue, createNewNote, deleteNote } from './services/firebaseSync';
+import { isMac } from './lib/utils';
 
 export function App() {
-  const { user, loading, isAuthenticated } = useAuth();
-  const { theme, resolvedTheme } = useTheme();
-  const { setShowInstallPrompt } = useAppStore();
-
+  useAuthListener();
+  useTheme();
   useKeyboardShortcuts();
 
-  // Initialize real-time sync when authenticated
+  const { loading, isAuthenticated } = useAuth();
+
+  // Retry queued writes when coming back online
   useEffect(() => {
-    if (isAuthenticated) {
-      startRealtimeSync();
-      
-      // Process sync queue when coming online
-      const handleOnline = () => processSyncQueue();
-      window.addEventListener('online', handleOnline);
-      
-      return () => {
-        stopRealtimeSync();
-        window.removeEventListener('online', handleOnline);
-      };
-    }
+    if (!isAuthenticated) return;
+    processSyncQueue();
+    const handleOnline = () => processSyncQueue();
+    window.addEventListener('online', handleOnline);
+    return () => window.removeEventListener('online', handleOnline);
   }, [isAuthenticated]);
-
-  // Handle PWA install prompt
-  useEffect(() => {
-    let deferredPrompt: BeforeInstallPromptEvent | null = null;
-    let visitCount = parseInt(localStorage.getItem('quicknotes_visits') || '0', 10);
-    visitCount++;
-    localStorage.setItem('quicknotes_visits', String(visitCount));
-
-    const handleBeforeInstallPrompt = (e: BeforeInstallPromptEvent) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      
-      // Show prompt after 2 visits or 30 seconds
-      if (visitCount >= 2) {
-        setTimeout(() => {
-          if (deferredPrompt) {
-            setShowInstallPrompt(true);
-          }
-        }, 30000);
-      }
-    };
-
-    const handleAppInstalled = () => {
-      deferredPrompt = null;
-      setShowInstallPrompt(false);
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt as EventListener);
-    window.addEventListener('appinstalled', handleAppInstalled);
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt as EventListener);
-      window.removeEventListener('appinstalled', handleAppInstalled);
-    };
-  }, [setShowInstallPrompt]);
 
   if (loading) {
     return (
@@ -86,52 +47,62 @@ export function App() {
 
   return (
     <ToastProvider>
-      <div className="min-h-screen flex bg-background">
-        <a href="#main-content" className="skip-link">Skip to main content</a>
+      <a href="#main-content" className="skip-link">Skip to main content</a>
+      <div className="h-dvh flex bg-background overflow-hidden">
         <Sidebar />
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex-1 flex overflow-hidden">
-            <NoteList />
-            <NoteEditor />
-          </div>
-        </div>
+        <main id="main-content" className="flex-1 flex overflow-hidden min-w-0">
+          <NoteList />
+          <NoteEditor />
+        </main>
         <SettingsModal />
+        <DeleteNoteDialog />
       </div>
-      <button
-        onClick={() => {
-          const state = useAppStore.getState();
-          const folderId = state.activeFolderId ?? state.folders[0]?.id;
-          if (folderId) {
-            const newNote = {
-              id: `note-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-              userId: '',
-              folderId,
-              title: '',
-              content: '',
-              order: 0,
-              pinned: false,
-              createdAt: Date.now(),
-              updatedAt: Date.now(),
-              wordCount: 0,
-              charCount: 0,
-            };
-            state.addNote(newNote);
-            state.setSelectedNote(newNote.id);
-            state.setCreatingNote(true);
-          }
-        }}
-        aria-label="Create new note"
-        className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-24 h-24 rounded-full bg-teal-600 text-white shadow-2xl hover:scale-110 hover:bg-teal-700 active:scale-95 transition-all duration-200 ring-4 ring-background text-6xl leading-none"
-        title="New note (Ctrl+N)"
-      >
-        +
-      </button>
+      <NewNoteButton />
     </ToastProvider>
   );
 }
 
+function NewNoteButton() {
+  const hasFolders = useAppStore((state) => state.folders.length > 0);
+  if (!hasFolders) return null;
+
+  return (
+    <button
+      onClick={() => createNewNote()}
+      aria-label="Create new note"
+      title={`New note (${isMac ? '⌥N' : 'Alt+N'})`}
+      className="fixed bottom-6 right-6 z-40 flex items-center justify-center w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+    >
+      <Plus className="w-7 h-7" />
+    </button>
+  );
+}
+
+function DeleteNoteDialog() {
+  const showDeleteConfirm = useAppStore((state) => state.showDeleteConfirm);
+  const setShowDeleteConfirm = useAppStore((state) => state.setShowDeleteConfirm);
+  const isOpen = showDeleteConfirm.type === 'note' && !!showDeleteConfirm.id;
+  const close = () => setShowDeleteConfirm('note', null);
+
+  return (
+    <ConfirmDialog
+      isOpen={isOpen}
+      onClose={close}
+      onConfirm={async () => {
+        const id = showDeleteConfirm.id;
+        close();
+        if (id) await deleteNote(id);
+      }}
+      title="Delete Note"
+      message="This note will be permanently deleted. This cannot be undone."
+      confirmText="Delete"
+      variant="destructive"
+    />
+  );
+}
+
 function AuthPage() {
-  const { signIn, signUp, resetPassword, resendVerification } = useAuth();
+  const { signIn, signUp, resetPassword } = useAuth();
   const [mode, setMode] = useState<'signin' | 'signup' | 'forgot'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -141,30 +112,35 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
 
+  const switchMode = (next: typeof mode) => {
+    setMode(next);
+    setError('');
+    setSuccess('');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
+    setSuccess('');
 
+    if (mode === 'signup' && password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    setLoading(true);
     try {
       if (mode === 'signin') {
         await signIn(email, password);
       } else if (mode === 'signup') {
-        if (password !== confirmPassword) {
-          setError('Passwords do not match');
-          setLoading(false);
-          return;
-        }
-        await signUp(email, password, displayName);
-        setSuccess('Account created! Please verify your email.');
-        setMode('signin');
-      } else if (mode === 'forgot') {
+        await signUp(email, password, displayName.trim() || undefined);
+      } else {
         await resetPassword(email);
-        setSuccess('Password reset email sent!');
+        setSuccess('Password reset email sent! Check your inbox.');
         setMode('signin');
       }
-    } catch (err: any) {
-      setError(err.message || 'An error occurred');
+    } catch (err) {
+      setError(getAuthErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -172,14 +148,13 @@ function AuthPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <a href="#main-content" className="skip-link">Skip to main content</a>
-      <div className="w-full max-w-md">
+      <div id="main-content" className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="font-bold text-foreground text-display">QuickNotes</h1>
           <p className="text-muted-foreground mt-2">Dump thoughts. Organize fast. Sync everywhere.</p>
         </div>
 
-        <div id="main-content" className="card p-6">
+        <div className="card p-6">
           {success && (
             <div className="mb-4 alert alert-success" role="alert">
               {success}
@@ -193,7 +168,7 @@ function AuthPage() {
           )}
 
           <form onSubmit={handleSubmit}>
-            {(mode === 'signup') && (
+            {mode === 'signup' && (
               <div className="mb-4">
                 <label htmlFor="displayName" className="block text-sm font-medium text-foreground mb-1">
                   Display Name
@@ -205,7 +180,7 @@ function AuthPage() {
                   onChange={(e) => setDisplayName(e.target.value)}
                   className="input"
                   placeholder="Your name"
-                  required={mode === 'signup'}
+                  autoComplete="name"
                 />
               </div>
             )}
@@ -226,22 +201,24 @@ function AuthPage() {
               />
             </div>
 
-            <div className="mb-4">
-              <label htmlFor="password" className="block text-sm font-medium text-foreground mb-1">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="input"
-                placeholder="••••••••"
-                required
-                minLength={6}
-                autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
-              />
-            </div>
+            {mode !== 'forgot' && (
+              <div className="mb-4">
+                <label htmlFor="password" className="block text-sm font-medium text-foreground mb-1">
+                  Password
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="input"
+                  placeholder="••••••••"
+                  required
+                  minLength={6}
+                  autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
+                />
+              </div>
+            )}
 
             {mode === 'signup' && (
               <div className="mb-4">
@@ -256,6 +233,7 @@ function AuthPage() {
                   className="input"
                   placeholder="••••••••"
                   required
+                  minLength={6}
                   autoComplete="new-password"
                 />
               </div>
@@ -271,31 +249,19 @@ function AuthPage() {
           <div className="mt-6 text-center text-sm text-muted-foreground">
             {mode === 'signin' && (
               <>
-                <p>Don't have an account? <button onClick={() => setMode('signup')} className="btn btn-ghost text-sm px-0">Sign up</button></p>
-                <p className="mt-2"><button onClick={() => setMode('forgot')} className="btn btn-ghost text-sm px-0">Forgot password?</button></p>
+                <p>Don't have an account? <button type="button" onClick={() => switchMode('signup')} className="text-primary font-medium hover:underline">Sign up</button></p>
+                <p className="mt-2"><button type="button" onClick={() => switchMode('forgot')} className="text-primary font-medium hover:underline">Forgot password?</button></p>
               </>
             )}
             {mode === 'signup' && (
-              <p>Already have an account? <button onClick={() => setMode('signin')} className="btn btn-ghost text-sm px-0">Sign in</button></p>
+              <p>Already have an account? <button type="button" onClick={() => switchMode('signin')} className="text-primary font-medium hover:underline">Sign in</button></p>
             )}
             {mode === 'forgot' && (
-              <p>Remember your password? <button onClick={() => setMode('signin')} className="btn btn-ghost text-sm px-0">Sign in</button></p>
+              <p>Remember your password? <button type="button" onClick={() => switchMode('signin')} className="text-primary font-medium hover:underline">Sign in</button></p>
             )}
           </div>
         </div>
-
-        <p className="text-center text-xs text-muted-foreground mt-6">
-          By continuing, you agree to our Terms of Service and Privacy Policy.
-        </p>
       </div>
     </div>
   );
-}
-
-import { useState } from 'react';
-
-// Type for beforeinstallprompt event
-interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }

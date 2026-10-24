@@ -1,212 +1,158 @@
-import { useRef, useEffect, useState, useCallback } from 'react';
-import { cn } from '../lib/utils';
-import { Save, Pin, Archive, Trash2, MoreVertical, Download, Copy, Type, X } from 'lucide-react';
+import { useRef, useEffect, useState } from 'react';
+import { Save, Pin, Archive, ArchiveRestore, Trash2, Type, ArrowLeft } from 'lucide-react';
 import { Button } from './ui/Button';
-import { Modal, ConfirmDialog } from './ui/Modal';
 import { useAppStore } from '../stores/appStore';
-import { updateNote, deleteNote, createNote } from '../services/firebaseSync';
+import { updateNote, toggleArchiveNote } from '../services/firebaseSync';
 import { useAutoSave } from '../hooks/useAutoSave';
-import { formatRelativeTime, countWords, countChars, extractTitle } from '../lib/utils';
+import { formatRelativeTime, countWords, countChars, shortcutLabel, isMac, cn } from '../lib/utils';
+import type { Note } from '../types';
 
 export function NoteEditor() {
-  const {
-    selectedNoteId,
-    notes,
-    activeFolderId,
-    setSelectedNote,
-    setCreatingNote,
-    addNote,
-    updateNote: updateNoteStore,
-    deleteNote: deleteNoteStore,
-    setShowDeleteConfirm,
-  } = useAppStore();
+  const selectedNoteId = useAppStore((state) => state.selectedNoteId);
+  const note = useAppStore((state) => state.notes.find((n) => n.id === state.selectedNoteId));
 
-  const note = notes.find(n => n.id === selectedNoteId);
-  const isNew = !note && selectedNoteId;
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
-  const [showDeleteConfirm, setShowDeleteConfirmLocal] = useState(false);
-  const [wordCount, setWordCount] = useState(0);
-  const [charCount, setCharCount] = useState(0);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const titleRef = useRef<HTMLInputElement>(null);
-
-  // Auto-save
-  const { forceSave } = useAutoSave({
-    noteId: selectedNoteId,
-    content,
-    title,
-    enabled: !!selectedNoteId && !isNew,
-    delay: 1500,
-    onSave: setSaveStatus,
-  });
-
-  // Update counts
-  useEffect(() => {
-    setWordCount(countWords(content));
-    setCharCount(countChars(content));
-  }, [content]);
-
-  // Load note data when selected
-  useEffect(() => {
-    if (note) {
-      setTitle(note.title);
-      setContent(note.content);
-      setSaveStatus('idle');
-    } else if (isNew) {
-      setTitle('');
-      setContent('');
-      setSaveStatus('idle');
-      // Focus title for new note
-      setTimeout(() => titleRef.current?.focus(), 0);
-    }
-  }, [note, isNew]);
-
-  // Handle title change
-  const handleTitleChange = useCallback((newTitle: string) => {
-    setTitle(newTitle);
-    if (!isNew && selectedNoteId) {
-      const newTitleText = newTitle || extractTitle(content);
-      updateNote(selectedNoteId, { title: newTitleText, updatedAt: Date.now() });
-    }
-  }, [isNew, selectedNoteId, content]);
-
-  // Handle content change
-  const handleContentChange = useCallback((newContent: string) => {
-    setContent(newContent);
-  }, []);
-
-  // Save note
-  const handleSave = useCallback(async () => {
-    if (!selectedNoteId) return;
-    
-    if (isNew) {
-      // Create new note
-      const newNote = await createNote({
-        userId: '',
-        folderId: activeFolderId!,
-        title: title || extractTitle(content),
-        content,
-        order: 0,
-        pinned: false,
-        wordCount: countWords(content),
-        charCount: countChars(content),
-      });
-      setSelectedNote(newNote.id);
-      setCreatingNote(false);
-    } else {
-      // Update existing note
-      await updateNote(selectedNoteId, {
-        title: title || extractTitle(content),
-        content,
-        wordCount: countWords(content),
-        charCount: countChars(content),
-        updatedAt: Date.now(),
-      });
-      setSaveStatus('saved');
-      setTimeout(() => setSaveStatus('idle'), 2000);
-    }
-  }, [selectedNoteId, isNew, title, content, activeFolderId, setSelectedNote, setCreatingNote]);
-
-  // Keyboard shortcuts for editor
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 's') {
-        e.preventDefault();
-        handleSave();
-      }
-      if (e.key === 'Escape') {
-        if (isNew) {
-          setCreatingNote(false);
-          setSelectedNote(null);
-        }
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [handleSave, isNew, setCreatingNote, setSelectedNote]);
-
-  // Focus management
-  useEffect(() => {
-    const handleFocusEditor = () => {
-      textareaRef.current?.focus();
-    };
-    window.addEventListener('quicknotes:focus-editor', handleFocusEditor);
-    return () => window.removeEventListener('quicknotes:focus-editor', handleFocusEditor);
-  }, []);
-
-  if (!selectedNoteId) {
+  if (!selectedNoteId || !note) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-background">
+      <div className="hidden md:flex flex-1 items-center justify-center bg-background">
         <div className="empty-state">
           <Type className="empty-state-icon" />
           <h3 className="empty-state-title">No note selected</h3>
-          <p className="empty-state-text">Select a note from the list or press {navigator.platform.includes('Mac') ? 'Cmd' : 'Ctrl'}+N to create a new one</p>
+          <p className="empty-state-text">
+            Select a note from the list or press {isMac ? '⌥N' : 'Alt+N'} to create a new one
+          </p>
         </div>
       </div>
     );
   }
 
-  const folderType = useAppStore.getState().getFolderType(activeFolderId ?? '');
-  const isArchive = folderType === 'archive';
+  // Keyed by note id: local editor state is initialised once per note, so
+  // background syncs never overwrite what the user is typing.
+  return <NoteEditorPane key={note.id} note={note} />;
+}
+
+function NoteEditorPane({ note }: { note: Note }) {
+  const setSelectedNote = useAppStore((state) => state.setSelectedNote);
+  const setShowDeleteConfirm = useAppStore((state) => state.setShowDeleteConfirm);
+  const isArchived = useAppStore((state) => state.folders.find((f) => f.id === note.folderId)?.isArchive ?? false);
+
+  const [title, setTitle] = useState(note.title);
+  const [content, setContent] = useState(note.content);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const titleRef = useRef<HTMLInputElement>(null);
+
+  const wordCount = countWords(content);
+  const charCount = countChars(content);
+
+  const { forceSave } = useAutoSave({
+    noteId: note.id,
+    content,
+    title,
+    delay: 1500,
+    onSave: setSaveStatus,
+  });
+
+  // Fade "Saved" back to the last-edited label
+  useEffect(() => {
+    if (saveStatus !== 'saved') return;
+    const timer = setTimeout(() => setSaveStatus('idle'), 2000);
+    return () => clearTimeout(timer);
+  }, [saveStatus]);
+
+  // Focus: new empty notes start in the title, Enter in the list focuses the body
+  useEffect(() => {
+    if (!note.title && !note.content) titleRef.current?.focus();
+
+    const focusEditor = () => textareaRef.current?.focus();
+    const focusTitle = () => titleRef.current?.focus();
+    window.addEventListener('quicknotes:focus-editor', focusEditor);
+    window.addEventListener('quicknotes:focus-title', focusTitle);
+    return () => {
+      window.removeEventListener('quicknotes:focus-editor', focusEditor);
+      window.removeEventListener('quicknotes:focus-title', focusTitle);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleArchive = async () => {
+    await forceSave();
+    await toggleArchiveNote(note.id);
+  };
 
   return (
-    <div className="flex-1 flex flex-col bg-background">
+    <div className="flex-1 flex flex-col bg-background min-w-0">
       {/* Toolbar */}
       <div className="toolbar flex-shrink-0">
-        <div className="flex-1 flex items-center gap-2">
+        <div className="flex-1 flex items-center gap-2 min-w-0">
+          <button
+            onClick={async () => { await forceSave(); setSelectedNote(null); }}
+            className="toolbar-btn md:hidden"
+            aria-label="Back to notes"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
           <input
             ref={titleRef}
             type="text"
             value={title}
-            onChange={(e) => handleTitleChange(e.target.value)}
+            onChange={(e) => setTitle(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                textareaRef.current?.focus();
+              }
+            }}
             placeholder="Note title..."
-            className="bg-transparent border-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background text-lg font-medium text-foreground w-full px-2 py-1"
+            className="bg-transparent border-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-md text-lg font-medium text-foreground w-full min-w-0 px-2 py-1"
             aria-label="Note title"
           />
-          <span className="text-xs px-2">
-            {saveStatus === 'saving' && <Save className="w-4 h-4 animate-spin mr-1" />}
+          <span className="hidden sm:flex items-center text-xs px-2 whitespace-nowrap" aria-live="polite">
             {saveStatus === 'saving' && <span className="text-muted-foreground">Saving...</span>}
-            {saveStatus === 'saved' && <span className="text-secondary-foreground">Saved</span>}
+            {saveStatus === 'saved' && <span className="text-primary">Saved</span>}
             {saveStatus === 'error' && <span className="text-destructive">Save failed</span>}
-            {saveStatus === 'idle' && note && <span className="text-muted-foreground">Last edited {formatRelativeTime(note.updatedAt)}</span>}
+            {saveStatus === 'idle' && <span className="text-muted-foreground">Edited {formatRelativeTime(note.updatedAt)}</span>}
           </span>
         </div>
         <div className="flex items-center gap-1">
           <Button
             variant="ghost"
             size="sm"
-            onClick={handleSave}
+            onClick={() => forceSave()}
             disabled={saveStatus === 'saving'}
-            aria-label={`Save (${navigator.platform.includes('Mac') ? 'Cmd' : 'Ctrl'}+S)`}
+            aria-label={`Save (${shortcutLabel('s')})`}
+            title={`Save (${shortcutLabel('s')})`}
           >
             <Save className="w-4 h-4" />
           </Button>
+          {!isArchived && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => updateNote(note.id, { pinned: !note.pinned })}
+              className={cn(note.pinned && 'toolbar-btn-active')}
+              aria-label={note.pinned ? 'Unpin' : 'Pin'}
+              aria-pressed={note.pinned}
+              title={note.pinned ? 'Unpin' : 'Pin'}
+            >
+              <Pin className="w-4 h-4" />
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => updateNote(selectedNoteId!, { pinned: !note?.pinned })}
-            className={note?.pinned ? 'toolbar-btn-active' : ''}
-            aria-label={note?.pinned ? 'Unpin' : 'Pin'}
+            onClick={handleArchive}
+            aria-label={isArchived ? 'Restore to Inbox' : 'Archive'}
+            title={isArchived ? 'Restore to Inbox' : 'Archive'}
           >
-            <Pin className="w-4 h-4" />
+            {isArchived ? <ArchiveRestore className="w-4 h-4" /> : <Archive className="w-4 h-4" />}
           </Button>
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setShowDeleteConfirmLocal(true)}
-            aria-label="Archive"
-          >
-            <Archive className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowDeleteConfirm('note', selectedNoteId!)}
+            onClick={() => setShowDeleteConfirm('note', note.id)}
             className="text-destructive hover:bg-destructive/10"
             aria-label="Delete"
+            title="Delete"
           >
             <Trash2 className="w-4 h-4" />
           </Button>
@@ -218,37 +164,22 @@ export function NoteEditor() {
         <textarea
           ref={textareaRef}
           value={content}
-          onChange={(e) => handleContentChange(e.target.value)}
+          onChange={(e) => setContent(e.target.value)}
           placeholder="Start typing your thoughts..."
-          className="w-full h-full p-4 bg-transparent border-none focus-visible:outline-none resize-none text-foreground placeholder:text-muted-foreground font-sans text-base leading-relaxed"
+          className="w-full h-full p-4 pb-16 bg-transparent border-none focus-visible:outline-none resize-none text-foreground placeholder:text-muted-foreground font-sans text-base leading-relaxed"
+          aria-label="Note content"
           spellCheck={true}
           autoComplete="off"
-          autoCorrect="off"
-          autoCapitalize="off"
           data-gramm="false"
         />
-        
-        {/* Word count badge */}
-        <div className="absolute bottom-4 right-4 flex items-center gap-2">
+
+        {/* Word count badge (left side, the new-note button sits bottom right) */}
+        <div className="absolute bottom-4 left-4 pointer-events-none">
           <span className="badge badge-muted text-xs">
             {wordCount} words · {charCount} chars
           </span>
         </div>
       </div>
-
-      {/* Delete Confirm */}
-      <ConfirmDialog
-        isOpen={showDeleteConfirm}
-        onClose={() => setShowDeleteConfirmLocal(false)}
-        onConfirm={async () => {
-          await deleteNote(selectedNoteId!, false);
-          setShowDeleteConfirmLocal(false);
-        }}
-        title="Delete Note"
-        message="Are you sure you want to delete this note? It will be moved to Archive."
-        confirmText="Archive"
-        variant="destructive"
-      />
     </div>
   );
 }
