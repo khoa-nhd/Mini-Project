@@ -28,11 +28,6 @@ interface SearchIndexItem {
   folderId: string;
 }
 
-interface SettingItem {
-  key: string;
-  value: unknown;
-}
-
 interface SyncStatusItem {
   key: string;
   status: SyncStatus['status'];

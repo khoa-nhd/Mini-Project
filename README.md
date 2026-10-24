@@ -9,69 +9,97 @@
 [![Firebase](https://img.shields.io/badge/Firebase-13-FFC107?logo=firebase&logoColor=white)](https://firebase.google.com)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white)](https://typescriptlang.org)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-
-```text
-  ╔════════════════════════════════════════╗
-  ║  Small ideas. Fast builds. No bloat.  ║
-  ╚════════════════════════════════════════╝
-```
-
-| Project | Purpose | Live Link |
-|---------|---------|-----------|
-| **QuickNotes** | Capture ideas during the day instantly | [quicknote-7c89b.web.app](https://quicknote-7c89b.web.app) |
-| **Interactive Quiz** | Click-click learning for faster study | — |
+[![Status](https://img.shields.io/badge/Status-Active-2a9d8f)]
 
 ---
 
 ## 🗂 What's Inside
 
-Each folder is a standalone experiment. No monorepo complexity — just open and run.
-
-### 1. QuickNotes (`quicknotes/`)
-
-A PWA note-taking app built for speed. Dump thoughts, organize into folders, search instantly, and sync everywhere via Firebase Firestore.
-
-**Highlights:**
-- ⚡ Floating **+** button — create notes immediately
-- ⌨️ Keyboard shortcuts (`Ctrl+N`, `Ctrl+K`, `Ctrl+S`)
-- 🌙 Dark / light theme
-- 📱 Offline-first via IndexedDB + Service Worker
-- 🔍 Full-text search with MiniSearch
-
-### 2. Interactive Quiz (`interactivequiz/`)
-
-A lightweight quiz site made while studying. Questions are loaded from JSON, answers respond instantly, and the experience is designed to make repetition feel interactive rather than passive.
+| Project | Purpose | Live Link | Stack |
+|---------|---------|-----------|-------|
+| **QuickNotes** | Capture ideas during the day instantly | [Live →](https://quicknote-7c89b.web.app) | React · Vite · Firebase · PWA |
+| **Interactive Quiz** | Click-click website for faster study | — | HTML · JSON · JS |
 
 ---
 
-## 🔧 Stack at a Glance
+## ✨ Why These Exist
 
-| Layer | Technology |
-|-------|------------|
-| UI | React 19 + TypeScript |
-| Styling | Tailwind CSS |
-| Build | Vite |
-| State | Zustand (persisted) |
-| Backend | Firebase Auth + Firestore |
-| Hosting | Firebase Hosting |
-| PWA | vite-plugin-pwa + Workbox |
+Every project here solves a small, real problem quickly.
+
+- **QuickNotes** — ideas fade in seconds; this gives them a button and a home.
+- **Interactive Quiz** — reading can become passive; this makes review an active decision.
+
+They are not production systems with large teams. They are personal experiments in speed, clarity, and minimal friction.
+
+---
+
+## 🏗 Architecture Overview
+
+```mermaid
+graph TD
+    A[User] --> B[QuickNotes PWA]
+    B --> C[Firebase Auth]
+    B --> D[Firestore DB]
+    B --> E[IndexedDB Offline]
+    B --> F[Service Worker Cache]
+    G[Interactive Quiz] --> H[Static JSON]
+    H --> I[Browser Render]
+```
 
 ---
 
 ## 🚀 How to Explore
 
 ```bash
+# QuickNotes (full stack)
 cd quicknotes
 npm install
 npm run dev         # localhost:3000
-npm run deploy      # build + Firebase deploy
+npm run deploy      # build + Firebase Hosting
 
-cd ../interactivequiz
-open index.html
+# Interactive Quiz (static)
+open interactivequiz/index.html
 ```
+
+> **Note:** QuickNotes requires a `.env` file with Firebase config values (`VITE_FIREBASE_*`).
 
 ---
 
-> *"Not every project needs to be large. Some just need to be fast, clear, and fun."*
+## 📦 Tech Stack at a Glance
 
+| Layer | Technology |
+|-------|------------|
+| UI | React 19 · TypeScript |
+| Styling | Tailwind CSS |
+| Build | Vite |
+| State | Zustand (persisted) |
+| Database / Auth | Firebase Firestore & Auth |
+| Search | MiniSearch |
+| PWA | vite-plugin-pwa + Workbox |
+| Icons | Lucide React |
+
+---
+
+## 🤝 Contributing
+
+These are personal experiments. If you have ideas for new mini-projects — fast tools, study aids, quick capture apps — open an issue or submit a PR with a new folder. Keep it light, keep it fast.
+
+---
+
+## 🙏 Acknowledgments
+
+Built with care, coffee, and the belief that a simple button can save a thought.
+
+---
+
+<!-- Feature Grid -->
+
+### Key Features
+
+- ⚡ **Big + Button** — create instantly
+- ⌨️ **Shortcuts** — `Ctrl+N`, `Ctrl+K`, `Ctrl+S`
+- 🌙 **Themes** — dark / light / system
+- 📱 **PWA** — installable, offline-ready
+- 🔍 **Search** — full-text indexing
+- 🇻🇳 **Vietnamese origin** — ideas captured in passing
 </div>

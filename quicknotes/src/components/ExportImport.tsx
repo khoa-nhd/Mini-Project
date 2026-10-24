@@ -28,6 +28,7 @@ async function readImportFile(file: File): Promise<{ folders: Folder[]; notes: N
 
 function safeFileName(name: string, fallback: string): string {
   // Strip characters that are invalid in file names (slashes, : * ? " < > | and control chars)
+  // eslint-disable-next-line no-control-regex
   return name.replace(/[/\\:*?"<>|\u0000-\u001f]/g, '-').trim().slice(0, 50) || fallback;
 }
 

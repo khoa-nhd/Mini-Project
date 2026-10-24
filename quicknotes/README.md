@@ -21,74 +21,85 @@
 
 ---
 
-## Why This Exists
+## ✨ Why This Exists
 
-Ideas often arrive in brief windows — while walking, between conversations, or mid-task. Waiting to open a full productivity suite kills the moment. QuickNotes is built to reduce that delay to near zero.
-
----
-
-## ✨ Features
-
-| Feature | Description |
-|---------|-------------|
-| **Big + Button** | Create a new note instantly — always visible |
-| **Keyboard Shortcuts** | `Ctrl+N` (new), `Ctrl+K` (search), `Ctrl+S` (save) |
-| **Folders** | Inbox, Archive, custom folders with drag-and-drop |
-| **Search** | Full-text indexing via MiniSearch |
-| **Auto-Save** | Configurable delay; no manual save required |
-| **Offline-First** | IndexedDB persistence; works without internet |
-| **Firebase Sync** | Auth + Firestore sync when online |
-| **PWA** | Installable, service worker cached, mobile-ready |
-| **Themes** | Dark / light with system preference detection |
-| **Export / Import** | ZIP export for backup and migration |
+Ideas often arrive in brief windows — while walking, between conversations, or mid-task. Waiting to open a full productivity suite kills the moment. QuickNotes reduces that delay to near zero with a big button, keyboard shortcuts, and offline-first storage.
 
 ---
 
-## 🛠 Tech Stack
+## 🛠 Feature Matrix
 
-| Layer | Choice |
-|-------|--------|
-| UI Framework | React 19 + TypeScript |
-| Build Tool | Vite |
-| Styling | Tailwind CSS |
-| State | Zustand (persisted) |
-| Database / Auth | Firebase Firestore & Auth |
-| Search | MiniSearch |
-| PWA | vite-plugin-pwa + Workbox |
-| Icons | Lucide React |
+| Feature | What It Does | How To Access |
+|---------|--------------|---------------|
+| **New Note** | Creates a note instantly | Big `+` button or `Ctrl+N` |
+| **Search** | Full-text across all notes | `Ctrl+K` |
+| **Folders** | Organize into Inbox / Archive / Custom | Sidebar |
+| **Auto-Save** | Saves after typing delay | Automatic |
+| **Offline** | Works without internet | IndexedDB + Service Worker |
+| **Sync** | Firestore when signed in | Background sync |
+| **Export** | ZIP backup / import | Settings → Export |
+| **Themes** | Dark / Light / System | Settings → Theme |
+| **PWA** | Installable app experience | Browser install prompt |
 
 ---
 
-## 🚀 Quick Start
+## 🏗 Architecture
+
+```mermaid
+graph TD
+    User --> App[QuickNotes PWA]
+    App --> Auth[Firebase Auth]
+    App --> DB[Firestore DB]
+    App --> Local[IndexedDB Offline]
+    App --> SW[Service Worker Cache]
+    User --> Editor[NoteEditor]
+    Editor --> Save[Auto-Save Hook]
+    Editor --> Sync[Firebase Sync Service]
+```
+
+---
+
+## 📂 Project Tree
+
+```text
+quicknotes/
+├── src/
+│   ├── App.tsx              # Root layout + routing
+│   ├── components/          # NoteList, NoteEditor, Sidebar, UI
+│   ├── stores/              # Zustand app state
+│   ├── services/            # Firebase sync logic
+│   └── hooks/               # Auto-save, keyboard, theme
+├── public/
+│   ├── sw.js                # Service worker
+│   └── manifest.webmanifest # PWA manifest
+├── firebase.json            # Hosting + Firestore config
+├── firestore.rules          # Security rules
+└── vite.config.ts           # PWA plugin + build config
+```
+
+---
+
+## 🚀 How To Explore
 
 ```bash
+# QuickNotes
 cd quicknotes
 npm install
-npm run dev        # localhost:3000
-npm run build      # production build
-npm run deploy     # build + Firebase Hosting
-```
+npm run dev         # localhost:3000
+npm run build       # production dist/
+npm run deploy      # build + Firebase deploy
 
-Requires a `.env` file with Firebase config values:
-
-```env
-VITE_FIREBASE_API_KEY=...
-VITE_FIREBASE_AUTH_DOMAIN=...
-VITE_FIREBASE_PROJECT_ID=...
-VITE_FIREBASE_STORAGE_BUCKET=...
-VITE_FIREBASE_MESSAGING_SENDER_ID=...
-VITE_FIREBASE_APP_ID=...
-VITE_FIREBASE_MEASUREMENT_ID=...
+# Requires .env with VITE_FIREBASE_* values
 ```
 
 ---
 
-## 🏗 Architecture Highlights
+## 🔑 Key Design Decisions
 
-- **Offline persistence**: Firestore `enableIndexedDbPersistence` plus local Zustand persistence
-- **Real-time sync**: Starts when authenticated; stops on unmount
-- **SPA routing**: `firebase.json` rewrites all paths to `index.html`
-- **Security**: Firestore rules enforce `isOwner` on every document
+- **No backend server** — Firebase handles auth, DB, and hosting; the frontend is fully static
+- **Offline first** — IndexedDB stores notes locally; sync happens when online and authenticated
+- **Keyboard-driven** — shortcuts reduce mouse dependency for power users
+- **Minimal UI** — no decorative clutter; information and speed take priority
 
 ---
 

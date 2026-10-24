@@ -1,13 +1,6 @@
 import MiniSearch from 'minisearch';
 import type { Note } from '../types';
 
-interface SearchDocument {
-  id: string;
-  title: string;
-  content: string;
-  folderId: string;
-}
-
 class SearchIndex {
   private index: MiniSearch<{ id: string; title: string; content: string; folderId: string }>;
   private noteMap: Map<string, Note> = new Map();
