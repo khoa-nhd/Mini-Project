@@ -107,7 +107,7 @@ export function parseFrontmatter(content: string): { data: Record<string, unknow
   frontmatter.split('\n').forEach((line) => {
     const [key, ...valueParts] = line.split(':');
     if (key && valueParts.length) {
-      let rawValue = valueParts.join(':').trim();
+      const rawValue = valueParts.join(':').trim();
       let parsedValue: unknown = rawValue;
       if (rawValue.startsWith('"') && rawValue.endsWith('"')) {
         parsedValue = rawValue.slice(1, -1);
@@ -144,6 +144,13 @@ export function stringifyFrontmatter(data: Record<string, unknown>, body: string
   }
   lines.push('---', '', body);
   return lines.join('\n');
+}
+
+export const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent);
+
+/** Human readable label for a "mod+x" shortcut on the current platform. */
+export function shortcutLabel(key: string): string {
+  return `${isMac ? '⌘' : 'Ctrl+'}${key.toUpperCase()}`;
 }
 
 export function isOnline(): boolean {

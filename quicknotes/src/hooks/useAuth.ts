@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import {
-  User as FirebaseUser,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -11,41 +10,57 @@ import {
 } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { useAppStore } from '../stores/appStore';
-import { performInitialSync, cleanupOnLogout, createUserProfile } from '../services/firebaseSync';
+import {
+  performInitialSync,
+  cleanupOnLogout,
+  createUserProfile,
+  startRealtimeSync,
+  stopRealtimeSync,
+  DEFAULT_USER_SETTINGS,
+} from '../services/firebaseSync';
 
-export function useAuth() {
-  const [user, setUser] = useState<FirebaseUser | null>(null);
-  const [loading, setLoading] = useState(true);
-  const { setUser: setAppUser } = useAppStore();
-
+/**
+ * Subscribes to Firebase auth state and runs the initial sync / cleanup.
+ * Mount this exactly once (in App) — useAuth() can be used anywhere.
+ */
+export function useAuthListener() {
   useEffect(() => {
+    let wasSignedIn = false;
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      setUser(firebaseUser);
-      setLoading(false);
+      const store = useAppStore.getState();
 
       if (firebaseUser) {
-        setAppUser({
+        wasSignedIn = true;
+        store.setUser({
           uid: firebaseUser.uid,
-          email: firebaseUser.email!,
+          email: firebaseUser.email ?? '',
           displayName: firebaseUser.displayName ?? undefined,
           photoURL: firebaseUser.photoURL ?? undefined,
           createdAt: Date.now(),
-          settings: {
-            theme: 'system',
-            shortcutsEnabled: true,
-            autoSaveDelay: 1500,
-            sortOrder: 'manual',
-          },
+          settings: store.user?.uid === firebaseUser.uid ? store.user.settings : DEFAULT_USER_SETTINGS,
         });
+        store.setAuthStatus('authenticated');
         await performInitialSync();
+        if (auth.currentUser?.uid === firebaseUser.uid) startRealtimeSync();
       } else {
-        await cleanupOnLogout();
-        setAppUser(null);
+        stopRealtimeSync();
+        if (wasSignedIn) await cleanupOnLogout();
+        wasSignedIn = false;
+        store.setUser(null);
+        store.setAuthStatus('unauthenticated');
       }
     });
 
-    return () => unsubscribe();
-  }, [setAppUser]);
+    return () => {
+      unsubscribe();
+      stopRealtimeSync();
+    };
+  }, []);
+}
+
+export function useAuth() {
+  const authStatus = useAppStore((state) => state.authStatus);
 
   const signIn = async (email: string, password: string) => {
     const { user } = await signInWithEmailAndPassword(auth, email, password);
@@ -56,23 +71,19 @@ export function useAuth() {
     const { user } = await createUserWithEmailAndPassword(auth, email, password);
     if (displayName) {
       await updateProfile(user, { displayName });
+      const current = useAppStore.getState().user;
+      if (current?.uid === user.uid) useAppStore.getState().setUser({ ...current, displayName });
     }
-    await sendEmailVerification(user);
-    
-    // Create user profile in Firestore
+
     await createUserProfile({
       uid: user.uid,
-      email: user.email!,
+      email: user.email ?? email,
       displayName,
       createdAt: Date.now(),
-      settings: {
-        theme: 'system',
-        shortcutsEnabled: true,
-        autoSaveDelay: 1500,
-        sortOrder: 'manual',
-      },
+      settings: DEFAULT_USER_SETTINGS,
     });
-    
+
+    sendEmailVerification(user).catch((error) => console.warn('Failed to send verification email:', error));
     return user;
   };
 
@@ -91,13 +102,31 @@ export function useAuth() {
   };
 
   return {
-    user,
-    loading,
+    loading: authStatus === 'loading',
+    isAuthenticated: authStatus === 'authenticated',
     signIn,
     signUp,
     signOut,
     resetPassword,
     resendVerification,
-    isAuthenticated: !!user,
   };
+}
+
+const AUTH_ERROR_MESSAGES: Record<string, string> = {
+  'auth/invalid-credential': 'Incorrect email or password.',
+  'auth/wrong-password': 'Incorrect email or password.',
+  'auth/user-not-found': 'No account found with this email.',
+  'auth/invalid-email': 'Please enter a valid email address.',
+  'auth/email-already-in-use': 'An account with this email already exists.',
+  'auth/weak-password': 'Password must be at least 6 characters.',
+  'auth/too-many-requests': 'Too many attempts. Please try again later.',
+  'auth/network-request-failed': 'Network error. Check your connection.',
+  'auth/requires-recent-login': 'Please sign in again to continue.',
+  'auth/invalid-api-key': 'Firebase is not configured. Check your .env file.',
+};
+
+export function getAuthErrorMessage(error: unknown): string {
+  const code = (error as { code?: string })?.code;
+  if (code && AUTH_ERROR_MESSAGES[code]) return AUTH_ERROR_MESSAGES[code];
+  return (error as { message?: string })?.message || 'An error occurred';
 }

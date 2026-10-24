@@ -1,3 +1,3 @@
 # Interactive Quiz
 
-Trong lúc học bài thì tôi tạo website bấm bấm cho nhanh.
+Created a click-click website to study faster while learning.

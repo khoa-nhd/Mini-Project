@@ -1,3 +1,3 @@
 # Mini-Project
 
-Các mini projects tôi làm cho Voi.
+Mini projects I made for fun.

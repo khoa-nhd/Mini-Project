@@ -2,58 +2,63 @@ import { useEffect, useState, useCallback } from 'react';
 import { useAppStore } from '../stores/appStore';
 import { updateUserSettings } from '../services/firebaseSync';
 
+type ThemeMode = 'light' | 'dark' | 'system';
+
+const THEME_STORAGE_KEY = 'quicknotes-theme-mode';
+
+function readStoredTheme(): ThemeMode {
+  try {
+    const stored = localStorage.getItem(THEME_STORAGE_KEY);
+    if (stored === 'light' || stored === 'dark' || stored === 'system') return stored;
+  } catch {
+    // storage unavailable
+  }
+  return 'system';
+}
+
+function getSystemTheme(): 'light' | 'dark' {
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+/** Theme mode comes from the user's settings (synced), falling back to the last local choice. */
 export function useTheme() {
-  const { user, updateUserSettings: updateSettings } = useAppStore();
-  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
-  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
+  const userTheme = useAppStore((state) => state.user?.settings.theme);
+  const theme: ThemeMode = userTheme ?? readStoredTheme();
+  const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>(getSystemTheme);
+  const resolvedTheme = theme === 'system' ? systemTheme : theme;
 
   useEffect(() => {
-    if (user?.settings.theme) {
-      setTheme(user.settings.theme);
-    }
-  }, [user]);
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = () => setSystemTheme(getSystemTheme());
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
 
   useEffect(() => {
     const root = document.documentElement;
-    
-    const applyTheme = (t: 'light' | 'dark' | 'system') => {
-      let resolved: 'light' | 'dark';
-      
-      if (t === 'system') {
-        resolved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      } else {
-        resolved = t;
-      }
-      
-      setResolvedTheme(resolved);
-      root.classList.remove('light', 'dark');
-      root.classList.add(resolved);
-      localStorage.setItem('theme', resolved);
-    };
+    root.classList.remove('light', 'dark');
+    root.classList.add(resolvedTheme);
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, theme);
+    } catch {
+      // storage unavailable
+    }
+  }, [theme, resolvedTheme]);
 
-    applyTheme(theme);
-
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = () => {
-      if (theme === 'system') {
-        applyTheme('system');
-      }
-    };
-
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [theme]);
-
-  const setThemeMode = useCallback((newTheme: 'light' | 'dark' | 'system') => {
-    setTheme(newTheme);
-    updateSettings({ theme: newTheme });
-  }, [updateSettings]);
+  const setThemeMode = useCallback((newTheme: ThemeMode) => {
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, newTheme);
+    } catch {
+      // storage unavailable
+    }
+    if (useAppStore.getState().user) {
+      updateUserSettings({ theme: newTheme }).catch((error) => console.error('Failed to save theme:', error));
+    }
+  }, []);
 
   const toggleTheme = useCallback(() => {
-    const themes: Array<'light' | 'dark' | 'system'> = ['light', 'dark', 'system'];
-    const currentIndex = themes.indexOf(theme);
-    const nextIndex = (currentIndex + 1) % themes.length;
-    setThemeMode(themes[nextIndex]);
+    const themes: ThemeMode[] = ['light', 'dark', 'system'];
+    setThemeMode(themes[(themes.indexOf(theme) + 1) % themes.length]);
   }, [theme, setThemeMode]);
 
   return { theme, resolvedTheme, setThemeMode, toggleTheme };
