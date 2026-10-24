@@ -206,6 +206,10 @@ export function Sidebar() {
   const handleCreateFolder = async () => {
     const name = newFolderName.trim();
     if (!name) return;
+    if (folders.some((f) => f.name.toLowerCase() === name.toLowerCase())) {
+      alert('Folder name already exists');
+      return;
+    }
     try {
       const maxOrder = customFolders.reduce((max, f) => Math.max(max, f.order), 0);
       const folder = await createFolder({

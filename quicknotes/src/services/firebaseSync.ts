@@ -352,6 +352,25 @@ let unsubscribeFolders: (() => void) | null = null;
 export function startRealtimeSync(): void {
   stopRealtimeSync();
   const userId = getUserId();
+  if (!userId) {
+    console.warn('startRealtimeSync: no userId, skipping');
+    return;
+  }
+  // Force initial load from server in case listener misses early docs
+  const initialNotesQuery = query(collection(db, NOTES_COLLECTION), where('userId', '==', userId));
+  getDocs(initialNotesQuery).then((snap) => {
+    const store = useAppStore.getState();
+    snap.forEach((docSnap) => {
+      const n = noteFromFirestore(docSnap);
+      if (!store.notes.some((note) => note.id === n.id)) {
+        store.addNote(n);
+        saveNoteOffline(n, true).catch(() => {});
+      } else if (store.notes.find((note) => note.id === n.id)?.updatedAt !== n.updatedAt) {
+        store.updateNote(n.id, n);
+        saveNoteOffline(n, true).catch(() => {});
+      }
+    });
+  }).catch((err) => console.error('Initial notes load error:', err));
 
   unsubscribeNotes = onSnapshot(
     query(collection(db, NOTES_COLLECTION), where('userId', '==', userId)),
