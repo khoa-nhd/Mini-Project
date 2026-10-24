@@ -223,7 +223,7 @@ const handleCreateFolder = async () => {
         <Button
           onClick={() => setShowCreateFolder(true)}
           variant="ghost"
-          className="mx-3 mb-3 w-full justify-start"
+          className="mx-3 mb-3 w-[calc(100%-1.5rem)] justify-start rounded-lg"
         >
           <Plus className="w-4 h-4 mr-2" />
           New Folder

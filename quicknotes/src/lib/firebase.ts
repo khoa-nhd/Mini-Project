@@ -6,9 +6,14 @@ import {
   browserLocalPersistence,
   indexedDBLocalPersistence,
 } from 'firebase/auth';
-import { getFirestore, Firestore, enableIndexedDbPersistence, connectFirestoreEmulator } from 'firebase/firestore';
-import { getStorage, FirebaseStorage } from 'firebase/storage';
-import { getFunctions, Functions } from 'firebase/functions';
+import {
+  getFirestore,
+  initializeFirestore,
+  Firestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+  connectFirestoreEmulator,
+} from 'firebase/firestore';
 
 // Firebase configuration - replace with your project config
 const firebaseConfig = {
@@ -30,49 +35,35 @@ for (const key of requiredKeys) {
 }
 
 // Initialize Firebase
-let app: FirebaseApp;
-let auth: Auth;
-let db: Firestore;
-let storage: FirebaseStorage;
-let functions: Functions;
-
-if (getApps().length === 0) {
-  app = initializeApp(firebaseConfig);
-} else {
-  app = getApps()[0];
-}
+const app: FirebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
 // Initialize Auth with persistence for offline support
+let auth: Auth;
 try {
   auth = initializeAuth(app, {
     persistence: [indexedDBLocalPersistence, browserLocalPersistence],
   });
 } catch {
-  // Auth already initialized
+  // Auth already initialized (HMR)
   auth = getAuth(app);
 }
 
-db = getFirestore(app);
-storage = getStorage(app);
-functions = getFunctions(app);
-
-// Enable offline persistence for Firestore
-if (typeof window !== 'undefined') {
-  enableIndexedDbPersistence(db).catch((err) => {
-    if (err.code === 'failed-precondition') {
-      console.warn('Multiple tabs open, persistence can only be enabled in one tab at a time.');
-    } else if (err.code === 'unimplemented') {
-      console.warn('Current browser does not support offline persistence.');
-    }
+// Firestore with multi-tab offline cache. ignoreUndefinedProperties lets us
+// pass optional fields (color, tags, ...) without Firestore rejecting the write.
+let db: Firestore;
+try {
+  db = initializeFirestore(app, {
+    localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+    ignoreUndefinedProperties: true,
   });
+} catch {
+  // Firestore already initialized (HMR)
+  db = getFirestore(app);
 }
 
 // Connect to emulators in development
 if (import.meta.env.DEV && import.meta.env.VITE_USE_FIREBASE_EMULATORS === 'true') {
   connectFirestoreEmulator(db, 'localhost', 8080);
-  // connectAuthEmulator(auth, 'http://localhost:9099');
-  // connectStorageEmulator(storage, 'localhost', 9199);
-  // connectFunctionsEmulator(functions, 'localhost', 5001);
 }
 
-export { app, auth, db, storage, functions, firebaseConfig };
+export { app, auth, db, firebaseConfig };

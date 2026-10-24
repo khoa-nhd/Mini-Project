@@ -48,20 +48,12 @@ class SearchIndex {
 
   remove(id: string): void {
     this.noteMap.delete(id);
-    // MiniSearch remove requires the full document
-    const results = this.index.search(id) as any[];
-    if (results.length > 0) {
-      this.index.remove(results[0]);
-    }
+    if (this.index.has(id)) this.index.discard(id);
   }
 
   update(note: Note): void {
     this.noteMap.set(note.id, note);
-    // Remove old document
-    const results = this.index.search(note.id) as any[];
-    if (results.length > 0) {
-      this.index.remove(results[0]);
-    }
+    if (this.index.has(note.id)) this.index.discard(note.id);
     // Add updated document
     this.index.add({
       id: note.id,
@@ -73,8 +65,7 @@ class SearchIndex {
 
   clear(): void {
     this.noteMap.clear();
-    const allDocs = this.index.search('') as any[];
-    allDocs.forEach((doc: any) => this.index.remove(doc));
+    this.index.removeAll();
   }
 
   search(query: string, options?: { folderId?: string; limit?: number }): Array<{ note: Note; score: number; matches: string[] }> {

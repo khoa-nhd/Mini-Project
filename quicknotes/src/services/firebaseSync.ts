@@ -1,29 +1,60 @@
 import {
   collection,
   doc,
+  getDoc,
   getDocs,
   setDoc,
   updateDoc,
   deleteDoc,
+  deleteField,
   query,
   where,
-  orderBy,
   onSnapshot,
   writeBatch,
-  serverTimestamp,
   Timestamp,
   DocumentSnapshot,
   QuerySnapshot,
 } from 'firebase/firestore';
 import { db, auth } from '../lib/firebase';
-import type { Note, Folder, User, UserSettings } from '../types';
-import { getNotesOffline, getFoldersOffline, getUserOffline, saveNoteOffline, saveFolderOffline, saveUserOffline, clearAllData, addToSyncQueue, getSyncQueue, removeFromSyncQueue, incrementSyncRetry, setSyncStatus } from '../lib/offline-db';
+import type { Note, Folder, User, UserSettings, SyncStatus, ExportData } from '../types';
+import { DEFAULT_FOLDERS } from '../types';
+import {
+  getNotesOffline,
+  getFoldersOffline,
+  getUserOffline,
+  saveNoteOffline,
+  saveFolderOffline,
+  saveUserOffline,
+  deleteNoteOffline,
+  deleteFolderOffline,
+  clearAllData,
+  addToSyncQueue,
+  getSyncQueue,
+  removeFromSyncQueue,
+  incrementSyncRetry,
+  setSyncStatus,
+} from '../lib/offline-db';
 import { useAppStore } from '../stores/appStore';
+import { generateId } from '../lib/utils';
 
 const NOTES_COLLECTION = 'notes';
 const FOLDERS_COLLECTION = 'folders';
 const USERS_COLLECTION = 'users';
-const SETTINGS_COLLECTION = 'settings';
+
+// Firestore caps a write batch at 500 operations
+const BATCH_LIMIT = 450;
+
+export const DEFAULT_USER_SETTINGS: UserSettings = {
+  theme: 'system',
+  shortcutsEnabled: true,
+  autoSaveDelay: 1500,
+  sortOrder: 'manual',
+};
+
+const defaultSyncStatus: SyncStatus = {
+  status: 'synced',
+  pendingChanges: 0,
+};
 
 function getUserId(): string {
   const user = auth.currentUser;
@@ -31,41 +62,83 @@ function getUserId(): string {
   return user.uid;
 }
 
+// Timestamps may be Firestore Timestamps (normal writes) or plain numbers
+// (older writes from previous versions of the app). Accept both.
+function toMillis(value: unknown): number | undefined {
+  if (value == null) return undefined;
+  if (typeof value === 'number') return value;
+  if (value instanceof Timestamp) return value.toMillis();
+  if (typeof (value as { toMillis?: unknown }).toMillis === 'function') {
+    return (value as { toMillis: () => number }).toMillis();
+  }
+  return undefined;
+}
+
+const TIMESTAMP_FIELDS = ['createdAt', 'updatedAt', 'deletedAt'] as const;
+
+// Convert a partial update into Firestore field values
+function toFirestoreUpdate<T extends Record<string, unknown>>(updates: T): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(updates)) {
+    if (key === 'id') continue;
+    if ((TIMESTAMP_FIELDS as readonly string[]).includes(key)) {
+      result[key] = typeof value === 'number' ? Timestamp.fromMillis(value) : deleteField();
+    } else if (value === undefined) {
+      result[key] = deleteField();
+    } else {
+      result[key] = value;
+    }
+  }
+  return result;
+}
+
 function noteToFirestore(note: Note) {
+  const { id: _id, deletedAt, ...rest } = note;
   return {
-    ...note,
+    ...rest,
     createdAt: Timestamp.fromMillis(note.createdAt),
     updatedAt: Timestamp.fromMillis(note.updatedAt),
-    deletedAt: note.deletedAt ? Timestamp.fromMillis(note.deletedAt) : null,
+    ...(deletedAt ? { deletedAt: Timestamp.fromMillis(deletedAt) } : {}),
   };
 }
 
-function noteFromFirestore(doc: DocumentSnapshot): Note {
-  const data = doc.data()!;
+function noteFromFirestore(snap: DocumentSnapshot): Note {
+  const data = snap.data()!;
+  const content = typeof data.content === 'string' ? data.content : '';
   return {
     ...data,
-    id: doc.id,
-    createdAt: data.createdAt?.toMillis() ?? Date.now(),
-    updatedAt: data.updatedAt?.toMillis() ?? Date.now(),
-    deletedAt: data.deletedAt?.toMillis(),
+    id: snap.id,
+    title: typeof data.title === 'string' ? data.title : '',
+    content,
+    order: typeof data.order === 'number' ? data.order : 0,
+    pinned: !!data.pinned,
+    wordCount: typeof data.wordCount === 'number' ? data.wordCount : 0,
+    charCount: typeof data.charCount === 'number' ? data.charCount : content.length,
+    createdAt: toMillis(data.createdAt) ?? Date.now(),
+    updatedAt: toMillis(data.updatedAt) ?? Date.now(),
+    deletedAt: toMillis(data.deletedAt),
   } as Note;
 }
 
 function folderToFirestore(folder: Folder) {
+  const { id: _id, ...rest } = folder;
   return {
-    ...folder,
+    ...rest,
     createdAt: Timestamp.fromMillis(folder.createdAt),
     updatedAt: Timestamp.fromMillis(folder.updatedAt),
   };
 }
 
-function folderFromFirestore(doc: DocumentSnapshot): Folder {
-  const data = doc.data()!;
+function folderFromFirestore(snap: DocumentSnapshot): Folder {
+  const data = snap.data()!;
   return {
     ...data,
-    id: doc.id,
-    createdAt: data.createdAt?.toMillis() ?? Date.now(),
-    updatedAt: data.updatedAt?.toMillis() ?? Date.now(),
+    id: snap.id,
+    isInbox: !!data.isInbox,
+    isArchive: !!data.isArchive,
+    order: typeof data.order === 'number' ? data.order : 0,
+    createdAt: toMillis(data.createdAt) ?? Date.now(),
+    updatedAt: toMillis(data.updatedAt) ?? Date.now(),
   } as Folder;
 }
 
@@ -73,25 +146,125 @@ function userToFirestore(user: User) {
   return {
     ...user,
     createdAt: Timestamp.fromMillis(user.createdAt),
-    settings: user.settings,
   };
 }
 
-function userFromFirestore(doc: DocumentSnapshot): User {
-  const data = doc.data()!;
+function userFromFirestore(snap: DocumentSnapshot): User {
+  const data = snap.data()!;
   return {
     ...data,
-    uid: doc.id,
-    createdAt: data.createdAt?.toMillis() ?? Date.now(),
-    settings: data.settings,
+    uid: snap.id,
+    createdAt: toMillis(data.createdAt) ?? Date.now(),
+    settings: { ...DEFAULT_USER_SETTINGS, ...(data.settings ?? {}) },
   } as User;
 }
 
+const byOrder = (a: { order: number }, b: { order: number }) => a.order - b.order;
+
 // Sync status helpers
-function updateSyncStatus(partial: Partial<import('../types').SyncStatus>) {
-  const current = useAppStore.getState().syncStatus;
+function updateSyncStatus(partial: Partial<SyncStatus>) {
   useAppStore.getState().setSyncStatus(partial);
-  setSyncStatus({ ...current, ...partial });
+  setSyncStatus(useAppStore.getState().syncStatus).catch(() => {});
+}
+
+/**
+ * Send a write to Firestore without blocking the UI. With the offline cache,
+ * Firestore applies writes locally right away but only resolves the promise
+ * once the server acknowledges, which never happens while offline. So the
+ * caller updates local state first, and we track the server ack here.
+ */
+function trackWrite(write: Promise<unknown>, onError?: () => Promise<void>): void {
+  const pending = useAppStore.getState().syncStatus.pendingChanges + 1;
+  updateSyncStatus({ status: navigator.onLine ? 'syncing' : 'offline', pendingChanges: pending });
+
+  write
+    .then(() => {
+      const left = Math.max(0, useAppStore.getState().syncStatus.pendingChanges - 1);
+      updateSyncStatus({
+        pendingChanges: left,
+        ...(left === 0 ? { status: 'synced', lastSynced: Date.now(), error: undefined } : {}),
+      });
+    })
+    .catch(async (error) => {
+      console.error('Sync write failed:', error);
+      try {
+        await onError?.();
+      } catch (queueError) {
+        console.error('Failed to queue write:', queueError);
+      }
+      updateSyncStatus({
+        status: 'error',
+        error: String(error),
+        pendingChanges: Math.max(0, useAppStore.getState().syncStatus.pendingChanges - 1),
+      });
+    });
+}
+
+async function commitInChunks(ops: Array<(batch: ReturnType<typeof writeBatch>) => void>): Promise<void> {
+  for (let i = 0; i < ops.length; i += BATCH_LIMIT) {
+    const batch = writeBatch(db);
+    ops.slice(i, i + BATCH_LIMIT).forEach((op) => op(batch));
+    await batch.commit();
+  }
+}
+
+// Make sure the user has Inbox / Archive / Uncategorized folders.
+// IDs are deterministic per user so two devices never create duplicates.
+async function ensureDefaultFolders(userId: string, folders: Folder[]): Promise<Folder[]> {
+  const now = Date.now();
+  const missing: Folder[] = [];
+
+  for (const def of DEFAULT_FOLDERS) {
+    const exists = folders.some((f) =>
+      def.isInbox ? f.isInbox : def.isArchive ? f.isArchive : f.name === def.name && !f.isInbox && !f.isArchive
+    );
+    if (!exists) {
+      missing.push({
+        ...def,
+        id: `${def.name.toLowerCase()}-${userId}`,
+        userId,
+        createdAt: now,
+        updatedAt: now,
+      });
+    }
+  }
+
+  if (missing.length === 0) return folders;
+
+  for (const folder of missing) {
+    await saveFolderOffline(folder);
+    trackWrite(setDoc(doc(db, FOLDERS_COLLECTION, folder.id), folderToFirestore(folder)));
+  }
+  return [...folders, ...missing].sort(byOrder);
+}
+
+// Notes from older versions could reference folders that don't exist
+// (e.g. folderId "archive") or be soft-deleted. Move them somewhere visible.
+function repairOrphanNotes(notes: Note[], folders: Folder[]): Note[] {
+  const folderIds = new Set(folders.map((f) => f.id));
+  const inbox = folders.find((f) => f.isInbox);
+  const archive = folders.find((f) => f.isArchive);
+  if (!inbox) return notes;
+
+  return notes.map((note) => {
+    let target: string | null = null;
+    if (note.deletedAt) target = archive?.id ?? inbox.id;
+    else if (!folderIds.has(note.folderId)) target = note.folderId === 'archive' && archive ? archive.id : inbox.id;
+    if (!target) return note;
+
+    const fixed: Note = { ...note, folderId: target, deletedAt: undefined };
+    trackWrite(
+      updateDoc(doc(db, NOTES_COLLECTION, note.id), toFirestoreUpdate({ folderId: target, deletedAt: undefined }))
+    );
+    return fixed;
+  });
+}
+
+function pickActiveFolder(folders: Folder[]) {
+  const { activeFolderId, setActiveFolder } = useAppStore.getState();
+  if (activeFolderId && folders.some((f) => f.id === activeFolderId)) return;
+  const inbox = folders.find((f) => f.isInbox);
+  setActiveFolder(inbox?.id ?? folders[0]?.id ?? null);
 }
 
 // Initial full sync
@@ -100,46 +273,53 @@ export async function performInitialSync(): Promise<void> {
   updateSyncStatus({ status: 'syncing' });
 
   try {
-    // Fetch user profile
-    const userDoc = await getDocs(query(collection(db, USERS_COLLECTION), where('uid', '==', userId)));
-    if (!userDoc.empty) {
-      const user = userFromFirestore(userDoc.docs[0]);
-      useAppStore.getState().setUser(user);
-      await saveUserOffline(user);
+    // User profile (create it if this is the first sign-in)
+    const userRef = doc(db, USERS_COLLECTION, userId);
+    const userSnap = await getDoc(userRef);
+    let user: User;
+    if (userSnap.exists()) {
+      user = userFromFirestore(userSnap);
+    } else {
+      const fbUser = auth.currentUser!;
+      user = {
+        uid: userId,
+        email: fbUser.email ?? '',
+        displayName: fbUser.displayName ?? undefined,
+        createdAt: Date.now(),
+        settings: DEFAULT_USER_SETTINGS,
+      };
+      trackWrite(setDoc(userRef, userToFirestore(user), { merge: true }));
     }
+    useAppStore.getState().setUser(user);
+    useAppStore.getState().setShortcutsEnabled(user.settings.shortcutsEnabled);
+    await saveUserOffline(user);
 
-    // Fetch folders
-    const foldersSnapshot = await getDocs(
-      query(collection(db, FOLDERS_COLLECTION), where('userId', '==', userId), orderBy('order'))
-    );
-    const folders = foldersSnapshot.docs.map(folderFromFirestore);
+    // Folders (sorted client-side so no composite index is needed)
+    const foldersSnapshot = await getDocs(query(collection(db, FOLDERS_COLLECTION), where('userId', '==', userId)));
+    let folders = foldersSnapshot.docs.map(folderFromFirestore).sort(byOrder);
+    folders = await ensureDefaultFolders(userId, folders);
     useAppStore.getState().setFolders(folders);
     for (const folder of folders) {
       await saveFolderOffline(folder, true);
     }
 
-    // Fetch notes
-    const notesSnapshot = await getDocs(
-      query(collection(db, NOTES_COLLECTION), where('userId', '==', userId), orderBy('order'))
-    );
-    const notes = notesSnapshot.docs.map(noteFromFirestore).filter((n) => !n.deletedAt);
+    // Notes
+    const notesSnapshot = await getDocs(query(collection(db, NOTES_COLLECTION), where('userId', '==', userId)));
+    const notes = repairOrphanNotes(notesSnapshot.docs.map(noteFromFirestore), folders).sort(byOrder);
     useAppStore.getState().setNotes(notes);
     for (const note of notes) {
       await saveNoteOffline(note, true);
     }
 
-    // Set active folder to Inbox if not set
-    const { activeFolderId, folders: currentFolders } = useAppStore.getState();
-    if (!activeFolderId && currentFolders.length > 0) {
-      const inbox = currentFolders.find((f) => f.isInbox);
-      useAppStore.getState().setActiveFolder(inbox?.id ?? currentFolders[0].id);
-    }
+    pickActiveFolder(folders);
 
-    updateSyncStatus({ status: 'synced', lastSynced: Date.now(), pendingChanges: 0 });
+    if (useAppStore.getState().syncStatus.pendingChanges === 0) {
+      updateSyncStatus({ status: 'synced', lastSynced: Date.now(), error: undefined });
+    }
   } catch (error) {
     console.error('Initial sync failed:', error);
-    updateSyncStatus({ status: 'error', error: String(error) });
-    
+    updateSyncStatus({ status: navigator.onLine ? 'error' : 'offline', error: String(error) });
+
     // Load from offline as fallback
     await loadFromOffline(userId);
   }
@@ -157,12 +337,9 @@ export async function loadFromOffline(userId: string): Promise<void> {
     if (user) useAppStore.getState().setUser(user);
     if (folders.length > 0) {
       useAppStore.getState().setFolders(folders);
-      const inbox = folders.find((f) => f.isInbox);
-      useAppStore.getState().setActiveFolder(inbox?.id ?? folders[0].id);
+      pickActiveFolder(folders);
     }
     if (notes.length > 0) useAppStore.getState().setNotes(notes);
-
-    updateSyncStatus({ status: 'offline', lastSynced: Date.now() });
   } catch (error) {
     console.error('Failed to load from offline:', error);
   }
@@ -173,37 +350,25 @@ let unsubscribeNotes: (() => void) | null = null;
 let unsubscribeFolders: (() => void) | null = null;
 
 export function startRealtimeSync(): void {
+  stopRealtimeSync();
   const userId = getUserId();
 
-  // Notes listener
   unsubscribeNotes = onSnapshot(
-    query(collection(db, NOTES_COLLECTION), where('userId', '==', userId), orderBy('order')),
+    query(collection(db, NOTES_COLLECTION), where('userId', '==', userId)),
     (snapshot: QuerySnapshot) => {
-      const changes = snapshot.docChanges();
-      const currentNotes = useAppStore.getState().notes;
-      let hasChanges = false;
-
-      for (const change of changes) {
+      const store = useAppStore.getState();
+      for (const change of snapshot.docChanges()) {
         const note = noteFromFirestore(change.doc);
-        
-        if (change.type === 'added') {
-          if (!currentNotes.find((n) => n.id === note.id)) {
-            useAppStore.getState().addNote(note);
-            saveNoteOffline(note, true);
-            hasChanges = true;
-          }
-        } else if (change.type === 'modified') {
-          useAppStore.getState().updateNote(note.id, note);
-          saveNoteOffline(note, true);
-          hasChanges = true;
-        } else if (change.type === 'removed') {
-          useAppStore.getState().deleteNote(note.id);
-          hasChanges = true;
+        if (change.type === 'removed') {
+          store.deleteNote(note.id);
+          deleteNoteOffline(note.id).catch(() => {});
+        } else if (useAppStore.getState().notes.some((n) => n.id === note.id)) {
+          store.updateNote(note.id, note);
+          saveNoteOffline(note, true).catch(() => {});
+        } else {
+          store.addNote(note);
+          saveNoteOffline(note, true).catch(() => {});
         }
-      }
-
-      if (hasChanges) {
-        updateSyncStatus({ status: 'synced', lastSynced: Date.now() });
       }
     },
     (error) => {
@@ -212,28 +377,25 @@ export function startRealtimeSync(): void {
     }
   );
 
-  // Folders listener
   unsubscribeFolders = onSnapshot(
-    query(collection(db, FOLDERS_COLLECTION), where('userId', '==', userId), orderBy('order')),
+    query(collection(db, FOLDERS_COLLECTION), where('userId', '==', userId)),
     (snapshot: QuerySnapshot) => {
-      const changes = snapshot.docChanges();
-      const currentFolders = useAppStore.getState().folders;
-
-      for (const change of changes) {
+      const store = useAppStore.getState();
+      for (const change of snapshot.docChanges()) {
         const folder = folderFromFirestore(change.doc);
-        
-        if (change.type === 'added') {
-          if (!currentFolders.find((f) => f.id === folder.id)) {
-            useAppStore.getState().addFolder(folder);
-            saveFolderOffline(folder, true);
-          }
-        } else if (change.type === 'modified') {
-          useAppStore.getState().updateFolder(folder.id, folder);
-          saveFolderOffline(folder, true);
-        } else if (change.type === 'removed') {
-          useAppStore.getState().deleteFolder(folder.id);
+        if (change.type === 'removed') {
+          store.deleteFolder(folder.id);
+          deleteFolderOffline(folder.id).catch(() => {});
+        } else if (useAppStore.getState().folders.some((f) => f.id === folder.id)) {
+          store.updateFolder(folder.id, folder);
+          saveFolderOffline(folder, true).catch(() => {});
+        } else {
+          store.addFolder(folder);
+          saveFolderOffline(folder, true).catch(() => {});
         }
       }
+      // Keep folders sorted after remote reorders
+      store.setFolders([...useAppStore.getState().folders].sort(byOrder));
     },
     (error) => {
       console.error('Folders listener error:', error);
@@ -249,12 +411,13 @@ export function stopRealtimeSync(): void {
 }
 
 // Note operations
-export async function createNote(note: Omit<Note, 'id' | 'createdAt' | 'updatedAt'>): Promise<Note> {
+export async function createNote(note: Omit<Note, 'id' | 'userId' | 'createdAt' | 'updatedAt'>): Promise<Note> {
   const userId = getUserId();
   const now = Date.now();
   const newNote: Note = {
     ...note,
-    id: `note-${now}-${Math.random().toString(36).substring(2, 9)}`,
+    id: `note-${generateId()}`,
+    userId,
     createdAt: now,
     updatedAt: now,
   };
@@ -262,197 +425,178 @@ export async function createNote(note: Omit<Note, 'id' | 'createdAt' | 'updatedA
   // Optimistic update
   useAppStore.getState().addNote(newNote);
   await saveNoteOffline(newNote);
-  updateSyncStatus({ status: 'syncing', pendingChanges: useAppStore.getState().syncStatus.pendingChanges + 1 });
 
-  try {
-    await setDoc(doc(db, NOTES_COLLECTION, newNote.id), noteToFirestore(newNote));
-    await saveNoteOffline(newNote, true);
-    updateSyncStatus({ status: 'synced', lastSynced: Date.now(), pendingChanges: Math.max(0, useAppStore.getState().syncStatus.pendingChanges - 1) });
-  } catch (error) {
-    console.error('Failed to create note:', error);
-    await addToSyncQueue('create', 'notes', newNote);
-    updateSyncStatus({ status: 'error', error: String(error) });
-  }
+  trackWrite(setDoc(doc(db, NOTES_COLLECTION, newNote.id), noteToFirestore(newNote)), () =>
+    addToSyncQueue('create', 'notes', newNote)
+  );
 
   return newNote;
 }
 
+/** Create an empty note at the top of the given (or active) folder and select it. */
+export async function createNewNote(folderId?: string): Promise<Note | null> {
+  const state = useAppStore.getState();
+  const active = state.folders.find((f) => f.id === state.activeFolderId);
+  const inbox = state.folders.find((f) => f.isInbox);
+  // New notes never go straight into the archive
+  const targetFolderId = folderId ?? (active && !active.isArchive ? active.id : inbox?.id ?? state.folders[0]?.id);
+  if (!targetFolderId) return null;
+
+  const folderNotes = state.notes.filter((n) => n.folderId === targetFolderId);
+  const minOrder = folderNotes.reduce((min, n) => Math.min(min, n.order), 0);
+
+  const note = await createNote({
+    folderId: targetFolderId,
+    title: '',
+    content: '',
+    order: minOrder - 1,
+    pinned: false,
+    wordCount: 0,
+    charCount: 0,
+  });
+
+  const store = useAppStore.getState();
+  store.clearSearch();
+  if (store.activeFolderId !== targetFolderId) store.setActiveFolder(targetFolderId);
+  store.setSelectedNote(note.id);
+  window.dispatchEvent(new CustomEvent('quicknotes:focus-title'));
+  return note;
+}
+
 export async function updateNote(noteId: string, updates: Partial<Note>): Promise<void> {
-  const userId = getUserId();
-  const now = Date.now();
-  const updatedNote = { ...updates, updatedAt: now };
+  const updatedFields: Partial<Note> = { ...updates, updatedAt: Date.now() };
 
   // Optimistic update
-  useAppStore.getState().updateNote(noteId, updatedNote);
+  useAppStore.getState().updateNote(noteId, updatedFields);
   const note = useAppStore.getState().notes.find((n) => n.id === noteId);
-  if (note) await saveNoteOffline({ ...note, ...updatedNote });
-  updateSyncStatus({ status: 'syncing', pendingChanges: useAppStore.getState().syncStatus.pendingChanges + 1 });
+  if (!note) return;
+  await saveNoteOffline(note);
 
-  try {
-    await updateDoc(doc(db, NOTES_COLLECTION, noteId), updatedNote);
-    const updated = useAppStore.getState().notes.find((n) => n.id === noteId);
-    if (updated) await saveNoteOffline(updated, true);
-    updateSyncStatus({ status: 'synced', lastSynced: Date.now(), pendingChanges: Math.max(0, useAppStore.getState().syncStatus.pendingChanges - 1) });
-  } catch (error) {
-    console.error('Failed to update note:', error);
-    const currentNote = useAppStore.getState().notes.find((n) => n.id === noteId);
-    if (currentNote) await addToSyncQueue('update', 'notes', { id: noteId, ...updatedNote });
-    updateSyncStatus({ status: 'error', error: String(error) });
-  }
+  trackWrite(updateDoc(doc(db, NOTES_COLLECTION, noteId), toFirestoreUpdate(updatedFields)), () =>
+    addToSyncQueue('update', 'notes', { id: noteId, ...updatedFields })
+  );
 }
 
-export async function deleteNote(noteId: string, permanent = false): Promise<void> {
-  const userId = getUserId();
-  const now = Date.now();
+/** Permanently delete a note. */
+export async function deleteNote(noteId: string): Promise<void> {
+  useAppStore.getState().deleteNote(noteId);
+  await deleteNoteOffline(noteId);
 
-  if (permanent) {
-    // Hard delete
-    useAppStore.getState().deleteNote(noteId);
-    await saveNoteOffline({ id: noteId } as Note); // Will be filtered out
-    
-    try {
-      await deleteDoc(doc(db, NOTES_COLLECTION, noteId));
-    } catch (error) {
-      console.error('Failed to delete note:', error);
-      await addToSyncQueue('delete', 'notes', { id: noteId });
-    }
-  } else {
-    // Soft delete (archive)
-    await updateNote(noteId, { 
-      deletedAt: now, 
-      folderId: 'archive',
-      updatedAt: now,
-    });
-  }
+  trackWrite(deleteDoc(doc(db, NOTES_COLLECTION, noteId)), () => addToSyncQueue('delete', 'notes', { id: noteId }));
 }
 
-export async function restoreNote(noteId: string, folderId: string = 'inbox'): Promise<void> {
-  await updateNote(noteId, { 
-    deletedAt: undefined, 
-    folderId,
-    updatedAt: Date.now(),
-  });
+/** Move a note to Archive, or back to Inbox if it is already archived. */
+export async function toggleArchiveNote(noteId: string): Promise<void> {
+  const { notes, folders } = useAppStore.getState();
+  const note = notes.find((n) => n.id === noteId);
+  const archive = folders.find((f) => f.isArchive);
+  const inbox = folders.find((f) => f.isInbox);
+  if (!note || !archive || !inbox) return;
+
+  const isArchived = note.folderId === archive.id;
+  await updateNote(noteId, { folderId: isArchived ? inbox.id : archive.id, pinned: false });
+  if (useAppStore.getState().selectedNoteId === noteId) {
+    useAppStore.getState().setSelectedNote(null);
+  }
 }
 
 // Folder operations
-export async function createFolder(folder: Omit<Folder, 'id' | 'createdAt' | 'updatedAt'>): Promise<Folder> {
+export async function createFolder(folder: Omit<Folder, 'id' | 'userId' | 'createdAt' | 'updatedAt'>): Promise<Folder> {
   const userId = getUserId();
   const now = Date.now();
   const newFolder: Folder = {
     ...folder,
-    id: `folder-${now}-${Math.random().toString(36).substring(2, 9)}`,
+    id: `folder-${generateId()}`,
+    userId,
     createdAt: now,
     updatedAt: now,
   };
 
   useAppStore.getState().addFolder(newFolder);
   await saveFolderOffline(newFolder);
-  updateSyncStatus({ status: 'syncing', pendingChanges: useAppStore.getState().syncStatus.pendingChanges + 1 });
 
-  try {
-    await setDoc(doc(db, FOLDERS_COLLECTION, newFolder.id), folderToFirestore(newFolder));
-    await saveFolderOffline(newFolder, true);
-    updateSyncStatus({ status: 'synced', lastSynced: Date.now(), pendingChanges: Math.max(0, useAppStore.getState().syncStatus.pendingChanges - 1) });
-  } catch (error) {
-    console.error('Failed to create folder:', error);
-    await addToSyncQueue('create', 'folders', newFolder);
-    updateSyncStatus({ status: 'error', error: String(error) });
-  }
+  trackWrite(setDoc(doc(db, FOLDERS_COLLECTION, newFolder.id), folderToFirestore(newFolder)), () =>
+    addToSyncQueue('create', 'folders', newFolder)
+  );
 
   return newFolder;
 }
 
 export async function updateFolder(folderId: string, updates: Partial<Folder>): Promise<void> {
-  const updatedFolder = { ...updates, updatedAt: Date.now() };
-  
-  useAppStore.getState().updateFolder(folderId, updatedFolder);
-  const folder = useAppStore.getState().folders.find((f) => f.id === folderId);
-  if (folder) await saveFolderOffline({ ...folder, ...updatedFolder });
-  updateSyncStatus({ status: 'syncing', pendingChanges: useAppStore.getState().syncStatus.pendingChanges + 1 });
+  const updatedFields: Partial<Folder> = { ...updates, updatedAt: Date.now() };
 
-  try {
-    await updateDoc(doc(db, FOLDERS_COLLECTION, folderId), updatedFolder);
-    const updated = useAppStore.getState().folders.find((f) => f.id === folderId);
-    if (updated) await saveFolderOffline(updated, true);
-    updateSyncStatus({ status: 'synced', lastSynced: Date.now(), pendingChanges: Math.max(0, useAppStore.getState().syncStatus.pendingChanges - 1) });
-  } catch (error) {
-    console.error('Failed to update folder:', error);
-    const currentFolder = useAppStore.getState().folders.find((f) => f.id === folderId);
-    if (currentFolder) await addToSyncQueue('update', 'folders', { id: folderId, ...updatedFolder });
-    updateSyncStatus({ status: 'error', error: String(error) });
-  }
+  useAppStore.getState().updateFolder(folderId, updatedFields);
+  const folder = useAppStore.getState().folders.find((f) => f.id === folderId);
+  if (!folder) return;
+  await saveFolderOffline(folder);
+
+  trackWrite(updateDoc(doc(db, FOLDERS_COLLECTION, folderId), toFirestoreUpdate(updatedFields)), () =>
+    addToSyncQueue('update', 'folders', { id: folderId, ...updatedFields })
+  );
 }
 
+/** Delete a folder; its notes are moved to Inbox. */
 export async function deleteFolder(folderId: string): Promise<void> {
-  // Move notes to uncategorized first
-  const uncategorized = useAppStore.getState().folders.find((f) => f.name === 'Uncategorized');
-  const notesToMove = useAppStore.getState().notes.filter((n) => n.folderId === folderId);
-  
-  for (const note of notesToMove) {
-    await updateNote(note.id, { folderId: uncategorized?.id ?? 'uncategorized' });
+  const { folders, notes } = useAppStore.getState();
+  const folder = folders.find((f) => f.id === folderId);
+  if (!folder || folder.isInbox || folder.isArchive) return;
+
+  const inbox = folders.find((f) => f.isInbox);
+  if (inbox) {
+    for (const note of notes.filter((n) => n.folderId === folderId)) {
+      await updateNote(note.id, { folderId: inbox.id });
+    }
   }
 
   useAppStore.getState().deleteFolder(folderId);
-  await saveFolderOffline({ id: folderId } as Folder); // Will be filtered
-  updateSyncStatus({ status: 'syncing', pendingChanges: useAppStore.getState().syncStatus.pendingChanges + 1 });
-
-  try {
-    await deleteDoc(doc(db, FOLDERS_COLLECTION, folderId));
-    updateSyncStatus({ status: 'synced', lastSynced: Date.now(), pendingChanges: Math.max(0, useAppStore.getState().syncStatus.pendingChanges - 1) });
-  } catch (error) {
-    console.error('Failed to delete folder:', error);
-    await addToSyncQueue('delete', 'folders', { id: folderId });
-    updateSyncStatus({ status: 'error', error: String(error) });
+  if (!useAppStore.getState().activeFolderId && inbox) {
+    useAppStore.getState().setActiveFolder(inbox.id);
   }
+  await deleteFolderOffline(folderId);
+
+  trackWrite(deleteDoc(doc(db, FOLDERS_COLLECTION, folderId)), () =>
+    addToSyncQueue('delete', 'folders', { id: folderId })
+  );
 }
 
-export async function reorderFolders(folderIds: string[]): Promise<void> {
-  const batch = writeBatch(db);
-  const userId = getUserId();
-  
-  folderIds.forEach((id, index) => {
-    const folderRef = doc(db, FOLDERS_COLLECTION, id);
-    batch.update(folderRef, { order: index, updatedAt: serverTimestamp() });
-  });
+export async function reorderFolders(folderIds: string[], startOrder = 0): Promise<void> {
+  const now = Date.now();
+  const store = useAppStore.getState();
+  folderIds.forEach((id, index) => store.updateFolder(id, { order: startOrder + index, updatedAt: now }));
+  store.setFolders([...useAppStore.getState().folders].sort(byOrder));
 
-  try {
-    await batch.commit();
-    useAppStore.getState().reorderFolders(folderIds);
-    // Update offline
-    for (let i = 0; i < folderIds.length; i++) {
-      const folder = useAppStore.getState().folders.find((f) => f.id === folderIds[i]);
-      if (folder) await saveFolderOffline({ ...folder, order: i }, true);
-    }
-  } catch (error) {
-    console.error('Failed to reorder folders:', error);
+  const batch = writeBatch(db);
+  folderIds.forEach((id, index) => {
+    batch.update(doc(db, FOLDERS_COLLECTION, id), { order: startOrder + index, updatedAt: Timestamp.fromMillis(now) });
+  });
+  trackWrite(batch.commit());
+
+  for (const id of folderIds) {
+    const folder = useAppStore.getState().folders.find((f) => f.id === id);
+    if (folder) await saveFolderOffline(folder);
   }
 }
 
 export async function reorderNotes(noteIds: string[]): Promise<void> {
-  const batch = writeBatch(db);
-  
-  noteIds.forEach((id, index) => {
-    const noteRef = doc(db, NOTES_COLLECTION, id);
-    batch.update(noteRef, { order: index, updatedAt: serverTimestamp() });
-  });
+  const store = useAppStore.getState();
+  noteIds.forEach((id, index) => store.updateNote(id, { order: index }));
 
-  try {
-    await batch.commit();
-    useAppStore.getState().reorderNotes(noteIds);
-    // Update offline
-    for (let i = 0; i < noteIds.length; i++) {
-      const note = useAppStore.getState().notes.find((n) => n.id === noteIds[i]);
-      if (note) await saveNoteOffline({ ...note, order: i }, true);
-    }
-  } catch (error) {
-    console.error('Failed to reorder notes:', error);
+  const batch = writeBatch(db);
+  noteIds.forEach((id, index) => {
+    batch.update(doc(db, NOTES_COLLECTION, id), { order: index });
+  });
+  trackWrite(batch.commit());
+
+  for (const id of noteIds) {
+    const note = useAppStore.getState().notes.find((n) => n.id === id);
+    if (note) await saveNoteOffline(note);
   }
 }
 
 // User operations
 export async function createUserProfile(user: User): Promise<void> {
   try {
-    await setDoc(doc(db, USERS_COLLECTION, user.uid), userToFirestore(user));
+    await setDoc(doc(db, USERS_COLLECTION, user.uid), userToFirestore(user), { merge: true });
     await saveUserOffline(user);
   } catch (error) {
     console.error('Failed to create user profile:', error);
@@ -466,19 +610,15 @@ export async function updateUserSettings(settings: Partial<UserSettings>): Promi
 
   const updatedSettings = { ...user.settings, ...settings };
   useAppStore.getState().updateUserSettings(settings);
+  await saveUserOffline({ ...user, settings: updatedSettings });
 
-  try {
-    await updateDoc(doc(db, USERS_COLLECTION, userId), { settings: updatedSettings });
-    await saveUserOffline({ ...user, settings: updatedSettings });
-  } catch (error) {
-    console.error('Failed to update user settings:', error);
-  }
+  trackWrite(setDoc(doc(db, USERS_COLLECTION, userId), { settings: updatedSettings }, { merge: true }));
 }
 
 // Sync queue processing
 export async function processSyncQueue(): Promise<void> {
-  if (!navigator.onLine) return;
-  
+  if (!navigator.onLine || !auth.currentUser) return;
+
   const queue = await getSyncQueue();
   for (const item of queue) {
     if (item.retries > 5) {
@@ -487,24 +627,19 @@ export async function processSyncQueue(): Promise<void> {
     }
 
     try {
-      if (item.collection === 'notes') {
-        const data = item.data as Note;
-        if (item.type === 'create') {
-          await setDoc(doc(db, NOTES_COLLECTION, data.id), noteToFirestore(data));
-        } else if (item.type === 'update') {
-          await updateDoc(doc(db, NOTES_COLLECTION, data.id), data);
-        } else if (item.type === 'delete') {
-          await deleteDoc(doc(db, NOTES_COLLECTION, data.id));
-        }
-      } else if (item.collection === 'folders') {
-        const data = item.data as Folder;
-        if (item.type === 'create') {
-          await setDoc(doc(db, FOLDERS_COLLECTION, data.id), folderToFirestore(data));
-        } else if (item.type === 'update') {
-          await updateDoc(doc(db, FOLDERS_COLLECTION, data.id), data);
-        } else if (item.type === 'delete') {
-          await deleteDoc(doc(db, FOLDERS_COLLECTION, data.id));
-        }
+      const data = item.data as { id: string } & Record<string, unknown>;
+      const collectionName = item.collection === 'notes' ? NOTES_COLLECTION : FOLDERS_COLLECTION;
+      const ref = doc(db, collectionName, data.id);
+
+      if (item.type === 'create') {
+        await setDoc(
+          ref,
+          item.collection === 'notes' ? noteToFirestore(data as unknown as Note) : folderToFirestore(data as unknown as Folder)
+        );
+      } else if (item.type === 'update') {
+        await updateDoc(ref, toFirestoreUpdate(data));
+      } else {
+        await deleteDoc(ref);
       }
       await removeFromSyncQueue(item.id);
     } catch (error) {
@@ -513,20 +648,19 @@ export async function processSyncQueue(): Promise<void> {
     }
   }
 
-  updateSyncStatus({ status: 'synced', lastSynced: Date.now(), pendingChanges: 0 });
+  if (useAppStore.getState().syncStatus.status !== 'syncing') {
+    updateSyncStatus({ status: 'synced', lastSynced: Date.now(), error: undefined });
+  }
 }
 
 // Export/Import
 export async function exportAllData(): Promise<string> {
-  const userId = getUserId();
-  const user = useAppStore.getState().user;
-  const folders = useAppStore.getState().folders;
-  const notes = useAppStore.getState().notes;
+  const { user, folders, notes } = useAppStore.getState();
 
-  const exportData = {
+  const exportData: ExportData = {
     version: '1.0',
     exportedAt: Date.now(),
-    user: { uid: user?.uid, email: user?.email },
+    user: { uid: user?.uid ?? '', email: user?.email ?? '' },
     folders,
     notes,
   };
@@ -534,64 +668,133 @@ export async function exportAllData(): Promise<string> {
   return JSON.stringify(exportData, null, 2);
 }
 
-export async function importData(json: string, options: { mergeStrategy: 'replace' | 'merge' | 'skip' } = { mergeStrategy: 'merge' }): Promise<void> {
-  const data = JSON.parse(json) as { folders: Folder[]; notes: Note[] };
+export async function importData(
+  data: { folders?: Folder[]; notes?: Note[] },
+  options: { mergeStrategy: 'replace' | 'merge' | 'skip' } = { mergeStrategy: 'merge' }
+): Promise<{ folders: number; notes: number }> {
   const userId = getUserId();
+  const importFolders = Array.isArray(data.folders) ? data.folders : [];
+  const importNotes = Array.isArray(data.notes) ? data.notes : [];
+  if (importFolders.length === 0 && importNotes.length === 0) {
+    throw new Error('No notes or folders found in file');
+  }
+
+  const ops: Array<(batch: ReturnType<typeof writeBatch>) => void> = [];
+  const store = useAppStore.getState();
 
   if (options.mergeStrategy === 'replace') {
-    // Clear existing data
-    stopRealtimeSync();
-    // Note: In a real app, you'd batch delete from Firestore
-    useAppStore.getState().setFolders([]);
-    useAppStore.getState().setNotes([]);
-    await clearAllData();
+    // Delete all notes and custom folders, keep system folders
+    for (const note of store.notes) {
+      ops.push((b) => b.delete(doc(db, NOTES_COLLECTION, note.id)));
+      store.deleteNote(note.id);
+      await deleteNoteOffline(note.id);
+    }
+    for (const folder of store.folders.filter((f) => !f.isInbox && !f.isArchive)) {
+      ops.push((b) => b.delete(doc(db, FOLDERS_COLLECTION, folder.id)));
+      store.deleteFolder(folder.id);
+      await deleteFolderOffline(folder.id);
+    }
   }
 
-  const batch = writeBatch(db);
-  let hasChanges = false;
+  const currentFolders = useAppStore.getState().folders;
+  const inbox = currentFolders.find((f) => f.isInbox);
+  const archive = currentFolders.find((f) => f.isArchive);
+  const folderMap = new Map<string, string>(); // imported folder id -> local folder id
+  let folderCount = 0;
+  let noteCount = 0;
+  const now = Date.now();
 
-  for (const folder of data.folders) {
-    if (folder.isInbox || folder.isArchive) continue; // Skip system folders
-    
-    const existing = useAppStore.getState().folders.find((f) => f.name === folder.name);
+  for (const folder of importFolders) {
+    if (!folder?.id) continue;
+    if (folder.isInbox && inbox) { folderMap.set(folder.id, inbox.id); continue; }
+    if (folder.isArchive && archive) { folderMap.set(folder.id, archive.id); continue; }
+
+    const existing = useAppStore.getState().folders.find((f) => f.name === folder.name && !f.isInbox && !f.isArchive);
+    if (existing) {
+      folderMap.set(folder.id, existing.id);
+      continue;
+    }
+
+    const newFolder: Folder = {
+      ...folder,
+      id: `folder-${generateId()}`,
+      userId,
+      isInbox: false,
+      isArchive: false,
+      order: typeof folder.order === 'number' ? folder.order : useAppStore.getState().folders.length,
+      createdAt: typeof folder.createdAt === 'number' ? folder.createdAt : now,
+      updatedAt: now,
+    };
+    folderMap.set(folder.id, newFolder.id);
+    ops.push((b) => b.set(doc(db, FOLDERS_COLLECTION, newFolder.id), folderToFirestore(newFolder)));
+    useAppStore.getState().addFolder(newFolder);
+    await saveFolderOffline(newFolder);
+    folderCount++;
+  }
+
+  for (const note of importNotes) {
+    if (!note || typeof note.content !== 'string') continue;
+    const existing = useAppStore.getState().notes.find((n) => n.id === note.id);
     if (existing && options.mergeStrategy === 'skip') continue;
-    
-    const folderId = existing?.id ?? `folder-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-    const folderData = { ...folder, id: folderId, userId, updatedAt: Date.now() };
-    batch.set(doc(db, FOLDERS_COLLECTION, folderId), folderToFirestore(folderData));
-    useAppStore.getState().addFolder(folderData);
-    await saveFolderOffline(folderData);
-    hasChanges = true;
-  }
 
-  for (const note of data.notes) {
-    const noteId = `note-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-    const noteData = { ...note, id: noteId, userId, updatedAt: Date.now() };
-    batch.set(doc(db, NOTES_COLLECTION, noteId), noteToFirestore(noteData));
-    useAppStore.getState().addNote(noteData);
+    const folderId = folderMap.get(note.folderId) ?? (currentFolders.some((f) => f.id === note.folderId) ? note.folderId : inbox?.id);
+    if (!folderId) continue;
+
+    const noteData: Note = {
+      ...note,
+      id: existing ? existing.id : `note-${generateId()}`,
+      userId,
+      folderId,
+      title: note.title ?? '',
+      pinned: !!note.pinned,
+      order: typeof note.order === 'number' ? note.order : 0,
+      wordCount: typeof note.wordCount === 'number' ? note.wordCount : 0,
+      charCount: typeof note.charCount === 'number' ? note.charCount : note.content.length,
+      createdAt: typeof note.createdAt === 'number' ? note.createdAt : now,
+      updatedAt: now,
+      deletedAt: undefined,
+    };
+    ops.push((b) => b.set(doc(db, NOTES_COLLECTION, noteData.id), noteToFirestore(noteData)));
+    if (existing) useAppStore.getState().updateNote(noteData.id, noteData);
+    else useAppStore.getState().addNote(noteData);
     await saveNoteOffline(noteData);
-    hasChanges = true;
+    noteCount++;
   }
 
-  if (hasChanges) {
-    await batch.commit();
-    startRealtimeSync();
-    updateSyncStatus({ status: 'synced', lastSynced: Date.now() });
+  if (ops.length > 0) {
+    trackWrite(commitInChunks(ops));
   }
+  return { folders: folderCount, notes: noteCount };
+}
+
+/** Delete every note, folder and the profile of the current user from Firestore. */
+export async function deleteAllUserData(): Promise<void> {
+  const userId = getUserId();
+  stopRealtimeSync();
+
+  const [notesSnap, foldersSnap] = await Promise.all([
+    getDocs(query(collection(db, NOTES_COLLECTION), where('userId', '==', userId))),
+    getDocs(query(collection(db, FOLDERS_COLLECTION), where('userId', '==', userId))),
+  ]);
+
+  const ops: Array<(batch: ReturnType<typeof writeBatch>) => void> = [
+    ...notesSnap.docs.map((d) => (b: ReturnType<typeof writeBatch>) => b.delete(d.ref)),
+    ...foldersSnap.docs.map((d) => (b: ReturnType<typeof writeBatch>) => b.delete(d.ref)),
+    (b) => b.delete(doc(db, USERS_COLLECTION, userId)),
+  ];
+  await commitInChunks(ops);
 }
 
 // Cleanup on logout
 export async function cleanupOnLogout(): Promise<void> {
   stopRealtimeSync();
   await clearAllData();
-  useAppStore.getState().setUser(null);
-  useAppStore.getState().setFolders([]);
-  useAppStore.getState().setNotes([]);
-  useAppStore.getState().setActiveFolder(null);
+  const store = useAppStore.getState();
+  store.setUser(null);
+  store.setFolders([]);
+  store.setNotes([]);
+  store.setActiveFolder(null);
+  store.setSelectedNote(null);
+  store.clearSearch();
   updateSyncStatus(defaultSyncStatus);
 }
-
-const defaultSyncStatus: import('../types').SyncStatus = {
-  status: 'synced',
-  pendingChanges: 0,
-};

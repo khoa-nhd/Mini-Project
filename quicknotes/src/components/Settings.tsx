@@ -11,11 +11,10 @@ import { updateUserSettings, cleanupOnLogout, exportAllData } from '../services/
 import { ExportImportModal } from './ExportImport';
 
 export function SettingsModal() {
-  const { user, updateUserSettings: updateSettingsStore, shortcutsEnabled, setShortcutsEnabled } = useAppStore();
+  const { user, updateUserSettings: updateSettingsStore, shortcutsEnabled, setShortcutsEnabled, showSettings, setShowSettings } = useAppStore();
   const { theme, resolvedTheme, setThemeMode, toggleTheme } = useTheme();
   const { signOut, resetPassword } = useAuth();
   const { showToast } = useToast();
-  const [showSettings, setShowSettings] = useState(false);
   const [showDeleteAccount, setShowDeleteAccount] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
@@ -110,7 +109,7 @@ export function SettingsModal() {
               <label className="flex items-center justify-between cursor-pointer p-3 rounded-lg border transition-colors hover:bg-muted/50">
                 <div>
                   <div className="font-medium text-foreground">Keyboard Shortcuts</div>
-                  <div className="text-sm text-muted-foreground">Enable Cmd+N, Cmd+K, Cmd+S, etc.</div>
+                  <div className="text-sm text-muted-foreground">Enable {navigator.platform.includes('Mac') ? 'Cmd' : 'Ctrl'}+N, {navigator.platform.includes('Mac') ? 'Cmd' : 'Ctrl'}+K, {navigator.platform.includes('Mac') ? 'Cmd' : 'Ctrl'}+S, etc.</div>
                 </div>
                 <label className="ds-toggle">
                   <input

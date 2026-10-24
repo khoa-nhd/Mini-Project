@@ -143,7 +143,7 @@ export function NoteEditor() {
         <div className="empty-state">
           <Type className="empty-state-icon" />
           <h3 className="empty-state-title">No note selected</h3>
-          <p className="empty-state-text">Select a note from the list or press Cmd+N to create a new one</p>
+          <p className="empty-state-text">Select a note from the list or press {navigator.platform.includes('Mac') ? 'Cmd' : 'Ctrl'}+N to create a new one</p>
         </div>
       </div>
     );
@@ -180,7 +180,7 @@ export function NoteEditor() {
             size="sm"
             onClick={handleSave}
             disabled={saveStatus === 'saving'}
-            aria-label="Save (Cmd+S)"
+            aria-label={`Save (${navigator.platform.includes('Mac') ? 'Cmd' : 'Ctrl'}+S)`}
           >
             <Save className="w-4 h-4" />
           </Button>

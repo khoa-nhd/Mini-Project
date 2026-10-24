@@ -97,6 +97,35 @@ export function App() {
         </div>
         <SettingsModal />
       </div>
+      <button
+        onClick={() => {
+          const state = useAppStore.getState();
+          const folderId = state.activeFolderId ?? state.folders[0]?.id;
+          if (folderId) {
+            const newNote = {
+              id: `note-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+              userId: '',
+              folderId,
+              title: '',
+              content: '',
+              order: 0,
+              pinned: false,
+              createdAt: Date.now(),
+              updatedAt: Date.now(),
+              wordCount: 0,
+              charCount: 0,
+            };
+            state.addNote(newNote);
+            state.setSelectedNote(newNote.id);
+            state.setCreatingNote(true);
+          }
+        }}
+        aria-label="Create new note"
+        className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-24 h-24 rounded-full bg-teal-600 text-white shadow-2xl hover:scale-110 hover:bg-teal-700 active:scale-95 transition-all duration-200 ring-4 ring-background text-6xl leading-none"
+        title="New note (Ctrl+N)"
+      >
+        +
+      </button>
     </ToastProvider>
   );
 }

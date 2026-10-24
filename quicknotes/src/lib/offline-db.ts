@@ -128,8 +128,9 @@ export async function getNotesOffline(userId: string, folderId?: string): Promis
   }
 
   return notes
-    .filter((n) => !n.deletedAt && n._synced !== false)
-    .sort((a, b) => a.order - b.order) as Note[];
+    .filter((n) => !n.deletedAt)
+    .map(({ _synced, _pending, ...note }) => note as Note)
+    .sort((a, b) => a.order - b.order);
 }
 
 export async function getNoteOffline(id: string): Promise<Note | undefined> {
@@ -166,7 +167,9 @@ export async function getPendingNotes(userId: string): Promise<Note[]> {
 export async function getFoldersOffline(userId: string): Promise<Folder[]> {
   const db = await getDB();
   const folders = await db.getAllFromIndex('folders', 'byUser', userId);
-  return folders.sort((a, b) => a.order - b.order) as Folder[];
+  return folders
+    .map(({ _synced, _pending, ...folder }) => folder as Folder)
+    .sort((a, b) => a.order - b.order);
 }
 
 export async function saveFolderOffline(folder: Folder, synced = false): Promise<void> {
@@ -203,7 +206,7 @@ export async function addToSyncQueue(
     data,
     timestamp: Date.now(),
     retries: 0,
-  } as any);
+  } as Omit<SyncQueueItem, 'id'> as SyncQueueItem);
 }
 
 export async function getSyncQueue(): Promise<SyncQueueItem[]> {

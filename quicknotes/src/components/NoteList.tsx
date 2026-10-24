@@ -231,7 +231,7 @@ export function NoteList() {
             type="text"
             value={searchQuery}
             onChange={(e) => useAppStore.getState().setSearchQuery(e.target.value)}
-            placeholder="Search notes... (Cmd+K)"
+            placeholder={`Search notes... (${navigator.platform.includes('Mac') ? 'Cmd' : 'Ctrl'}+K)`}
             className="input pl-10 pr-10"
             onKeyDown={(e) => {
               if (e.key === 'Escape') useAppStore.getState().clearSearch();
@@ -310,7 +310,7 @@ export function NoteList() {
                     {searchQuery ? 'No matching notes' : 'No notes yet'}
                   </h3>
                   <p className="empty-state-text">
-                    {searchQuery ? 'Try a different search term' : 'Press Cmd+N to create your first note'}
+                    {searchQuery ? 'Try a different search term' : `Press ${navigator.platform.includes('Mac') ? 'Cmd' : 'Ctrl'}+N to create your first note`}
                   </p>
                 </div>
               </div>

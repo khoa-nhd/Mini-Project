@@ -1,9 +1,14 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Folder, Note, User, UserSettings, SyncStatus, FolderType } from '../types';
-import { SPECIAL_FOLDER_IDS } from '../types';
+
+export type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
 
 interface AppState {
+  // Auth
+  authStatus: AuthStatus;
+  setAuthStatus: (status: AuthStatus) => void;
+
   // User
   user: User | null;
   setUser: (user: User | null) => void;
@@ -45,6 +50,8 @@ interface AppState {
   setEditingFolder: (folderId: string | null) => void;
   showSettings: boolean;
   setShowSettings: (show: boolean) => void;
+  showExportImport: boolean;
+  setShowExportImport: (show: boolean) => void;
 
   // Sync
   syncStatus: SyncStatus;
@@ -71,13 +78,6 @@ interface AppState {
   getFolderType: (folderId: string) => FolderType;
 }
 
-const defaultSettings: UserSettings = {
-  theme: 'system',
-  shortcutsEnabled: true,
-  autoSaveDelay: 1500,
-  sortOrder: 'manual',
-};
-
 const defaultSyncStatus: SyncStatus = {
   status: 'synced',
   pendingChanges: 0,
@@ -86,6 +86,10 @@ const defaultSyncStatus: SyncStatus = {
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
+      // Auth
+      authStatus: 'loading',
+      setAuthStatus: (authStatus) => set({ authStatus }),
+
       // User
       user: null,
       setUser: (user) => set({ user }),
@@ -99,7 +103,7 @@ export const useAppStore = create<AppState>()(
       activeFolderId: null,
       setFolders: (folders) => set({ folders }),
       addFolder: (folder) =>
-        set((state) => ({ folders: [...state.folders, folder] })),
+        set((state) => ({ folders: [...state.folders, folder].sort((a, b) => a.order - b.order) })),
       updateFolder: (id, updates) =>
         set((state) => ({
           folders: state.folders.map((f) => (f.id === id ? { ...f, ...updates } : f)),
@@ -170,6 +174,8 @@ export const useAppStore = create<AppState>()(
       setEditingFolder: (folderId) => set({ isEditingFolder: folderId }),
       showSettings: false,
       setShowSettings: (show) => set({ showSettings: show }),
+      showExportImport: false,
+      setShowExportImport: (show) => set({ showExportImport: show }),
 
       // Sync
       syncStatus: defaultSyncStatus,
@@ -212,9 +218,10 @@ export const useAppStore = create<AppState>()(
         return notes.filter((n) => !n.pinned).sort((a, b) => a.order - b.order);
       },
       getFolderType: (folderId) => {
-        if (folderId === SPECIAL_FOLDER_IDS.INBOX) return 'inbox';
-        if (folderId === SPECIAL_FOLDER_IDS.ARCHIVE) return 'archive';
-        if (folderId === SPECIAL_FOLDER_IDS.UNCATEGORIZED) return 'uncategorized';
+        const folder = get().folders.find((f) => f.id === folderId);
+        if (folder?.isInbox) return 'inbox';
+        if (folder?.isArchive) return 'archive';
+        if (folder?.name === 'Uncategorized') return 'uncategorized';
         return 'custom';
       },
     }),
@@ -225,12 +232,6 @@ export const useAppStore = create<AppState>()(
         activeFolderId: state.activeFolderId,
         isSidebarOpen: state.isSidebarOpen,
         shortcutsEnabled: state.shortcutsEnabled,
-        searchQuery: '',
-        selectedNoteId: null,
-        isCreatingNote: false,
-        isEditingFolder: null,
-        showDeleteConfirm: { type: 'note', id: null },
-        showInstallPrompt: state.showInstallPrompt,
       }),
     }
   )
@@ -239,50 +240,8 @@ export const useAppStore = create<AppState>()(
 // Selectors for performance
 export const useUser = () => useAppStore((state) => state.user);
 export const useFolders = () => useAppStore((state) => state.folders);
-export const useActiveFolder = () => useAppStore((state) => state.getActiveFolder());
 export const useActiveFolderId = () => useAppStore((state) => state.activeFolderId);
 export const useNotes = () => useAppStore((state) => state.notes);
-export const useSelectedNote = () => useAppStore((state) => state.getSelectedNote());
 export const useSelectedNoteId = () => useAppStore((state) => state.selectedNoteId);
 export const useSearchQuery = () => useAppStore((state) => state.searchQuery);
 export const useSyncStatus = () => useAppStore((state) => state.syncStatus);
-export const useUIState = () =>
-  useAppStore((state) => ({
-    isSidebarOpen: state.isSidebarOpen,
-    isCreatingNote: state.isCreatingNote,
-    isEditingFolder: state.isEditingFolder,
-    showDeleteConfirm: state.showDeleteConfirm,
-    showInstallPrompt: state.showInstallPrompt,
-  }));
-export const useActions = () =>
-  useAppStore((state) => ({
-    setUser: state.setUser,
-    updateUserSettings: state.updateUserSettings,
-    setFolders: state.setFolders,
-    addFolder: state.addFolder,
-    updateFolder: state.updateFolder,
-    deleteFolder: state.deleteFolder,
-    setActiveFolder: state.setActiveFolder,
-    reorderFolders: state.reorderFolders,
-    setNotes: state.setNotes,
-    addNote: state.addNote,
-    updateNote: state.updateNote,
-    deleteNote: state.deleteNote,
-    setSelectedNote: state.setSelectedNote,
-    reorderNotes: state.reorderNotes,
-    moveNoteToFolder: state.moveNoteToFolder,
-    setSearchQuery: state.setSearchQuery,
-    clearSearch: state.clearSearch,
-    toggleSidebar: state.toggleSidebar,
-    setSidebarOpen: state.setSidebarOpen,
-    setCreatingNote: state.setCreatingNote,
-    setEditingFolder: state.setEditingFolder,
-    setSyncStatus: state.setSyncStatus,
-    setShowDeleteConfirm: state.setShowDeleteConfirm,
-    setShowInstallPrompt: state.setShowInstallPrompt,
-    setShortcutsEnabled: state.setShortcutsEnabled,
-    getNotesByFolder: state.getNotesByFolder,
-    getPinnedNotes: state.getPinnedNotes,
-    getUnpinnedNotes: state.getUnpinnedNotes,
-    getFolderType: state.getFolderType,
-  }));
