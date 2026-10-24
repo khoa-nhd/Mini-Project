@@ -1,39 +1,63 @@
-import { useState, useRef, useEffect } from 'react';
-import { cn } from '../lib/utils';
-import { Search, X, Pin, Archive, MoreVertical, FileText, Clock, Loader2 } from 'lucide-react';
-import { Button } from './ui/Button';
-import { Input } from './ui/Input';
-import { Modal, ConfirmDialog } from './ui/Modal';
+import { useEffect, useRef, Fragment } from 'react';
+import { cn, formatRelativeTime, shortcutLabel, isMac } from '../lib/utils';
+import { Search, X, Pin, Archive, ArchiveRestore, Trash2, FileText, Clock, GripVertical, Menu } from 'lucide-react';
 import { useAppStore } from '../stores/appStore';
-import { updateNote, deleteNote, reorderNotes } from '../services/firebaseSync';
-import { formatRelativeTime, countWords, extractTitle } from '../lib/utils';
-import { DndContext, closestCorners, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
-import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
+import { updateNote, reorderNotes, toggleArchiveNote } from '../services/firebaseSync';
+import type { Note } from '../types';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-interface SortableNoteItemProps {
-  note: {
-    id: string;
-    title: string;
-    content: string;
-    pinned: boolean;
-    updatedAt: number;
-    createdAt: number;
-    wordCount: number;
-  };
-  isSelected: boolean;
-  onSelect: () => void;
-  onArchive: () => void;
-  onPin: () => void;
-  onDelete: () => void;
-  searchQuery?: string;
+/** Highlights matches of `query` in `text` without using innerHTML. */
+function Highlight({ text, query }: { text: string; query: string }) {
+  if (!query) return <>{text}</>;
+  const lowerText = text.toLowerCase();
+  const lowerQuery = query.toLowerCase();
+  const parts: Array<{ text: string; match: boolean }> = [];
+  let index = 0;
+  while (index < text.length) {
+    const found = lowerText.indexOf(lowerQuery, index);
+    if (found === -1) {
+      parts.push({ text: text.slice(index), match: false });
+      break;
+    }
+    if (found > index) parts.push({ text: text.slice(index, found), match: false });
+    parts.push({ text: text.slice(found, found + query.length), match: true });
+    index = found + query.length;
+  }
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.match ? <mark key={i} className="search-highlight">{part.text}</mark> : <Fragment key={i}>{part.text}</Fragment>
+      )}
+    </>
+  );
 }
 
-function SortableNoteItem({ note, isSelected, onSelect, onArchive, onPin, onDelete, searchQuery }: SortableNoteItemProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: note.id });
-  const [showActions, setShowActions] = useState(false);
-  const [swipeX, setSwipeX] = useState(0);
-  const itemRef = useRef<HTMLDivElement>(null);
+/** Snippet of the content around the first match so the highlight is visible. */
+function snippet(content: string, query: string): string {
+  const flat = content.replace(/\s+/g, ' ').trim();
+  if (!query) return flat.slice(0, 160);
+  const found = flat.toLowerCase().indexOf(query.toLowerCase());
+  if (found <= 40) return flat.slice(0, 160);
+  return '…' + flat.slice(found - 30, found + 130);
+}
+
+interface NoteItemProps {
+  note: Note;
+  isSelected: boolean;
+  isArchived: boolean;
+  draggable: boolean;
+  searchQuery: string;
+  onSelect: () => void;
+}
+
+function SortableNoteItem({ note, isSelected, isArchived, draggable, searchQuery, onSelect }: NoteItemProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: note.id,
+    disabled: !draggable,
+  });
+  const setShowDeleteConfirm = useAppStore((state) => state.setShowDeleteConfirm);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -41,74 +65,51 @@ function SortableNoteItem({ note, isSelected, onSelect, onArchive, onPin, onDele
     opacity: isDragging ? 0.5 : 1,
   };
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setSwipeX(0);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    const deltaX = e.touches[0].clientX - (e as any).nativeEvent.changedTouches[0].clientX;
-    if (Math.abs(deltaX) > 10) {
-      e.preventDefault();
-      setSwipeX(Math.max(-100, Math.min(0, deltaX)));
-    }
-  };
-
-  const handleTouchEnd = () => {
-    if (swipeX < -50) {
-      setShowActions(true);
-      setSwipeX(-80);
-    } else {
-      setSwipeX(0);
-      setShowActions(false);
-    }
-  };
-
-  const highlightedTitle = searchQuery && note.title.toLowerCase().includes(searchQuery.toLowerCase())
-    ? note.title.replace(new RegExp(`(${searchQuery})`, 'gi'), '<mark class="search-highlight">$1</mark>')
-    : note.title;
-
-  const highlightedContent = searchQuery && note.content.toLowerCase().includes(searchQuery.toLowerCase())
-    ? note.content.replace(new RegExp(`(${searchQuery})`, 'gi'), '<mark class="search-highlight">$1</mark>')
-    : note.content;
+  const title = note.title || 'Untitled';
+  const preview = snippet(note.content, searchQuery);
 
   return (
     <div
-      ref={(el) => { setNodeRef(el); itemRef.current = el; }}
+      ref={setNodeRef}
       style={style}
-      className={cn(
-        'note-item relative',
-        isSelected && 'note-item-selected',
-        note.pinned && 'note-item-pinned',
-        showActions && 'translate-x-[-80px]'
-      )}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      onMouseEnter={() => setShowActions(true)}
-      onMouseLeave={() => setShowActions(false)}
+      className={cn('note-item group relative', isSelected && 'note-item-selected', note.pinned && 'note-item-pinned')}
+      onClick={onSelect}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onSelect();
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      aria-current={isSelected ? 'true' : undefined}
     >
-      <div
-        {...attributes}
-        {...listeners}
-        className={cn(
-          'swipe-content flex items-start gap-3 p-3 rounded-lg transition-transform duration-fast',
-          showActions && 'translate-x-[-80px]'
+      <div className="flex items-start gap-2 p-3">
+        {draggable && (
+          <span
+            {...attributes}
+            {...listeners}
+            onClick={(e) => e.stopPropagation()}
+            className="drag-handle p-1 -ml-1 mt-0.5 opacity-40 group-hover:opacity-100"
+            aria-label="Drag to reorder"
+          >
+            <GripVertical className="w-4 h-4" />
+          </span>
         )}
-        onClick={onSelect}
-      >
-        <div className="flex flex-col items-center justify-center gap-1 p-1 rounded drag-handle" aria-label="Drag to reorder">
-          <MoreVertical className="w-4 h-4" />
-        </div>
-        
+
         <div className="flex-1 min-w-0">
-          <div className="flex items-start gap-2">
-            {note.pinned && <Pin className="pin-indicator w-4 h-4 flex-shrink-0 mt-0.5" />}
-            <div className="flex-1 min-w-0">
-              <p className="font-medium text-foreground truncate" dangerouslySetInnerHTML={{ __html: highlightedTitle }} />
-              <p className="text-sm text-muted-foreground truncate mt-0.5" dangerouslySetInnerHTML={{ __html: highlightedContent }} />
-            </div>
+          <div className="flex items-center gap-2">
+            {note.pinned && <Pin className="pin-indicator w-3.5 h-3.5 flex-shrink-0" aria-label="Pinned" />}
+            <p className={cn('font-medium truncate', note.title ? 'text-foreground' : 'text-muted-foreground italic')}>
+              <Highlight text={title} query={searchQuery} />
+            </p>
           </div>
-          <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+          {preview && (
+            <p className="text-sm text-muted-foreground truncate mt-0.5">
+              <Highlight text={preview} query={searchQuery} />
+            </p>
+          )}
+          <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
               <Clock className="w-3 h-3" />
               {formatRelativeTime(note.updatedAt)}
@@ -120,206 +121,213 @@ function SortableNoteItem({ note, isSelected, onSelect, onArchive, onPin, onDele
           </div>
         </div>
 
-        {note.pinned && (
-          <Pin className="pin-indicator w-5 h-5 flex-shrink-0" />
-        )}
-      </div>
-
-      {/* Swipe Actions */}
-      <div className="swipe-actions absolute inset-y-0 right-0 flex items-center gap-2 pr-4 pointer-events-none">
-        <button
-          onClick={(e) => { e.stopPropagation(); onPin(); }}
-          className={cn('toolbar-btn pointer-events-auto', note.pinned && 'toolbar-btn-active')}
-          aria-label={note.pinned ? 'Unpin' : 'Pin'}
+        {/* Quick actions: visible on hover/focus, always visible for the selected note */}
+        <div
+          className={cn(
+            'flex items-center gap-0.5 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity',
+            isSelected && 'opacity-100'
+          )}
         >
-          <Pin className="w-5 h-5" />
-        </button>
-        <button
-          onClick={(e) => { e.stopPropagation(); onArchive(); }}
-          className="toolbar-btn pointer-events-auto"
-          aria-label="Archive"
-        >
-          <Archive className="w-5 h-5" />
-        </button>
-        <button
-          onClick={(e) => { e.stopPropagation(); onDelete(); }}
-          className="toolbar-btn pointer-events-auto text-destructive hover:bg-destructive/10"
-          aria-label="Delete"
-        >
-          <X className="w-5 h-5" />
-        </button>
+          {!isArchived && (
+            <button
+              onClick={(e) => { e.stopPropagation(); updateNote(note.id, { pinned: !note.pinned }); }}
+              className={cn('toolbar-btn p-1.5', note.pinned && 'toolbar-btn-active')}
+              aria-label={note.pinned ? 'Unpin' : 'Pin'}
+              title={note.pinned ? 'Unpin' : 'Pin'}
+            >
+              <Pin className="w-4 h-4" />
+            </button>
+          )}
+          <button
+            onClick={(e) => { e.stopPropagation(); toggleArchiveNote(note.id); }}
+            className="toolbar-btn p-1.5"
+            aria-label={isArchived ? 'Restore to Inbox' : 'Archive'}
+            title={isArchived ? 'Restore to Inbox' : 'Archive'}
+          >
+            {isArchived ? <ArchiveRestore className="w-4 h-4" /> : <Archive className="w-4 h-4" />}
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); setShowDeleteConfirm('note', note.id); }}
+            className="toolbar-btn p-1.5 text-destructive hover:bg-destructive/10"
+            aria-label="Delete"
+            title="Delete"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </div>
   );
 }
 
-export function NoteList() {
-  const {
-    notes,
-    activeFolderId,
-    selectedNoteId,
-    searchQuery,
-    setSelectedNote,
-    setShowDeleteConfirm,
-    isCreatingNote,
-  } = useAppStore();
+function SectionLabel({ children }: { children: string }) {
+  return (
+    <div className="px-3 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+      {children}
+    </div>
+  );
+}
 
-  const [deleteConfirm, setDeleteConfirm] = useState<{ type: 'note'; id: string } | null>(null);
+export function NoteList() {
+  const notes = useAppStore((state) => state.notes);
+  const folders = useAppStore((state) => state.folders);
+  const activeFolderId = useAppStore((state) => state.activeFolderId);
+  const selectedNoteId = useAppStore((state) => state.selectedNoteId);
+  const searchQuery = useAppStore((state) => state.searchQuery);
+  const setSelectedNote = useAppStore((state) => state.setSelectedNote);
+  const setSearchQuery = useAppStore((state) => state.setSearchQuery);
+  const clearSearch = useAppStore((state) => state.clearSearch);
+  const setMobileNavOpen = useAppStore((state) => state.setMobileNavOpen);
+  const searchRef = useRef<HTMLInputElement>(null);
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
-  const { getPinnedNotes, getUnpinnedNotes, getFolderType } = useAppStore.getState();
-  const folderType = getFolderType(activeFolderId ?? '');
-  const pinnedNotes = getPinnedNotes(activeFolderId ?? '');
-  const unpinnedNotes = getUnpinnedNotes(activeFolderId ?? '');
+  useEffect(() => {
+    const focusSearch = () => {
+      searchRef.current?.focus();
+      searchRef.current?.select();
+    };
+    window.addEventListener('quicknotes:focus-search', focusSearch);
+    return () => window.removeEventListener('quicknotes:focus-search', focusSearch);
+  }, []);
+
+  const activeFolder = folders.find((f) => f.id === activeFolderId);
+  const isArchived = !!activeFolder?.isArchive;
+  const query = searchQuery.trim();
+  const lowerQuery = query.toLowerCase();
+
+  const folderNotes = notes
+    .filter((n) => n.folderId === activeFolderId && !n.deletedAt)
+    .filter((n) => !query || n.title.toLowerCase().includes(lowerQuery) || n.content.toLowerCase().includes(lowerQuery))
+    .sort((a, b) => a.order - b.order);
+  const pinnedNotes = folderNotes.filter((n) => n.pinned);
+  const unpinnedNotes = folderNotes.filter((n) => !n.pinned);
+  const draggable = !query;
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    if (over && active.id !== over.id) {
-      const allNotes = [...pinnedNotes, ...unpinnedNotes];
-      const noteIds = allNotes.map(n => n.id);
-      const activeIndex = noteIds.indexOf(active.id as string);
-      const overIndex = noteIds.indexOf(over.id as string);
-      const newOrder = [...noteIds];
-      const [removed] = newOrder.splice(activeIndex, 1);
-      newOrder.splice(overIndex, 0, removed);
-      reorderNotes(newOrder);
-    }
+    if (!over || active.id === over.id) return;
+
+    // Only reorder within the same group (pinned / unpinned)
+    const group = pinnedNotes.some((n) => n.id === active.id) ? pinnedNotes : unpinnedNotes;
+    const ids = group.map((n) => n.id);
+    const from = ids.indexOf(active.id as string);
+    const to = ids.indexOf(over.id as string);
+    if (from === -1 || to === -1) return;
+
+    const reorderedGroup = arrayMove(ids, from, to);
+    const allIds = group === pinnedNotes
+      ? [...reorderedGroup, ...unpinnedNotes.map((n) => n.id)]
+      : [...pinnedNotes.map((n) => n.id), ...reorderedGroup];
+    reorderNotes(allIds);
   };
 
-  const filteredNotes = searchQuery
-    ? notes.filter(n => 
-        n.folderId === activeFolderId &&
-        !n.deletedAt &&
-        (n.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-         n.content.toLowerCase().includes(searchQuery.toLowerCase()))
-      )
-    : [...pinnedNotes, ...unpinnedNotes];
-
-  if (!activeFolderId) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="empty-state">
-          <FileText className="empty-state-icon" />
-          <h3 className="empty-state-title">Select a folder</h3>
-          <p className="empty-state-text">Choose a folder from the sidebar to view notes</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (isCreatingNote) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="empty-state">
-          <Loader2 className="empty-state-icon animate-spin text-primary" />
-          <p className="empty-state-text">Creating new note...</p>
-        </div>
-      </div>
-    );
-  }
+  const renderItems = (items: Note[]) =>
+    items.map((note) => (
+      <SortableNoteItem
+        key={note.id}
+        note={note}
+        isSelected={selectedNoteId === note.id}
+        isArchived={isArchived}
+        draggable={draggable}
+        searchQuery={query}
+        onSelect={() => setSelectedNote(note.id)}
+      />
+    ));
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden">
-      {/* Search Bar */}
-      <div className="p-3 border-b border-border">
+    <section
+      className={cn(
+        'flex-col overflow-hidden border-r border-border bg-background w-full md:w-80 lg:w-96 flex-shrink-0',
+        selectedNoteId ? 'hidden md:flex' : 'flex'
+      )}
+      aria-label="Notes"
+    >
+      {/* Header + Search */}
+      <div className="p-3 border-b border-border space-y-3">
+        <div className="flex items-center gap-2">
+          <button onClick={() => setMobileNavOpen(true)} className="toolbar-btn md:hidden" aria-label="Open folders">
+            <Menu className="w-5 h-5" />
+          </button>
+          <h2 className="font-semibold text-foreground truncate flex-1">{activeFolder?.name ?? 'Notes'}</h2>
+          <span className="text-xs text-muted-foreground">{folderNotes.length}</span>
+        </div>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
           <input
-            type="text"
+            ref={searchRef}
+            type="search"
             value={searchQuery}
-            onChange={(e) => useAppStore.getState().setSearchQuery(e.target.value)}
-            placeholder={`Search notes... (${navigator.platform.includes('Mac') ? 'Cmd' : 'Ctrl'}+K)`}
-            className="input pl-10 pr-10"
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={`Search notes... (${shortcutLabel('k')})`}
+            className="input pl-9 pr-9"
+            aria-label="Search notes"
             onKeyDown={(e) => {
-              if (e.key === 'Escape') useAppStore.getState().clearSearch();
+              if (e.key === 'Escape') {
+                e.stopPropagation();
+                clearSearch();
+                e.currentTarget.blur();
+              }
             }}
           />
           {searchQuery && (
             <button
-              onClick={() => useAppStore.getState().clearSearch()}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-md p-1"
+              onClick={() => clearSearch()}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-md p-1"
               aria-label="Clear search"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           )}
         </div>
       </div>
 
       {/* Notes List */}
-      <div className="flex-1 overflow-y-auto">
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCorners}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={filteredNotes.map(n => n.id)}
-            strategy={verticalListSortingStrategy}
-          >
+      <div className="flex-1 overflow-y-auto pb-24">
+        {!activeFolderId ? (
+          <div className="empty-state p-8">
+            <FileText className="empty-state-icon" />
+            <h3 className="empty-state-title">Select a folder</h3>
+            <p className="empty-state-text">Choose a folder from the sidebar to view notes</p>
+          </div>
+        ) : folderNotes.length === 0 ? (
+          <div className="empty-state p-8">
+            <FileText className="empty-state-icon" />
+            <h3 className="empty-state-title">
+              {query ? 'No matching notes' : isArchived ? 'Archive is empty' : 'No notes yet'}
+            </h3>
+            <p className="empty-state-text">
+              {query
+                ? 'Try a different search term'
+                : isArchived
+                  ? 'Archived notes will show up here'
+                  : `Press ${isMac ? '⌥N' : 'Alt+N'} or the + button to create your first note`}
+            </p>
+          </div>
+        ) : (
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             {pinnedNotes.length > 0 && (
               <>
-                <div className="px-3 py-2 text-sm font-medium text-muted-foreground uppercase tracking-wider border-b border-border">
-                  Pinned
-                </div>
-                {pinnedNotes.map((note) => (
-                  <SortableNoteItem
-                    key={note.id}
-                    note={note}
-                    isSelected={selectedNoteId === note.id}
-                    onSelect={() => setSelectedNote(note.id)}
-                    onArchive={() => setShowDeleteConfirm('note', note.id)}
-                    onPin={() => updateNote(note.id, { pinned: !note.pinned })}
-                    onDelete={() => setDeleteConfirm({ type: 'note', id: note.id })}
-                    searchQuery={searchQuery}
-                  />
-                ))}
+                <SectionLabel>Pinned</SectionLabel>
+                <SortableContext items={pinnedNotes.map((n) => n.id)} strategy={verticalListSortingStrategy}>
+                  {renderItems(pinnedNotes)}
+                </SortableContext>
               </>
             )}
-
             {unpinnedNotes.length > 0 && (
               <>
-                {pinnedNotes.length > 0 && (
-                  <div className="px-3 py-2 text-sm font-medium text-muted-foreground uppercase tracking-wider border-b border-border">
-                    Notes
-                  </div>
-                )}
-                {unpinnedNotes.map((note) => (
-                  <SortableNoteItem
-                    key={note.id}
-                    note={note}
-                    isSelected={selectedNoteId === note.id}
-                    onSelect={() => setSelectedNote(note.id)}
-                    onArchive={() => setShowDeleteConfirm('note', note.id)}
-                    onPin={() => updateNote(note.id, { pinned: !note.pinned })}
-                    onDelete={() => setDeleteConfirm({ type: 'note', id: note.id })}
-                    searchQuery={searchQuery}
-                  />
-                ))}
+                {pinnedNotes.length > 0 && <SectionLabel>Notes</SectionLabel>}
+                <SortableContext items={unpinnedNotes.map((n) => n.id)} strategy={verticalListSortingStrategy}>
+                  {renderItems(unpinnedNotes)}
+                </SortableContext>
               </>
             )}
-
-            {filteredNotes.length === 0 && (
-              <div className="flex-1 flex items-center justify-center p-8">
-                <div className="empty-state">
-                  <FileText className="empty-state-icon" />
-                  <h3 className="empty-state-title">
-                    {searchQuery ? 'No matching notes' : 'No notes yet'}
-                  </h3>
-                  <p className="empty-state-text">
-                    {searchQuery ? 'Try a different search term' : `Press ${navigator.platform.includes('Mac') ? 'Cmd' : 'Ctrl'}+N to create your first note`}
-                  </p>
-                </div>
-              </div>
-            )}
-          </SortableContext>
-        </DndContext>
+          </DndContext>
+        )}
       </div>
-    </div>
+    </section>
   );
 }
-
-import { ChevronLeft, ChevronRight } from 'lucide-react';

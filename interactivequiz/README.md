@@ -1,17 +1,65 @@
-# Interactive Quiz
+<div align="center">
 
-Created a click-click website to study faster while learning.
+# 🎯 Interactive Quiz
 
-This project was born from a simple need: when studying, reading static text can become passive. The brain needs active engagement to retain information. So this site turns questions into interactive cards that respond immediately. You click answers, get instant feedback, and the experience feels like a conversation with the material rather than a one-way lecture.
+> A click-click study tool made for faster learning.
 
-## How it works
+![Study](https://img.shields.io/badge/Study-Interactive-blue?logo=book-open)
+![Static](https://img.shields.io/badge/Static-HTML%2FJS-ff5733)
 
-Questions are loaded from a structured JSON file (questions.json) extracted from study materials. The site renders them dynamically, allowing navigation between questions, tracking progress, and providing visual feedback on correct and incorrect choices. The design is intentionally minimal so the focus stays on the content, not on decorative elements.
+```text
+  ╔══════════════════════════════╗
+  ║  Learning through interaction ║
+  ╚══════════════════════════════╝
+```
 
-## Purpose
+---
 
-The goal is not to replace formal exams or textbooks. It is to create a quick, low-friction way to review concepts during short breaks, commute time, or between tasks. The faster you can test yourself, the more repetitions you can fit into a day, and repetition is the foundation of memorization.
+## What It Is
 
-## Technical notes
+A lightweight quiz site created during study sessions. Instead of reading static text passively, you answer questions interactively with immediate feedback. The goal is to turn review time into active recall.
 
-Built as a static site using HTML and JavaScript with embedded JSON data. It can be opened locally or served from any static host. No server is required, which means it works offline and can be distributed as a single folder.
+## Key Ideas
+
+- **Rapid load** — no server needed; open `index.html` locally
+- **JSON-driven** — questions live in `questions.json`, easy to extend
+- **Instant feedback** — answers respond without reload
+- **Distraction-free** — minimal design, no decorative noise
+
+## Structure
+
+```
+interactivequiz/
+├── index.html          # Main site
+├── questions.json      # Question bank
+├── generate_site.py    # Builder script
+└── extract.py          # Data extraction
+```
+
+---
+
+## How To Use
+
+```bash
+# Just open
+open interactivequiz/index.html
+```
+
+Or serve statically:
+
+```bash
+python -m http.server 8000
+# Visit http://localhost:8000/interactivequiz/
+```
+
+---
+
+## Why It Exists
+
+When studying, passive reading can become automatic — eyes move, but retention stays low. This site forces a decision at every step: choose an answer, see result, move on. That loop of action + feedback is what makes repetition stick.
+
+---
+
+> *Built quickly, meant for quick use.*
+
+</div>

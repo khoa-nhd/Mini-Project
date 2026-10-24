@@ -44,6 +44,8 @@ interface AppState {
   isSidebarOpen: boolean;
   toggleSidebar: () => void;
   setSidebarOpen: (open: boolean) => void;
+  isMobileNavOpen: boolean;
+  setMobileNavOpen: (open: boolean) => void;
   isCreatingNote: boolean;
   setCreatingNote: (creating: boolean) => void;
   isEditingFolder: string | null;
@@ -113,7 +115,12 @@ export const useAppStore = create<AppState>()(
           folders: state.folders.filter((f) => f.id !== id),
           activeFolderId: state.activeFolderId === id ? null : state.activeFolderId,
         })),
-      setActiveFolder: (folderId) => set({ activeFolderId: folderId }),
+      setActiveFolder: (folderId) =>
+        set((state) => ({
+          activeFolderId: folderId,
+          selectedNoteId: folderId === state.activeFolderId ? state.selectedNoteId : null,
+          isMobileNavOpen: false,
+        })),
       reorderFolders: (folderIds) =>
         set((state) => {
           const folderMap = new Map(state.folders.map((f) => [f.id, f]));
@@ -168,6 +175,8 @@ export const useAppStore = create<AppState>()(
       isSidebarOpen: true,
       toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
       setSidebarOpen: (open) => set({ isSidebarOpen: open }),
+      isMobileNavOpen: false,
+      setMobileNavOpen: (open) => set({ isMobileNavOpen: open }),
       isCreatingNote: false,
       setCreatingNote: (creating) => set({ isCreatingNote: creating }),
       isEditingFolder: null,

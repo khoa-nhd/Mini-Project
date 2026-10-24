@@ -94,10 +94,8 @@
 
   /* Focus visible for keyboard navigation */
   *:focus-visible {
-    outline: none;
-    ring: 2px solid var(--color-ring);
-    ring-offset: 2px;
-    ring-offset-color: var(--color-background);
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
   }
 
   /* Typography utilities */
@@ -198,8 +196,8 @@
     font-weight: 500;
     transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
     outline: none;
-    ring: 2px solid transparent;
-    ring-offset: 2px;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
     disabled: opacity-50;
     disabled: pointer-events-none;
     border-radius: var(--radius-md);
@@ -273,24 +271,21 @@
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
     color: var(--color-foreground);
-    transition: colors 150ms;
+    transition: border-color 150ms, box-shadow 150ms;
   }
   .input::placeholder {
     color: var(--color-muted-foreground);
   }
   .input:focus-visible {
     outline: none;
-    ring: 2px solid var(--color-ring);
-    ring-offset: 2px;
-    ring-offset-color: var(--color-background);
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
   }
   .input-error {
     border-color: var(--color-destructive);
   }
   .input-error:focus-visible {
-    ring-color: var(--color-destructive);
-    ring-offset: 2px;
-    ring-offset-color: var(--color-background);
+    outline-color: var(--color-destructive);
   }
 
   /* Card styles */
@@ -334,7 +329,7 @@
   }
   .badge-error {
     background-color: color-mix(in srgb, var(--color-destructive) 10%, transparent);
-    color: var(--color-destructive-foreground);
+    color: var(--color-destructive);
   }
   .badge-info {
     background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
@@ -347,12 +342,12 @@
   }
   .alert-success {
     background-color: color-mix(in srgb, var(--color-secondary) 10%, transparent);
-    color: var(--color-secondary-foreground);
+    color: var(--color-foreground);
     border: 1px solid color-mix(in srgb, var(--color-secondary) 20%, transparent);
   }
   .alert-error {
     background-color: color-mix(in srgb, var(--color-destructive) 10%, transparent);
-    color: var(--color-destructive-foreground);
+    color: var(--color-destructive);
     border: 1px solid color-mix(in srgb, var(--color-destructive) 20%, transparent);
   }
   .alert-info {
@@ -375,9 +370,8 @@
     outline: none;
   }
   .folder-pill:focus-visible {
-    ring: 2px solid var(--color-ring);
-    ring-offset: 2px;
-    ring-offset-color: var(--color-background);
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
   }
   .folder-pill-active {
     background-color: var(--color-primary);
@@ -393,33 +387,27 @@
 
   /* Note item */
   .note-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
-    padding: 0.75rem;
-    border-radius: 0.5rem;
+    margin: 0.25rem 0.5rem;
+    border-radius: var(--radius-md);
     background-color: var(--color-card);
-    border: 1px solid var(--color-border);
-    transition: all 150ms;
+    border: 1px solid transparent;
+    transition: background-color 150ms, border-color 150ms;
     cursor: pointer;
-    outline: none;
   }
   .note-item:focus-visible {
-    ring: 2px solid var(--color-ring);
-    ring-offset: 2px;
-    ring-offset-color: var(--color-background);
+    outline: 2px solid var(--color-ring);
+    outline-offset: 1px;
   }
   .note-item:hover {
-    background-color: color-mix(in srgb, var(--color-muted) 50%, transparent);
+    border-color: var(--color-border);
   }
-  .note-item-selected {
-    ring: 2px solid var(--color-ring);
-    ring-offset: 2px;
-    ring-offset-color: var(--color-background);
+  .note-item-selected,
+  .note-item-selected:hover {
+    border-color: var(--color-primary);
+    background-color: color-mix(in srgb, var(--color-primary) 8%, var(--color-card));
   }
   .note-item-pinned {
-    border-color: color-mix(in srgb, var(--color-primary) 50%, transparent);
-    background-color: color-mix(in srgb, var(--color-primary) 5%, transparent);
+    background-color: color-mix(in srgb, var(--color-accent) 5%, var(--color-card));
   }
 
   /* Swipe action */
@@ -455,7 +443,6 @@
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    width: 100%;
     max-width: 32rem;
     background-color: var(--color-card);
     border-radius: var(--radius-xl);
@@ -463,6 +450,9 @@
     box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
     padding: 1.5rem;
     z-index: 50;
+    width: calc(100% - 2rem);
+    max-height: calc(100dvh - 2rem);
+    overflow-y: auto;
   }
   .modal-content-sm {
     max-width: 28rem;
@@ -485,9 +475,8 @@
     outline: none;
   }
   .toolbar-btn:focus-visible {
-    ring: 2px solid var(--color-ring);
-    ring-offset: 2px;
-    ring-offset-color: var(--color-background);
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
   }
   .toolbar-btn:hover {
     color: var(--color-foreground);
@@ -543,9 +532,8 @@
     outline: none;
   }
   .drag-handle:focus-visible {
-    ring: 2px solid var(--color-ring);
-    ring-offset: 2px;
-    ring-offset-color: var(--color-background);
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
   }
   .drag-handle:hover {
     color: var(--color-foreground);
@@ -699,9 +687,8 @@
   }
   .ds-toggle-input:focus-visible + .ds-toggle-track {
     outline: none;
-    ring: 2px solid var(--color-ring);
-    ring-offset: 2px;
-    ring-offset-color: var(--color-background);
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
   }
   .ds-toggle-label {
     font-size: 0.875rem;

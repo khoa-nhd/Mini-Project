@@ -1,46 +1,97 @@
-https://quicknote-7c89b.web.app
+<div align="center">
 
-# QuickNotes
+[![Live](https://img.shields.io/badge/Live-Demo-teal?style=for-the-badge&logo=flash)](https://quicknote-7c89b.web.app)
 
-I have ideas during the day that need to be written down quickly.
+# 📝 QuickNotes
 
-QuickNotes is a fast, minimal note-taking application designed for one purpose: capture thoughts before they disappear. The interface is built around speed — a big plus button to create notes instantly, keyboard shortcuts for power users, and a clean sidebar to organize notes into folders without friction. It is not a complex productivity suite with calendars and reminders; it is a place to dump thoughts and organize them later.
+> Capture ideas during the day before they disappear.
 
-## Why it exists
+```text
+  ┌──────────────────────────────────────┐
+  │  Dump thoughts. Organize fast.       │
+  │  Sync everywhere.                    │
+  └──────────────────────────────────────┘
+```
 
-Ideas often come in brief moments — while walking, between conversations, or in the middle of work. If you wait to open a full application, the idea can fade. QuickNotes tries to reduce that delay to near zero by supporting keyboard shortcuts (Ctrl+N for new note, Ctrl+K for search, Ctrl+S for save), offline persistence through IndexedDB, and a progressive web app experience that feels native on both desktop and mobile.
+---
 
-## What it does
+## 🌐 Live Website
 
-- Create notes instantly with a large floating button or keyboard shortcut
-- Organize notes into folders (Inbox, Archive, custom folders)
-- Search through all notes quickly using a lightweight full-text index
-- Auto-save with configurable delay
-- Sync to Firebase Firestore when authenticated, with offline-first behavior so notes survive connectivity loss
-- Export and import data via ZIP
-- Dark and light theme support with system preference detection
-- PWA install prompt and service worker caching for offline use
+**[https://quicknote-7c89b.web.app](https://quicknote-7c89b.web.app)**
 
-## Technology stack
+---
 
-The application is built with modern web technologies:
+## Why This Exists
 
-- React 19 with TypeScript for the UI layer
-- Vite for fast development and production builds
-- Tailwind CSS for styling with a custom design token system
-- Zustand for global state management with persistence
-- Firebase SDK for authentication, Firestore database, and hosting
-- Workbox via vite-plugin-pwa for service worker generation
-- Lucide React for consistent iconography
+Ideas often arrive in brief windows — while walking, between conversations, or mid-task. Waiting to open a full productivity suite kills the moment. QuickNotes is built to reduce that delay to near zero.
 
-## Deployment
+---
 
-The site is hosted on Firebase Hosting at https://quicknote-7c89b.web.app. The build artifacts live in the `dist/` folder and include the Service Worker, manifest, and all static assets. Firestore rules enforce that users can only access their own notes, folders, and settings.
+## ✨ Features
 
-## How to use locally
+| Feature | Description |
+|---------|-------------|
+| **Big + Button** | Create a new note instantly — always visible |
+| **Keyboard Shortcuts** | `Ctrl+N` (new), `Ctrl+K` (search), `Ctrl+S` (save) |
+| **Folders** | Inbox, Archive, custom folders with drag-and-drop |
+| **Search** | Full-text indexing via MiniSearch |
+| **Auto-Save** | Configurable delay; no manual save required |
+| **Offline-First** | IndexedDB persistence; works without internet |
+| **Firebase Sync** | Auth + Firestore sync when online |
+| **PWA** | Installable, service worker cached, mobile-ready |
+| **Themes** | Dark / light with system preference detection |
+| **Export / Import** | ZIP export for backup and migration |
 
-Clone the repository, navigate to the `quicknotes/` directory, install dependencies with `npm install`, create a `.env` file with your Firebase project credentials, and run `npm run dev` to start the local server. To deploy, run `npm run deploy` which builds and publishes to Firebase.
+---
 
-## Notes on the future
+## 🛠 Tech Stack
 
-The project is intentionally small. It does not attempt to replace dedicated note apps with rich formatting, collaboration, or enterprise features. Its value is in speed and simplicity — a quick place for quick thoughts.
+| Layer | Choice |
+|-------|--------|
+| UI Framework | React 19 + TypeScript |
+| Build Tool | Vite |
+| Styling | Tailwind CSS |
+| State | Zustand (persisted) |
+| Database / Auth | Firebase Firestore & Auth |
+| Search | MiniSearch |
+| PWA | vite-plugin-pwa + Workbox |
+| Icons | Lucide React |
+
+---
+
+## 🚀 Quick Start
+
+```bash
+cd quicknotes
+npm install
+npm run dev        # localhost:3000
+npm run build      # production build
+npm run deploy     # build + Firebase Hosting
+```
+
+Requires a `.env` file with Firebase config values:
+
+```env
+VITE_FIREBASE_API_KEY=...
+VITE_FIREBASE_AUTH_DOMAIN=...
+VITE_FIREBASE_PROJECT_ID=...
+VITE_FIREBASE_STORAGE_BUCKET=...
+VITE_FIREBASE_MESSAGING_SENDER_ID=...
+VITE_FIREBASE_APP_ID=...
+VITE_FIREBASE_MEASUREMENT_ID=...
+```
+
+---
+
+## 🏗 Architecture Highlights
+
+- **Offline persistence**: Firestore `enableIndexedDbPersistence` plus local Zustand persistence
+- **Real-time sync**: Starts when authenticated; stops on unmount
+- **SPA routing**: `firebase.json` rewrites all paths to `index.html`
+- **Security**: Firestore rules enforce `isOwner` on every document
+
+---
+
+> *Not every idea needs a long document. Sometimes it just needs a quick button, a clean input, and a place to land.*
+
+</div>

@@ -1,24 +1,78 @@
-# Mini-Project
+<div align="center">
 
-This repository contains a collection of small-scale experimental projects built for fun, exploration, and rapid learning. Each folder represents a standalone idea implemented quickly using modern web technologies, with the goal of solving a small real-world problem or testing a concept without over-engineering.
+# ⌘ Mini-Project
 
-## What's inside
+> A curated collection of playful experiments, quick tools, and idea-capture apps.
 
-- **interactivequiz/** — A click-based interactive quiz site created to make studying faster and more engaging. It reads questions from JSON, renders them dynamically, and provides immediate feedback. The idea is simple: instead of reading static text, you interact with the material to reinforce memory through repetition and quick decision-making.
-- **quicknotes/** — A fast note-taking PWA (Progressive Web App) built with React, TypeScript, Vite, Tailwind CSS, and Firebase. It is designed for capturing ideas quickly during the day — notes sync to Firestore, work offline via IndexedDB, and include search, folders, and keyboard shortcuts. The site is deployed live at https://quicknote-7c89b.web.app.
+[![Built with React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)](https://react.dev)
+[![Vite](https://img.shields.io/badge/Vite-8.3-646CFF?logo=vite&logoColor=white)](https://vitejs.dev)
+[![Firebase](https://img.shields.io/badge/Firebase-13-FFC107?logo=firebase&logoColor=white)](https://firebase.google.com)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white)](https://typescriptlang.org)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-## Why these exist
+```text
+  ╔════════════════════════════════════════╗
+  ║  Small ideas. Fast builds. No bloat.  ║
+  ╚════════════════════════════════════════╝
+```
 
-They are not production systems with large teams. They are personal experiments: one created to study faster, another to never lose a thought that appears in passing. Both prioritize speed of use over feature completeness.
+| Project | Purpose | Live Link |
+|---------|---------|-----------|
+| **QuickNotes** | Capture ideas during the day instantly | [quicknote-7c89b.web.app](https://quicknote-7c89b.web.app) |
+| **Interactive Quiz** | Click-click learning for faster study | — |
 
-## Technologies used across projects
+---
 
-- React + TypeScript + Vite
-- Tailwind CSS for styling
-- Firebase (Firestore, Auth, Hosting) for backend and deployment
-- PWA service workers for offline support
-- Lucide icons, Zustand state management, and modern browser APIs
+## 🗂 What's Inside
 
-## How to run
+Each folder is a standalone experiment. No monorepo complexity — just open and run.
 
-Each subfolder is mostly self-contained. For quicknotes, install dependencies with `npm install`, run `npm run dev` for local development, and use `npm run deploy` to publish to Firebase Hosting.
+### 1. QuickNotes (`quicknotes/`)
+
+A PWA note-taking app built for speed. Dump thoughts, organize into folders, search instantly, and sync everywhere via Firebase Firestore.
+
+**Highlights:**
+- ⚡ Floating **+** button — create notes immediately
+- ⌨️ Keyboard shortcuts (`Ctrl+N`, `Ctrl+K`, `Ctrl+S`)
+- 🌙 Dark / light theme
+- 📱 Offline-first via IndexedDB + Service Worker
+- 🔍 Full-text search with MiniSearch
+
+### 2. Interactive Quiz (`interactivequiz/`)
+
+A lightweight quiz site made while studying. Questions are loaded from JSON, answers respond instantly, and the experience is designed to make repetition feel interactive rather than passive.
+
+---
+
+## 🔧 Stack at a Glance
+
+| Layer | Technology |
+|-------|------------|
+| UI | React 19 + TypeScript |
+| Styling | Tailwind CSS |
+| Build | Vite |
+| State | Zustand (persisted) |
+| Backend | Firebase Auth + Firestore |
+| Hosting | Firebase Hosting |
+| PWA | vite-plugin-pwa + Workbox |
+
+---
+
+## 🚀 How to Explore
+
+```bash
+# QuickNotes
+cd quicknotes
+npm install
+npm run dev        # localhost:3000
+npm run deploy     # build + Firebase deploy
+
+# Interactive Quiz
+open interactivequiz/index.html
+```
+
+---
+
+> *"Not every project needs to be large. Some just need to be fast, clear, and fun."*
+
+</div>
