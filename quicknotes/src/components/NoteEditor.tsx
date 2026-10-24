@@ -86,7 +86,7 @@ function NoteEditorPane({ note }: { note: Note }) {
         <div className="flex-1 flex items-center gap-2 min-w-0">
           <button
             onClick={async () => { await forceSave(); setSelectedNote(null); }}
-            className="toolbar-btn md:hidden"
+            className="toolbar-btn md:hidden size-11 flex items-center justify-center"
             aria-label="Back to notes"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -106,14 +106,14 @@ function NoteEditorPane({ note }: { note: Note }) {
             className="bg-transparent border-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-md text-lg font-medium text-foreground w-full min-w-0 px-2 py-1"
             aria-label="Note title"
           />
-          <span className="hidden sm:flex items-center text-xs px-2 whitespace-nowrap" aria-live="polite">
+          <span className="hidden xl:flex items-center text-xs px-2 whitespace-nowrap" aria-live="polite">
             {saveStatus === 'saving' && <span className="text-muted-foreground">Saving...</span>}
             {saveStatus === 'saved' && <span className="text-primary">Saved</span>}
             {saveStatus === 'error' && <span className="text-destructive">Save failed</span>}
             {saveStatus === 'idle' && <span className="text-muted-foreground">Edited {formatRelativeTime(note.updatedAt)}</span>}
           </span>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 [&>button]:max-md:size-11">
           <Button
             variant="ghost"
             size="sm"
@@ -159,14 +159,14 @@ function NoteEditorPane({ note }: { note: Note }) {
         </div>
       </div>
 
-      {/* Editor */}
-      <div className="flex-1 overflow-hidden relative">
+      {/* Editor: a centred ~70ch column keeps long lines readable */}
+      <div className="flex-1 overflow-hidden relative flex justify-center">
         <textarea
           ref={textareaRef}
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Start typing your thoughts..."
-          className="w-full h-full p-4 pb-16 bg-transparent border-none focus-visible:outline-none resize-none text-foreground placeholder:text-muted-foreground font-sans text-base leading-relaxed"
+          className="w-full max-w-[70ch] h-full px-4 md:px-8 pt-5 pb-16 bg-transparent border-none focus-visible:outline-none resize-none text-foreground placeholder:text-muted-foreground font-sans text-base leading-relaxed"
           aria-label="Note content"
           spellCheck={true}
           autoComplete="off"

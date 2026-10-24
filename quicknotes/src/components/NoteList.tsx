@@ -1,4 +1,4 @@
-import { useEffect, useRef, Fragment } from 'react';
+import { useEffect, useRef, useState, Fragment } from 'react';
 import { cn, formatRelativeTime, shortcutLabel, isMac } from '../lib/utils';
 import { Search, X, Pin, Archive, ArchiveRestore, Trash2, FileText, Clock, GripVertical, Menu } from 'lucide-react';
 import { useAppStore } from '../stores/appStore';
@@ -49,10 +49,14 @@ interface NoteItemProps {
   isArchived: boolean;
   draggable: boolean;
   searchQuery: string;
+  folderName?: string;
   onSelect: () => void;
 }
 
-function SortableNoteItem({ note, isSelected, isArchived, draggable, searchQuery, onSelect }: NoteItemProps) {
+// Horizontal distance (px) a touch swipe must travel to archive / restore a note
+const SWIPE_THRESHOLD = 80;
+
+function SortableNoteItem({ note, isSelected, isArchived, draggable, searchQuery, folderName, onSelect }: NoteItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: note.id,
     disabled: !draggable,
@@ -65,15 +69,63 @@ function SortableNoteItem({ note, isSelected, isArchived, draggable, searchQuery
     opacity: isDragging ? 0.5 : 1,
   };
 
-  const title = note.title || 'Untitled';
-  const preview = snippet(note.content, searchQuery);
+  // Swipe left or right (touch) to archive, or restore when already archived
+  const [swipeX, setSwipeX] = useState(0);
+  const touchRef = useRef<{ x: number; y: number; horizontal: boolean | null } | null>(null);
+  const swipedRef = useRef(false);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    touchRef.current = { x: touch.clientX, y: touch.clientY, horizontal: null };
+    swipedRef.current = false;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const start = touchRef.current;
+    if (!start) return;
+    const dx = e.touches[0].clientX - start.x;
+    const dy = e.touches[0].clientY - start.y;
+    if (start.horizontal === null && (Math.abs(dx) > 10 || Math.abs(dy) > 10)) {
+      start.horizontal = Math.abs(dx) > Math.abs(dy);
+    }
+    if (start.horizontal) setSwipeX(dx);
+  };
+
+  const handleTouchEnd = () => {
+    if (touchRef.current?.horizontal) swipedRef.current = true;
+    if (Math.abs(swipeX) >= SWIPE_THRESHOLD) toggleArchiveNote(note.id);
+    touchRef.current = null;
+    setSwipeX(0);
+  };
+
+  // Notes without a title borrow their first line, so the list stays scannable
+  const lines = note.content.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  const title = note.title || lines[0] || 'Empty note';
+  const preview = snippet(note.title ? note.content : lines.slice(1).join(' '), searchQuery);
+  const swipeReady = Math.abs(swipeX) >= SWIPE_THRESHOLD;
+  const SwipeIcon = isArchived ? ArchiveRestore : Archive;
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={cn('note-item group relative', isSelected && 'note-item-selected', note.pinned && 'note-item-pinned')}
-      onClick={onSelect}
+      className={cn(
+        'note-item group relative overflow-hidden touch-pan-y',
+        isSelected && 'note-item-selected',
+        note.pinned && 'note-item-pinned'
+      )}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={() => { touchRef.current = null; setSwipeX(0); }}
+      onClick={() => {
+        // A finished swipe also fires a click; ignore it
+        if (swipedRef.current) {
+          swipedRef.current = false;
+          return;
+        }
+        onSelect();
+      }}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
@@ -84,7 +136,27 @@ function SortableNoteItem({ note, isSelected, isArchived, draggable, searchQuery
       tabIndex={0}
       aria-current={isSelected ? 'true' : undefined}
     >
-      <div className="flex items-start gap-2 p-3">
+      {swipeX !== 0 && (
+        <div
+          className={cn(
+            'absolute inset-0 flex items-center px-4 text-sm font-medium transition-colors',
+            swipeX > 0 ? 'justify-start' : 'justify-end',
+            swipeReady ? 'bg-accent text-accent-foreground' : 'bg-muted text-muted-foreground'
+          )}
+          aria-hidden="true"
+        >
+          <SwipeIcon className="w-5 h-5 mr-2" />
+          {isArchived ? 'Restore' : 'Archive'}
+        </div>
+      )}
+      <div
+        className="relative flex items-start gap-2 p-3"
+        style={{
+          background: 'inherit',
+          transform: swipeX ? `translateX(${swipeX}px)` : undefined,
+          transition: swipeX ? 'none' : 'transform 150ms ease-out',
+        }}
+      >
         {draggable && (
           <span
             {...attributes}
@@ -100,7 +172,7 @@ function SortableNoteItem({ note, isSelected, isArchived, draggable, searchQuery
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             {note.pinned && <Pin className="pin-indicator w-3.5 h-3.5 flex-shrink-0" aria-label="Pinned" />}
-            <p className={cn('font-medium truncate', note.title ? 'text-foreground' : 'text-muted-foreground italic')}>
+            <p className={cn('font-medium truncate', title === 'Empty note' ? 'text-muted-foreground' : 'text-foreground')}>
               <Highlight text={title} query={searchQuery} />
             </p>
           </div>
@@ -118,15 +190,15 @@ function SortableNoteItem({ note, isSelected, isArchived, draggable, searchQuery
               <FileText className="w-3 h-3" />
               {note.wordCount} words
             </span>
+            {folderName && <span className="badge badge-muted truncate max-w-[8rem]">{folderName}</span>}
           </div>
         </div>
 
-        {/* Quick actions: visible on hover/focus, always visible for the selected note */}
+        {/* Quick actions float over the text on hover/focus so previews use the full width.
+            Touch devices use swipe and the editor toolbar instead. */}
         <div
-          className={cn(
-            'flex items-center gap-0.5 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity',
-            isSelected && 'opacity-100'
-          )}
+          className="absolute top-2 right-2 flex items-center gap-0.5 rounded-md opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:pointer-events-auto transition-opacity duration-150 [@media(hover:none)]:hidden"
+          style={{ background: 'inherit' }}
         >
           {!isArchived && (
             <button
@@ -162,7 +234,7 @@ function SortableNoteItem({ note, isSelected, isArchived, draggable, searchQuery
 
 function SectionLabel({ children }: { children: string }) {
   return (
-    <div className="px-3 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+    <div className="px-4 pt-3 pb-1 text-xs font-medium text-muted-foreground uppercase tracking-wider">
       {children}
     </div>
   );
@@ -199,10 +271,12 @@ export function NoteList() {
   const query = searchQuery.trim();
   const lowerQuery = query.toLowerCase();
 
+  // Searching looks across every folder; otherwise show the active folder
   const folderNotes = notes
-    .filter((n) => n.folderId === activeFolderId && !n.deletedAt)
+    .filter((n) => !n.deletedAt && (query ? true : n.folderId === activeFolderId))
     .filter((n) => !query || n.title.toLowerCase().includes(lowerQuery) || n.content.toLowerCase().includes(lowerQuery))
-    .sort((a, b) => a.order - b.order);
+    .sort((a, b) => (query ? b.updatedAt - a.updatedAt : a.order - b.order));
+  const folderById = new Map(folders.map((f) => [f.id, f]));
   const pinnedNotes = folderNotes.filter((n) => n.pinned);
   const unpinnedNotes = folderNotes.filter((n) => !n.pinned);
   const draggable = !query;
@@ -231,9 +305,10 @@ export function NoteList() {
         key={note.id}
         note={note}
         isSelected={selectedNoteId === note.id}
-        isArchived={isArchived}
+        isArchived={!!folderById.get(note.folderId)?.isArchive}
         draggable={draggable}
         searchQuery={query}
+        folderName={query ? folderById.get(note.folderId)?.name : undefined}
         onSelect={() => setSelectedNote(note.id)}
       />
     ));
@@ -252,14 +327,16 @@ export function NoteList() {
           <button onClick={() => setMobileNavOpen(true)} className="toolbar-btn md:hidden" aria-label="Open folders">
             <Menu className="w-5 h-5" />
           </button>
-          <h2 className="font-semibold text-foreground truncate flex-1">{activeFolder?.name ?? 'Notes'}</h2>
+          <h2 className="font-semibold text-foreground truncate flex-1">
+            {query ? 'Search all notes' : activeFolder?.name ?? 'Notes'}
+          </h2>
           <span className="text-xs text-muted-foreground">{folderNotes.length}</span>
         </div>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
           <input
             ref={searchRef}
-            type="search"
+            type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={`Search notes... (${shortcutLabel('k')})`}
@@ -287,7 +364,7 @@ export function NoteList() {
 
       {/* Notes List */}
       <div className="flex-1 overflow-y-auto pb-24">
-        {!activeFolderId ? (
+        {!activeFolderId && !query ? (
           <div className="empty-state p-8">
             <FileText className="empty-state-icon" />
             <h3 className="empty-state-title">Select a folder</h3>

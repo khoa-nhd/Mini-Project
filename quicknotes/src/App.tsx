@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, Download, X } from 'lucide-react';
 import { Sidebar } from './components/Sidebar';
 import { NoteList } from './components/NoteList';
 import { NoteEditor } from './components/NoteEditor';
@@ -12,7 +12,8 @@ import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useTheme } from './hooks/useTheme';
 import { useAppStore } from './stores/appStore';
 import { processSyncQueue, createNewNote, deleteNote } from './services/firebaseSync';
-import { isMac } from './lib/utils';
+import { isMac, cn } from './lib/utils';
+import { promptInstall, dismissInstallPrompt } from './lib/install-prompt';
 
 export function App() {
   useAuthListener();
@@ -58,12 +59,14 @@ export function App() {
         <DeleteNoteDialog />
       </div>
       <NewNoteButton />
+      <InstallBanner />
     </ToastProvider>
   );
 }
 
 function NewNoteButton() {
   const hasFolders = useAppStore((state) => state.folders.length > 0);
+  const hasSelection = useAppStore((state) => !!state.selectedNoteId);
   if (!hasFolders) return null;
 
   return (
@@ -71,10 +74,34 @@ function NewNoteButton() {
       onClick={() => createNewNote()}
       aria-label="Create new note"
       title={`New note (${isMac ? '⌥N' : 'Alt+N'})`}
-      className="fixed bottom-6 right-6 z-40 flex items-center justify-center w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      className={cn(
+        'fixed bottom-6 right-6 z-40 flex items-center justify-center w-14 h-14 rounded-full bg-primary text-primary-foreground ring-4 ring-background hover:bg-primary/90 hover:shadow-[var(--shadow-card-hover)] active:scale-95 transition-[background-color,box-shadow,transform] duration-150',
+        // On phones the editor fills the screen; keep the button out of the text
+        hasSelection && 'hidden md:flex'
+      )}
     >
       <Plus className="w-7 h-7" />
     </button>
+  );
+}
+
+function InstallBanner() {
+  const show = useAppStore((state) => state.showInstallPrompt);
+  if (!show) return null;
+
+  return (
+    <div
+      className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-md card flex items-center gap-3 p-3 animate-in"
+      role="region"
+      aria-label="Install app"
+    >
+      <Download className="w-5 h-5 text-primary flex-shrink-0" />
+      <p className="flex-1 text-sm text-foreground">Install QuickNotes for faster access and offline use.</p>
+      <Button size="sm" onClick={() => promptInstall()}>Install</Button>
+      <button onClick={dismissInstallPrompt} className="toolbar-btn p-1" aria-label="Dismiss install banner">
+        <X className="w-4 h-4" />
+      </button>
+    </div>
   );
 }
 

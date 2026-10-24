@@ -117,7 +117,7 @@ function FolderItem({
               <div className="hidden group-hover:flex group-focus-within:flex items-center gap-0.5">
                 <button
                   onClick={(e) => { e.stopPropagation(); onStartEdit(); }}
-                  className="p-1 rounded hover:bg-black/10"
+                  className="p-1 rounded hover:bg-foreground/10"
                   aria-label={`Rename ${folder.name}`}
                   title="Rename"
                 >
@@ -125,7 +125,7 @@ function FolderItem({
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); onDelete(); }}
-                  className="p-1 rounded hover:bg-black/10"
+                  className="p-1 rounded hover:bg-foreground/10"
                   aria-label={`Delete ${folder.name}`}
                   title="Delete"
                 >
@@ -253,7 +253,7 @@ export function Sidebar() {
 
       <aside
         className={cn(
-          'flex flex-col bg-card border-r border-border transition-all duration-150 flex-shrink-0',
+          'flex flex-col bg-card border-r border-border transition-[width,translate] duration-150 flex-shrink-0',
           // Mobile: off-canvas drawer. Desktop: collapsible column.
           'fixed inset-y-0 left-0 z-40 w-72 md:static md:z-auto',
           isMobileNavOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',

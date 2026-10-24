@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Theme is toggled with a .dark class on <html>, not the media query */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-primary: #0D9488;
   --color-primary-foreground: #000000;
@@ -69,7 +72,8 @@
     --color-card-foreground: #F0FDFA;
     --color-muted: #134E4A;
     --color-muted-foreground: #99F6E4;
-    --color-border: #134E4A;
+    /* Border must differ from card, or every outline disappears in dark mode */
+    --color-border: color-mix(in srgb, #99F6E4 22%, #134E4A);
     --color-destructive: #EF4444;
     --color-destructive-foreground: #0F172A;
     --color-ring: #14B8A6;
@@ -188,21 +192,21 @@
 
 @layer components {
   /* Button variants */
-  btn {
+  .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
     font-weight: 500;
     transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
-    outline: none;
-    outline: 2px solid transparent;
-    outline-offset: 2px;
-    disabled: opacity-50;
-    disabled: pointer-events-none;
     border-radius: var(--radius-md);
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
+    cursor: pointer;
+  }
+  .btn:disabled {
+    opacity: 0.5;
+    pointer-events: none;
   }
 
   .btn-primary {
@@ -388,26 +392,27 @@
   /* Note item */
   .note-item {
     margin: 0.25rem 0.5rem;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-lg);
     background-color: var(--color-card);
-    border: 1px solid transparent;
-    transition: background-color 150ms, border-color 150ms;
+    border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+    transition: border-color 150ms, background-color 150ms, box-shadow 150ms;
     cursor: pointer;
-  }
-  .note-item:focus-visible {
-    outline: 2px solid var(--color-ring);
-    outline-offset: 1px;
   }
   .note-item:hover {
     border-color: var(--color-border);
   }
+  .note-item:focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+  .note-item-pinned {
+    border-color: color-mix(in srgb, var(--color-primary) 50%, transparent);
+    background-color: color-mix(in srgb, var(--color-primary) 5%, var(--color-card));
+  }
   .note-item-selected,
   .note-item-selected:hover {
     border-color: var(--color-primary);
-    background-color: color-mix(in srgb, var(--color-primary) 8%, var(--color-card));
-  }
-  .note-item-pinned {
-    background-color: color-mix(in srgb, var(--color-accent) 5%, var(--color-card));
+    box-shadow: 0 0 0 1px var(--color-primary);
   }
 
   /* Swipe action */
@@ -665,7 +670,7 @@
     width: 44px;
     height: 24px;
     border-radius: 9999px;
-    background-color: var(--color-muted);
+    background-color: color-mix(in srgb, var(--color-muted-foreground) 30%, var(--color-muted));
     transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
   }
   .ds-toggle-input:checked + .ds-toggle-track {
