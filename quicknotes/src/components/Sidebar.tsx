@@ -289,6 +289,8 @@ export function Sidebar() {
           // Mobile: solid off-canvas drawer. Desktop: floating translucent panel.
           'fixed inset-y-0 left-0 z-40 w-72 bg-card border-r md:static md:z-auto md:panel md:rounded-2xl md:overflow-hidden',
           isMobileNavOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
+          // Fully remove the closed drawer on phones so iOS doesn't tint its bars navy from it
+          !isMobileNavOpen && 'max-md:hidden',
           isSidebarOpen ? 'md:w-64' : 'md:w-16'
         )}
         aria-label="Folders"

@@ -75,7 +75,8 @@ function NewNoteButton() {
       aria-label="Create new note"
       title={`New note (${isMac ? '⌥N' : 'Alt+N'})`}
       className={cn(
-        'fixed bottom-6 right-6 z-40 flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-primary text-primary-foreground shadow-glow hover:brightness-110 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-[filter,transform] duration-150',
+        // absolute on phones: iOS Safari tints its bottom bar from fixed elements near the edge
+        'absolute md:fixed bottom-6 right-6 z-40 flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-primary text-primary-foreground shadow-glow hover:brightness-110 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-[filter,transform] duration-150',
         // On phones the editor fills the screen; keep the button out of the text
         hasSelection && 'hidden md:flex'
       )}
@@ -91,7 +92,7 @@ function InstallBanner() {
 
   return (
     <div
-      className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-md card flex items-center gap-3 p-3 animate-in"
+      className="absolute md:fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-md card flex items-center gap-3 p-3 animate-in"
       role="region"
       aria-label="Install app"
     >
