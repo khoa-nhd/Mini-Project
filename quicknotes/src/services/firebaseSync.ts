@@ -579,7 +579,7 @@ export async function toggleArchiveNote(noteId: string): Promise<void> {
       new CustomEvent('quicknotes:toast', {
         detail: {
           type: 'warning',
-          message: `Ghi chú có ${note.attachments.length} file đính kèm sẽ hết hạn và tự động xóa sau 30 ngày trong Archive.`,
+          message: `This note's ${note.attachments.length === 1 ? 'attachment' : `${note.attachments.length} attachments`} will be deleted automatically after 30 days in Archive.`,
           duration: 6000,
         },
       })

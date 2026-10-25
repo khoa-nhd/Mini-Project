@@ -496,7 +496,7 @@ export function NoteList() {
         {isArchived && (
           <div className="mx-3 mt-3 p-3 rounded-xl bg-accent/10 border border-accent/20 text-accent text-xs flex items-start gap-2">
             <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-            <span>Các file đính kèm trong mục Archive sẽ hết hạn và tự động xóa sau 30 ngày.</span>
+            <span>Attachments in Archive expire and are deleted automatically after 30 days.</span>
           </div>
         )}
         {!activeFolderId && !query ? (
