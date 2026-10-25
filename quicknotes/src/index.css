@@ -106,6 +106,15 @@
     scroll-behavior: smooth;
   }
 
+  /* Phones: the system bars are black (theme-color), so keep the screen edges
+     black too — no blue glow bleeding into the top/bottom edges */
+  @media (max-width: 767px) {
+    .dark body {
+      background-color: #000000;
+      background-image: radial-gradient(70% 40% at 50% 45%, rgb(59 130 246 / 0.10), transparent 70%);
+    }
+  }
+
   body {
     min-height: 100dvh;
     background-color: var(--color-background);
