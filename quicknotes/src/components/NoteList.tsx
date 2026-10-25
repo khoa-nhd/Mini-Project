@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState, Fragment } from 'react';
-import { cn, formatRelativeTime, shortcutLabel, isMac } from '../lib/utils';
+import { cn, vibrateOnDragStart, formatRelativeTime, shortcutLabel, isMac } from '../lib/utils';
 import { Search, X, Pin, Archive, ArchiveRestore, Trash2, FileText, Clock, GripVertical, Menu } from 'lucide-react';
 import { useAppStore } from '../stores/appStore';
 import { updateNote, reorderNotes, toggleArchiveNote } from '../services/firebaseSync';
 import type { Note } from '../types';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { DndContext, closestCenter, KeyboardSensor, MouseSensor, TouchSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
@@ -66,7 +66,8 @@ function SortableNoteItem({ note, isSelected, isArchived, draggable, searchQuery
   const style = {
     transform: CSS.Transform.toString(transform),
     transition: isDragging ? undefined : transition,
-    opacity: isDragging ? 0.5 : 1,
+    position: 'relative' as const,
+    zIndex: isDragging ? 10 : undefined,
   };
 
   // Swipe left or right to archive, or restore when already archived.
@@ -115,6 +116,16 @@ function SortableNoteItem({ note, isSelected, isArchived, draggable, searchQuery
     setIsSwiping(false);
     setSwipeX(0);
   };
+
+  // A long-press drag must not also count as a swipe or open the note on release
+  const draggingRef = useRef(false);
+  useEffect(() => {
+    draggingRef.current = isDragging;
+    if (isDragging) {
+      cancelSwipe();
+      suppressClickRef.current = true;
+    }
+  }, [isDragging]);
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     // Touch already has native handlers below; this is the desktop path
@@ -173,17 +184,25 @@ function SortableNoteItem({ note, isSelected, isArchived, draggable, searchQuery
       className={cn(
         'note-item group relative overflow-hidden touch-pan-y select-none',
         isSwiping && 'cursor-grabbing',
+        isDragging && 'note-item-dragging',
         isSelected && 'note-item-selected',
         note.pinned && 'note-item-pinned'
       )}
       onTouchStart={(e) => {
         // Touches on the drag handle belong to dnd-kit, not the swipe gesture
         if ((e.target as Element).closest('.drag-handle')) return;
+        // Touch: press and hold anywhere on the card to start reordering
+        if (draggable && !(e.target as Element).closest('button')) listeners?.onTouchStart?.(e);
         startSwipe(e.touches[0].clientX, e.touches[0].clientY);
       }}
       onTouchMove={(e) => {
         if ((e.target as Element).closest('.drag-handle')) return;
+        if (draggingRef.current) return;
         moveSwipe(e.touches[0].clientX, e.touches[0].clientY);
+      }}
+      onContextMenu={(e) => {
+        // Long-press on touch should drag, not open the browser's menu
+        if (draggable) e.preventDefault();
       }}
       onTouchEnd={finishSwipe}
       onTouchCancel={cancelSwipe}
@@ -330,8 +349,11 @@ export function NoteList() {
   const setMobileNavOpen = useAppStore((state) => state.setMobileNavOpen);
   const searchRef = useRef<HTMLInputElement>(null);
 
+  // Mouse drags from the handle; touch drags anywhere after a short press-and-hold,
+  // so quick swipes and scrolling keep working
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 8 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
@@ -465,7 +487,7 @@ export function NoteList() {
             </p>
           </div>
         ) : (
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={vibrateOnDragStart} onDragEnd={handleDragEnd}>
             {pinnedNotes.length > 0 && (
               <>
                 <SectionLabel>Pinned</SectionLabel>

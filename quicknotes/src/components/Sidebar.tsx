@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { cn } from '../lib/utils';
+import { useEffect, useRef, useState } from 'react';
+import { cn, vibrateOnDragStart } from '../lib/utils';
 import { Folder as FolderIcon, Plus, Edit2, Trash2, Archive, Inbox, GripVertical, ChevronLeft, ChevronRight, Cloud, CloudOff, RefreshCw, AlertCircle, X } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
@@ -7,7 +7,7 @@ import { ConfirmDialog } from './ui/Modal';
 import { useAppStore } from '../stores/appStore';
 import { createFolder, updateFolder, deleteFolder, reorderFolders } from '../services/firebaseSync';
 import type { Folder } from '../types';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { DndContext, closestCenter, KeyboardSensor, MouseSensor, TouchSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { SettingsButton } from './Settings';
@@ -50,8 +50,14 @@ function FolderItem({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
+    position: 'relative' as const,
+    zIndex: isDragging ? 10 : undefined,
   };
+
+  const draggedRef = useRef(false);
+  useEffect(() => {
+    if (isDragging) draggedRef.current = true;
+  }, [isDragging]);
 
   const Icon = folder.isInbox ? Inbox : folder.isArchive ? Archive : FolderIcon;
 
@@ -85,9 +91,23 @@ function FolderItem({
           'folder-pill group w-full',
           isActive ? 'folder-pill-active' : 'folder-pill-inactive',
           collapsed && 'justify-center px-0',
-          isDragging && 'outline-2 outline-ring'
+          isDragging && 'folder-pill-dragging'
         )}
-        onClick={onActivate}
+        onTouchStart={(e) => {
+          // Touch: press and hold the folder to reorder it
+          if (sortable && !collapsed && !(e.target as Element).closest('button')) listeners?.onTouchStart?.(e);
+        }}
+        onContextMenu={(e) => {
+          if (sortable) e.preventDefault();
+        }}
+        onClick={() => {
+          // Releasing a long-press drag fires a click; don't switch folders then
+          if (draggedRef.current) {
+            draggedRef.current = false;
+            return;
+          }
+          onActivate();
+        }}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
@@ -187,8 +207,10 @@ export function Sidebar() {
   // The mobile drawer is always expanded
   const collapsed = !isSidebarOpen && !isMobileNavOpen;
 
+  // Same gestures as the note list: handle drag with the mouse, press-and-hold on touch
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 8 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
@@ -338,7 +360,7 @@ export function Sidebar() {
 
         {/* Folders List */}
         <nav className="flex-1 overflow-y-auto p-2">
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={vibrateOnDragStart} onDragEnd={handleDragEnd}>
           {inboxFolder && (
             <FolderItem
               folder={inboxFolder}

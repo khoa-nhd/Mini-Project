@@ -295,6 +295,15 @@
   }
 
   /* Folder item in the sidebar */
+  /* Cards and folders are drag targets on touch, not text: no selection or callout */
+  .folder-pill,
+  .note-item {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   .folder-pill {
     display: flex;
     align-items: center;
@@ -340,6 +349,15 @@
   .note-item-pinned {
     border-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
   }
+  /* Lifted while being reordered */
+  .note-item-dragging,
+  .folder-pill-dragging {
+    cursor: grabbing;
+    transform: scale(1.02);
+    border-color: color-mix(in srgb, var(--color-primary) 60%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-primary) 35%, transparent), 0 18px 40px -12px rgb(0 0 0 / 0.55), var(--glow-primary);
+  }
+
   .note-item-selected,
   .note-item-selected:hover {
     background-color: color-mix(in srgb, var(--color-primary) 12%, var(--color-card));

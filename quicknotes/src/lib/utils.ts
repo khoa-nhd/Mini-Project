@@ -225,3 +225,7 @@ export function uniqueBy<T>(array: T[], key: keyof T | ((item: T) => unknown)): 
     return true;
   });
 }
+/** Short haptic tick when a long-press drag picks an item up (Android). */
+export function vibrateOnDragStart() {
+  navigator.vibrate?.(15);
+}
