@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
-import { Save, Pin, Archive, ArchiveRestore, Trash2, Type, ArrowLeft, ImagePlus, Paperclip, Upload, ClipboardPaste } from 'lucide-react';
+import { Save, Pin, Archive, ArchiveRestore, Trash2, Type, ArrowLeft, ImagePlus, Paperclip, Upload, ClipboardPaste, AlertCircle } from 'lucide-react';
 import { Button } from './ui/Button';
 import { useAppStore } from '../stores/appStore';
 import { updateNote, toggleArchiveNote } from '../services/firebaseSync';
@@ -242,6 +242,13 @@ function NoteEditorPane({ note }: { note: Note }) {
           </Button>
         </div>
       </div>
+
+      {isArchived && (
+        <div className="mx-4 md:mx-8 mt-3 p-3 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-600 dark:text-orange-400 text-xs flex items-start gap-2 flex-shrink-0">
+          <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+          <span>Các file đính kèm trong mục Archive sẽ hết hạn và tự động xóa sau 30 ngày.</span>
+        </div>
+      )}
 
       {/* Editor: a centred ~70ch column keeps long lines readable */}
       <div className="flex-1 min-h-0 overflow-hidden flex justify-center">
