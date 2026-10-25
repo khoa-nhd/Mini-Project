@@ -36,7 +36,6 @@ import {
 } from '../lib/offline-db';
 import { useAppStore } from '../stores/appStore';
 import { generateId } from '../lib/utils';
-import { deleteChunks } from './attachments';
 
 const NOTES_COLLECTION = 'notes';
 const FOLDERS_COLLECTION = 'folders';
@@ -265,8 +264,11 @@ function checkExpiredAttachments(notes: Note[], folders: Folder[]): Note[] {
 
     const archiveTime = note.archivedAt ?? note.updatedAt ?? note.createdAt;
     if (now - archiveTime > THIRTY_DAYS) {
+      // Inline rather than importing attachments.ts, which imports this module
       for (const att of note.attachments) {
-        deleteChunks(att);
+        for (let i = 0; i < att.chunks; i++) {
+          trackWrite(deleteDoc(doc(db, ATTACHMENT_CHUNKS_COLLECTION, `${att.id}_${i}`)));
+        }
       }
       const fixed: Note = { ...note, attachments: [] };
       trackWrite(
