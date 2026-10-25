@@ -385,7 +385,7 @@ export function NoteList() {
   }, []);
 
   const activeFolder = folders.find((f) => f.id === activeFolderId);
-  const isArchived = !!activeFolder?.isArchive;
+  const isArchived = !!(activeFolder?.isArchive || activeFolder?.name?.toLowerCase() === 'archive');
   const query = searchQuery.trim();
   const lowerQuery = query.toLowerCase();
 
@@ -494,7 +494,7 @@ export function NoteList() {
       {/* Notes List */}
       <div className="flex-1 overflow-y-auto pb-24">
         {isArchived && (
-          <div className="mx-3 mt-3 p-3 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-600 dark:text-orange-400 text-xs flex items-start gap-2">
+          <div className="mx-3 mt-3 p-3 rounded-xl bg-accent/10 border border-accent/20 text-accent text-xs flex items-start gap-2">
             <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
             <span>Các file đính kèm trong mục Archive sẽ hết hạn và tự động xóa sau 30 ngày.</span>
           </div>

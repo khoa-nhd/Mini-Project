@@ -36,7 +36,10 @@ export function NoteEditor() {
 function NoteEditorPane({ note }: { note: Note }) {
   const setSelectedNote = useAppStore((state) => state.setSelectedNote);
   const setShowDeleteConfirm = useAppStore((state) => state.setShowDeleteConfirm);
-  const isArchived = useAppStore((state) => state.folders.find((f) => f.id === note.folderId)?.isArchive ?? false);
+  const isArchived = useAppStore((state) => {
+    const folder = state.folders.find((f) => f.id === note.folderId);
+    return !!(folder?.isArchive || folder?.name?.toLowerCase() === 'archive');
+  });
 
   const [title, setTitle] = useState(note.title);
   const [content, setContent] = useState(note.content);
@@ -244,7 +247,7 @@ function NoteEditorPane({ note }: { note: Note }) {
       </div>
 
       {isArchived && (
-        <div className="mx-4 md:mx-8 mt-3 p-3 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-600 dark:text-orange-400 text-xs flex items-start gap-2 flex-shrink-0">
+        <div className="mx-4 md:mx-8 mt-3 p-3 rounded-xl bg-accent/10 border border-accent/20 text-accent text-xs flex items-start gap-2 flex-shrink-0">
           <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
           <span>Các file đính kèm trong mục Archive sẽ hết hạn và tự động xóa sau 30 ngày.</span>
         </div>

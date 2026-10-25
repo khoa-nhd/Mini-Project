@@ -256,7 +256,7 @@ async function removeLegacyUncategorized(userId: string, folders: Folder[]): Pro
 const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
 
 function checkExpiredAttachments(notes: Note[], folders: Folder[]): Note[] {
-  const archiveFolderIds = new Set(folders.filter((f) => f.isArchive).map((f) => f.id));
+  const archiveFolderIds = new Set(folders.filter((f) => f.isArchive || f.name.toLowerCase() === 'archive').map((f) => f.id));
   const now = Date.now();
 
   return notes.map((note) => {
