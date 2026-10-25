@@ -100,11 +100,16 @@ function FolderItem({
         title={collapsed ? folder.name : undefined}
       >
         {sortable && !collapsed && (
+          // Always visible on touch devices, revealed on hover on desktop
           <span
             {...attributes}
             {...listeners}
             onClick={(e) => e.stopPropagation()}
-            className="drag-handle -ml-1 opacity-0 group-hover:opacity-60 hover:!opacity-100"
+            onTouchStart={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
+            onTouchEnd={(e) => e.stopPropagation()}
+            onTouchCancel={(e) => e.stopPropagation()}
+            className="drag-handle -ml-1.5 p-1.5 opacity-60 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-60 hover:!opacity-100"
             aria-label="Drag to reorder"
           >
             <GripVertical className="w-3.5 h-3.5" />

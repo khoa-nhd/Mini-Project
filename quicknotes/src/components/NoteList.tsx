@@ -176,8 +176,15 @@ function SortableNoteItem({ note, isSelected, isArchived, draggable, searchQuery
         isSelected && 'note-item-selected',
         note.pinned && 'note-item-pinned'
       )}
-      onTouchStart={(e) => startSwipe(e.touches[0].clientX, e.touches[0].clientY)}
-      onTouchMove={(e) => moveSwipe(e.touches[0].clientX, e.touches[0].clientY)}
+      onTouchStart={(e) => {
+        // Touches on the drag handle belong to dnd-kit, not the swipe gesture
+        if ((e.target as Element).closest('.drag-handle')) return;
+        startSwipe(e.touches[0].clientX, e.touches[0].clientY);
+      }}
+      onTouchMove={(e) => {
+        if ((e.target as Element).closest('.drag-handle')) return;
+        moveSwipe(e.touches[0].clientX, e.touches[0].clientY);
+      }}
       onTouchEnd={finishSwipe}
       onTouchCancel={cancelSwipe}
       onPointerDown={handlePointerDown}
@@ -229,7 +236,11 @@ function SortableNoteItem({ note, isSelected, isArchived, draggable, searchQuery
             {...attributes}
             {...listeners}
             onClick={(e) => e.stopPropagation()}
-            className="drag-handle p-1 -ml-1 mt-0.5 opacity-40 group-hover:opacity-100"
+            onTouchStart={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
+            onTouchEnd={(e) => e.stopPropagation()}
+            onTouchCancel={(e) => e.stopPropagation()}
+            className="drag-handle p-1.5 -ml-1.5 mt-0.5 opacity-50 group-hover:opacity-100"
             aria-label="Drag to reorder"
           >
             <GripVertical className="w-4 h-4" />
@@ -342,11 +353,13 @@ export function NoteList() {
   const folderNotes = notes
     .filter((n) => !n.deletedAt && (query ? true : n.folderId === activeFolderId))
     .filter((n) => !query || n.title.toLowerCase().includes(lowerQuery) || n.content.toLowerCase().includes(lowerQuery))
-    .sort((a, b) => (query ? b.updatedAt - a.updatedAt : a.order - b.order));
+    // Archive is always newest first; other folders keep their manual order
+    .sort((a, b) => (query || isArchived ? b.updatedAt - a.updatedAt : a.order - b.order));
   const folderById = new Map(folders.map((f) => [f.id, f]));
   const pinnedNotes = folderNotes.filter((n) => n.pinned);
   const unpinnedNotes = folderNotes.filter((n) => !n.pinned);
-  const draggable = !query;
+  // Manual reordering has no visible effect when the list is time-sorted
+  const draggable = !query && !isArchived;
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;

@@ -439,6 +439,12 @@
   .drag-handle {
     color: var(--color-muted-foreground);
     cursor: grab;
+    /* Keep the browser from turning the gesture into a scroll, which would
+       cancel the pointer stream dnd-kit relies on for touch dragging. */
+    touch-action: none;
+    -webkit-touch-callout: none;
+    user-select: none;
+    -webkit-user-select: none;
     transition: color 150ms, opacity 150ms;
   }
   .drag-handle:hover {
