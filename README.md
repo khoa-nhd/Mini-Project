@@ -16,6 +16,7 @@
 
 | Project | Purpose | Live Link | Stack |
 |---------|---------|-----------|-------|
+| **Quiz Generator** | Extract questions from docs & auto-publish public Blooket sets | — | React 19 · Vite · Fastify · Playwright · Gemini |
 | **QuickNotes** | Capture ideas during the day instantly | [Live →](https://quicknote-7c89b.web.app) | React · Vite · Firebase · PWA |
 | **Interactive Quiz** | Click-click website for faster study | — | HTML · JSON · JS |
 
@@ -25,6 +26,7 @@
 
 Every project here solves a small, real problem quickly.
 
+- **Quiz Generator** — manual Blooket question set creation is tedious; this extracts from any doc, lets you edit easily, and creates live Blooket sets automatically.
 - **QuickNotes** — ideas fade in seconds; this gives them a button and a home.
 - **Interactive Quiz** — reading can become passive; this makes review an active decision.
 

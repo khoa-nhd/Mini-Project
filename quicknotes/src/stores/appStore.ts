@@ -161,9 +161,17 @@ export const useAppStore = create<AppState>()(
         }),
       moveNoteToFolder: (noteId, folderId) =>
         set((state) => ({
-          notes: state.notes.map((n) =>
-            n.id === noteId ? { ...n, folderId, updatedAt: Date.now() } : n
-          ),
+          notes: state.notes.map((n) => {
+            if (n.id !== noteId) return n;
+            const targetFolder = state.folders.find((f) => f.id === folderId);
+            const isArchived = targetFolder?.isArchive;
+            return {
+              ...n,
+              folderId,
+              updatedAt: Date.now(),
+              archivedAt: isArchived ? (n.archivedAt ?? Date.now()) : undefined,
+            };
+          }),
         })),
 
       // Search

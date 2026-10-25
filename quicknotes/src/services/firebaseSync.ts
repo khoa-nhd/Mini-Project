@@ -36,6 +36,7 @@ import {
 } from '../lib/offline-db';
 import { useAppStore } from '../stores/appStore';
 import { generateId } from '../lib/utils';
+import { deleteChunks } from './attachments';
 
 const NOTES_COLLECTION = 'notes';
 const FOLDERS_COLLECTION = 'folders';
@@ -75,7 +76,7 @@ function toMillis(value: unknown): number | undefined {
   return undefined;
 }
 
-const TIMESTAMP_FIELDS = ['createdAt', 'updatedAt', 'deletedAt'] as const;
+const TIMESTAMP_FIELDS = ['createdAt', 'updatedAt', 'deletedAt', 'archivedAt'] as const;
 
 // Convert a partial update into Firestore field values
 function toFirestoreUpdate<T extends Record<string, unknown>>(updates: T): Record<string, unknown> {
@@ -94,12 +95,13 @@ function toFirestoreUpdate<T extends Record<string, unknown>>(updates: T): Recor
 }
 
 function noteToFirestore(note: Note) {
-  const { id: _id, deletedAt, ...rest } = note;
+  const { id: _id, deletedAt, archivedAt, ...rest } = note;
   return {
     ...rest,
     createdAt: Timestamp.fromMillis(note.createdAt),
     updatedAt: Timestamp.fromMillis(note.updatedAt),
     ...(deletedAt ? { deletedAt: Timestamp.fromMillis(deletedAt) } : {}),
+    ...(archivedAt ? { archivedAt: Timestamp.fromMillis(archivedAt) } : {}),
   };
 }
 
@@ -118,6 +120,7 @@ function noteFromFirestore(snap: DocumentSnapshot): Note {
     createdAt: toMillis(data.createdAt) ?? Date.now(),
     updatedAt: toMillis(data.updatedAt) ?? Date.now(),
     deletedAt: toMillis(data.deletedAt),
+    archivedAt: toMillis(data.archivedAt),
   } as Note;
 }
 
@@ -250,6 +253,31 @@ async function removeLegacyUncategorized(userId: string, folders: Folder[]): Pro
   return folders.filter((f) => f.id !== legacyId);
 }
 
+const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
+
+function checkExpiredAttachments(notes: Note[], folders: Folder[]): Note[] {
+  const archiveFolderIds = new Set(folders.filter((f) => f.isArchive).map((f) => f.id));
+  const now = Date.now();
+
+  return notes.map((note) => {
+    if (!archiveFolderIds.has(note.folderId)) return note;
+    if (!note.attachments || note.attachments.length === 0) return note;
+
+    const archiveTime = note.archivedAt ?? note.updatedAt ?? note.createdAt;
+    if (now - archiveTime > THIRTY_DAYS) {
+      for (const att of note.attachments) {
+        deleteChunks(att);
+      }
+      const fixed: Note = { ...note, attachments: [] };
+      trackWrite(
+        updateDoc(doc(db, NOTES_COLLECTION, note.id), toFirestoreUpdate({ attachments: [] }))
+      );
+      return fixed;
+    }
+    return note;
+  });
+}
+
 // Notes from older versions could reference folders that don't exist
 // (e.g. folderId "archive") or be soft-deleted. Move them somewhere visible.
 function repairOrphanNotes(notes: Note[], folders: Folder[]): Note[] {
@@ -318,7 +346,8 @@ export async function performInitialSync(): Promise<void> {
 
     // Notes
     const notesSnapshot = await getDocs(query(collection(db, NOTES_COLLECTION), where('userId', '==', userId)));
-    const notes = repairOrphanNotes(notesSnapshot.docs.map(noteFromFirestore), folders).sort(byOrder);
+    let notes = repairOrphanNotes(notesSnapshot.docs.map(noteFromFirestore), folders);
+    notes = checkExpiredAttachments(notes, folders).sort(byOrder);
     useAppStore.getState().setNotes(notes);
     for (const note of notes) {
       await saveNoteOffline(note, true);
@@ -341,7 +370,7 @@ export async function performInitialSync(): Promise<void> {
 // Load from offline storage
 export async function loadFromOffline(userId: string): Promise<void> {
   try {
-    const [user, folders, notes] = await Promise.all([
+    const [user, folders, notesRaw] = await Promise.all([
       getUserOffline(userId),
       getFoldersOffline(userId),
       getNotesOffline(userId),
@@ -352,7 +381,10 @@ export async function loadFromOffline(userId: string): Promise<void> {
       useAppStore.getState().setFolders(folders);
       pickActiveFolder(folders);
     }
-    if (notes.length > 0) useAppStore.getState().setNotes(notes);
+    if (notesRaw.length > 0) {
+      const notes = folders.length > 0 ? checkExpiredAttachments(notesRaw, folders) : notesRaw;
+      useAppStore.getState().setNotes(notes);
+    }
   } catch (error) {
     console.error('Failed to load from offline:', error);
   }
@@ -533,7 +565,12 @@ export async function toggleArchiveNote(noteId: string): Promise<void> {
   if (!note || !archive || !inbox) return;
 
   const isArchived = note.folderId === archive.id;
-  await updateNote(noteId, { folderId: isArchived ? inbox.id : archive.id, pinned: false });
+  const now = Date.now();
+  await updateNote(noteId, {
+    folderId: isArchived ? inbox.id : archive.id,
+    pinned: false,
+    archivedAt: isArchived ? undefined : now,
+  });
   if (useAppStore.getState().selectedNoteId === noteId) {
     useAppStore.getState().setSelectedNote(null);
   }

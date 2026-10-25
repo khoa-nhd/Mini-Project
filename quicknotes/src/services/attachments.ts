@@ -195,7 +195,7 @@ export function loadAttachmentBlob(attachment: Attachment): Promise<Blob> {
   return load;
 }
 
-function deleteChunks(attachment: Attachment) {
+export function deleteChunks(attachment: Attachment) {
   blobCache.delete(attachment.id);
   for (let i = 0; i < attachment.chunks; i++) {
     trackWrite(deleteDoc(doc(db, CHUNKS_COLLECTION, chunkId(attachment.id, i))));

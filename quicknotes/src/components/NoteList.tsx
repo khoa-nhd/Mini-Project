@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, Fragment } from 'react';
 import { cn, vibrateOnDragStart, formatRelativeTime, shortcutLabel, isMac } from '../lib/utils';
-import { Search, X, Pin, Archive, ArchiveRestore, Trash2, FileText, Clock, GripVertical, Menu, Paperclip, Plus } from 'lucide-react';
+import { Search, X, Pin, Archive, ArchiveRestore, Trash2, FileText, Clock, GripVertical, Menu, Paperclip, Plus, AlertCircle } from 'lucide-react';
 import { useAppStore } from '../stores/appStore';
 import { updateNote, reorderNotes, toggleArchiveNote, createNewNote } from '../services/firebaseSync';
 import type { Note } from '../types';
@@ -493,6 +493,12 @@ export function NoteList() {
 
       {/* Notes List */}
       <div className="flex-1 overflow-y-auto pb-24">
+        {isArchived && (
+          <div className="mx-3 mt-3 p-3 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-600 dark:text-orange-400 text-xs flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+            <span>Các file đính kèm trong mục Archive sẽ hết hạn và tự động xóa sau 30 ngày.</span>
+          </div>
+        )}
         {!activeFolderId && !query ? (
           <div className="empty-state p-8">
             <FileText className="empty-state-icon" />

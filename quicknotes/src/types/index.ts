@@ -38,6 +38,7 @@ export interface Note {
   createdAt: number;
   updatedAt: number;
   deletedAt?: number;
+  archivedAt?: number;
   wordCount: number;
   charCount: number;
   tags?: string[];
