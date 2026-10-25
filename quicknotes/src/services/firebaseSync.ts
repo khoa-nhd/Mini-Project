@@ -45,7 +45,7 @@ const USERS_COLLECTION = 'users';
 const BATCH_LIMIT = 450;
 
 export const DEFAULT_USER_SETTINGS: UserSettings = {
-  theme: 'system',
+  theme: 'dark',
   shortcutsEnabled: true,
   autoSaveDelay: 1500,
   sortOrder: 'manual',
@@ -208,7 +208,7 @@ async function commitInChunks(ops: Array<(batch: ReturnType<typeof writeBatch>) 
   }
 }
 
-// Make sure the user has Inbox / Archive / Uncategorized folders.
+// Make sure the user has the Inbox and Archive folders.
 // IDs are deterministic per user so two devices never create duplicates.
 async function ensureDefaultFolders(userId: string, folders: Folder[]): Promise<Folder[]> {
   const now = Date.now();
@@ -236,6 +236,17 @@ async function ensureDefaultFolders(userId: string, folders: Folder[]): Promise<
     trackWrite(setDoc(doc(db, FOLDERS_COLLECTION, folder.id), folderToFirestore(folder)));
   }
   return [...folders, ...missing].sort(byOrder);
+}
+
+// Older versions created an "Uncategorized" folder for every user. It is no
+// longer a default: delete it; repairOrphanNotes then moves its notes to Inbox.
+async function removeLegacyUncategorized(userId: string, folders: Folder[]): Promise<Folder[]> {
+  const legacyId = `uncategorized-${userId}`;
+  if (!folders.some((f) => f.id === legacyId)) return folders;
+
+  await deleteFolderOffline(legacyId);
+  trackWrite(deleteDoc(doc(db, FOLDERS_COLLECTION, legacyId)));
+  return folders.filter((f) => f.id !== legacyId);
 }
 
 // Notes from older versions could reference folders that don't exist
@@ -298,6 +309,7 @@ export async function performInitialSync(): Promise<void> {
     const foldersSnapshot = await getDocs(query(collection(db, FOLDERS_COLLECTION), where('userId', '==', userId)));
     let folders = foldersSnapshot.docs.map(folderFromFirestore).sort(byOrder);
     folders = await ensureDefaultFolders(userId, folders);
+    folders = await removeLegacyUncategorized(userId, folders);
     useAppStore.getState().setFolders(folders);
     for (const folder of folders) {
       await saveFolderOffline(folder, true);

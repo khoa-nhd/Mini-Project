@@ -33,7 +33,7 @@ export function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-dvh flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
           <p className="text-muted-foreground">Loading QuickNotes...</p>
@@ -49,9 +49,9 @@ export function App() {
   return (
     <ToastProvider>
       <a href="#main-content" className="skip-link">Skip to main content</a>
-      <div className="h-dvh flex bg-background overflow-hidden">
+      <div className="h-dvh flex overflow-hidden md:p-3 md:gap-3">
         <Sidebar />
-        <main id="main-content" className="flex-1 flex overflow-hidden min-w-0">
+        <main id="main-content" className="flex-1 flex overflow-hidden min-w-0 md:gap-3">
           <NoteList />
           <NoteEditor />
         </main>
@@ -75,7 +75,7 @@ function NewNoteButton() {
       aria-label="Create new note"
       title={`New note (${isMac ? '⌥N' : 'Alt+N'})`}
       className={cn(
-        'fixed bottom-6 right-6 z-40 flex items-center justify-center w-14 h-14 rounded-full bg-primary text-primary-foreground ring-4 ring-background hover:bg-primary/90 hover:shadow-[var(--shadow-card-hover)] active:scale-95 transition-[background-color,box-shadow,transform] duration-150',
+        'fixed bottom-6 right-6 z-40 flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-primary text-primary-foreground shadow-glow hover:brightness-110 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-[filter,transform] duration-150',
         // On phones the editor fills the screen; keep the button out of the text
         hasSelection && 'hidden md:flex'
       )}
@@ -174,14 +174,15 @@ function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div className="min-h-dvh flex items-center justify-center p-4">
       <div id="main-content" className="w-full max-w-md">
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 flex flex-col items-center">
+          <img src="/icons/icon.svg" alt="" width={56} height={56} className="brand-mark rounded-2xl mb-5" />
           <h1 className="font-bold text-foreground text-display">QuickNotes</h1>
           <p className="text-muted-foreground mt-2">Dump thoughts. Organize fast. Sync everywhere.</p>
         </div>
 
-        <div className="card p-6">
+        <div className="panel rounded-2xl p-6 sm:p-8">
           {success && (
             <div className="mb-4 alert alert-success" role="alert">
               {success}
@@ -276,15 +277,15 @@ function AuthPage() {
           <div className="mt-6 text-center text-sm text-muted-foreground">
             {mode === 'signin' && (
               <>
-                <p>Don't have an account? <button type="button" onClick={() => switchMode('signup')} className="text-primary font-medium hover:underline">Sign up</button></p>
-                <p className="mt-2"><button type="button" onClick={() => switchMode('forgot')} className="text-primary font-medium hover:underline">Forgot password?</button></p>
+                <p>Don't have an account? <button type="button" onClick={() => switchMode('signup')} className="text-primary font-medium hover:underline underline-offset-4">Sign up</button></p>
+                <p className="mt-2"><button type="button" onClick={() => switchMode('forgot')} className="text-primary font-medium hover:underline underline-offset-4">Forgot password?</button></p>
               </>
             )}
             {mode === 'signup' && (
-              <p>Already have an account? <button type="button" onClick={() => switchMode('signin')} className="text-primary font-medium hover:underline">Sign in</button></p>
+              <p>Already have an account? <button type="button" onClick={() => switchMode('signin')} className="text-primary font-medium hover:underline underline-offset-4">Sign in</button></p>
             )}
             {mode === 'forgot' && (
-              <p>Remember your password? <button type="button" onClick={() => switchMode('signin')} className="text-primary font-medium hover:underline">Sign in</button></p>
+              <p>Remember your password? <button type="button" onClick={() => switchMode('signin')} className="text-primary font-medium hover:underline underline-offset-4">Sign in</button></p>
             )}
           </div>
         </div>

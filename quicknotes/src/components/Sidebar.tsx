@@ -61,6 +61,7 @@ function FolderItem({
         <Input
           autoFocus
           defaultValue={folder.name}
+          key={folder.id + '-edit'}
           aria-label="Folder name"
           onFocus={(e) => e.currentTarget.select()}
           onKeyDown={(e) => {
@@ -117,7 +118,7 @@ function FolderItem({
               <div className="hidden group-hover:flex group-focus-within:flex items-center gap-0.5">
                 <button
                   onClick={(e) => { e.stopPropagation(); onStartEdit(); }}
-                  className="p-1 rounded hover:bg-foreground/10"
+                  className="p-1 rounded-md hover:bg-black/15"
                   aria-label={`Rename ${folder.name}`}
                   title="Rename"
                 >
@@ -125,7 +126,7 @@ function FolderItem({
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); onDelete(); }}
-                  className="p-1 rounded hover:bg-foreground/10"
+                  className="p-1 rounded-md hover:bg-black/15"
                   aria-label={`Delete ${folder.name}`}
                   title="Delete"
                 >
@@ -133,7 +134,7 @@ function FolderItem({
                 </button>
               </div>
             )}
-            <span className="text-xs opacity-70 tabular-nums group-hover:hidden">{count > 0 ? count : ''}</span>
+            <span className="ml-2 text-xs opacity-70 tabular-nums group-hover:hidden">{count > 0 ? count : ''}</span>
           </>
         )}
       </div>
@@ -252,14 +253,14 @@ export function Sidebar() {
     <>
       {/* Mobile backdrop */}
       {isMobileNavOpen && (
-        <div className="fixed inset-0 z-30 bg-black/40 md:hidden" onClick={() => setMobileNavOpen(false)} aria-hidden="true" />
+        <div className="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm md:hidden" onClick={() => setMobileNavOpen(false)} aria-hidden="true" />
       )}
 
       <aside
         className={cn(
-          'flex flex-col bg-card border-r border-border transition-[width,translate] duration-150 flex-shrink-0',
-          // Mobile: off-canvas drawer. Desktop: collapsible column.
-          'fixed inset-y-0 left-0 z-40 w-72 md:static md:z-auto',
+          'flex flex-col transition-[width,translate] duration-150 flex-shrink-0',
+          // Mobile: solid off-canvas drawer. Desktop: floating translucent panel.
+          'fixed inset-y-0 left-0 z-40 w-72 bg-card border-r md:static md:z-auto md:panel md:rounded-2xl md:overflow-hidden',
           isMobileNavOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
           isSidebarOpen ? 'md:w-64' : 'md:w-16'
         )}
@@ -268,8 +269,8 @@ export function Sidebar() {
         {/* Header */}
         <div className={cn('flex items-center p-4 border-b border-border', collapsed ? 'justify-center' : 'justify-between')}>
           {!collapsed && (
-            <h1 className="text-lg font-semibold text-foreground flex items-center gap-2">
-              <FolderIcon className="w-5 h-5 text-primary" />
+            <h1 className="text-base font-semibold tracking-tight text-foreground flex items-center gap-2.5">
+              <img src="/icons/icon.svg" alt="" width={28} height={28} className="brand-mark" />
               QuickNotes
             </h1>
           )}
@@ -360,6 +361,11 @@ export function Sidebar() {
                   onDelete={() => setDeleteFolderId(folder.id)}
                 />
               ))}
+              {customFolders.length === 0 && !collapsed && (
+                <p className="px-3 py-2 text-xs leading-relaxed text-muted-foreground">
+                  No folders yet. Create one to organize your notes.
+                </p>
+              )}
             </SortableContext>
 
           {archiveFolder && (

@@ -230,7 +230,6 @@ export const useAppStore = create<AppState>()(
         const folder = get().folders.find((f) => f.id === folderId);
         if (folder?.isInbox) return 'inbox';
         if (folder?.isArchive) return 'archive';
-        if (folder?.name === 'Uncategorized') return 'uncategorized';
         return 'custom';
       },
     }),

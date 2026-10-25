@@ -12,12 +12,12 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const baseStyles = 'inline-flex items-center justify-center gap-2 font-medium transition-all duration-fast ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:opacity-50 disabled:pointer-events-none rounded-md';
     
     const variants = {
-      primary: 'bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary',
+      primary: 'bg-gradient-primary text-primary-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.18)] hover:brightness-110 hover:shadow-glow',
       secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/90 active:bg-secondary',
       accent: 'bg-accent text-accent-foreground hover:bg-accent/90 active:bg-accent',
-      ghost: 'bg-transparent hover:bg-muted active:bg-muted',
-      destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90 active:bg-destructive',
-      icon: 'bg-transparent hover:bg-muted active:bg-muted p-2',
+      ghost: 'bg-transparent text-foreground hover:bg-[var(--surface-hover)]',
+      destructive: 'bg-[#DC2626] text-white hover:brightness-110',
+      icon: 'bg-transparent hover:bg-[var(--surface-hover)] p-2',
     };
 
     const sizes = {

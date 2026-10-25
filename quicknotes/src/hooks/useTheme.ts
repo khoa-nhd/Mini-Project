@@ -13,7 +13,7 @@ function readStoredTheme(): ThemeMode {
   } catch {
     // storage unavailable
   }
-  return 'system';
+  return 'dark';
 }
 
 function getSystemTheme(): 'light' | 'dark' {

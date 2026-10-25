@@ -73,18 +73,16 @@ export interface ImportOptions {
   folderMapping?: Record<string, string>;
 }
 
-export type FolderType = 'inbox' | 'archive' | 'uncategorized' | 'custom';
+export type FolderType = 'inbox' | 'archive' | 'custom';
 
 export const SPECIAL_FOLDER_IDS = {
   INBOX: 'inbox',
   ARCHIVE: 'archive',
-  UNCATEGORIZED: 'uncategorized',
 } as const;
 
 export const DEFAULT_FOLDERS: Omit<Folder, 'id' | 'userId' | 'createdAt' | 'updatedAt'>[] = [
-  { name: 'Inbox', order: 0, isArchive: false, isInbox: true, color: '#0D9488', icon: 'inbox' },
+  { name: 'Inbox', order: 0, isArchive: false, isInbox: true, color: '#334155', icon: 'inbox' },
   { name: 'Archive', order: 999, isArchive: true, isInbox: false, color: '#475569', icon: 'archive' },
-  { name: 'Uncategorized', order: 998, isArchive: false, isInbox: false, color: '#586380', icon: 'folder' },
 ];
 
 export const KEYBOARD_SHORTCUTS = {

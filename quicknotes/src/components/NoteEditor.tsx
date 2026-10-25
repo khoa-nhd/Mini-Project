@@ -13,7 +13,7 @@ export function NoteEditor() {
 
   if (!selectedNoteId || !note) {
     return (
-      <div className="hidden md:flex flex-1 items-center justify-center bg-background">
+      <div className="hidden md:flex panel flex-1 items-center justify-center rounded-2xl">
         <div className="empty-state">
           <Type className="empty-state-icon" />
           <h3 className="empty-state-title">No note selected</h3>
@@ -80,7 +80,7 @@ function NoteEditorPane({ note }: { note: Note }) {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-background min-w-0">
+    <div className="panel flex-1 flex flex-col min-w-0 overflow-hidden border-0 md:border md:rounded-2xl">
       {/* Toolbar */}
       <div className="toolbar flex-shrink-0">
         <div className="flex-1 flex items-center gap-2 min-w-0">

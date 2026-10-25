@@ -316,7 +316,7 @@ export function NoteList() {
   return (
     <section
       className={cn(
-        'flex-col overflow-hidden border-r border-border bg-background w-full md:w-80 lg:w-96 flex-shrink-0',
+        'panel flex-col overflow-hidden w-full md:w-80 lg:w-96 flex-shrink-0 border-0 md:border md:rounded-2xl',
         selectedNoteId ? 'hidden md:flex' : 'flex'
       )}
       aria-label="Notes"
