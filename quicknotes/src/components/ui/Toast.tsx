@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
 import { cn } from '../../lib/utils';
 import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react';
 
@@ -34,10 +34,21 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
+  useEffect(() => {
+    const handleCustomToast = (e: Event) => {
+      const customEvent = e as CustomEvent<{ type: Toast['type']; message: string; duration?: number }>;
+      if (customEvent.detail) {
+        showToast(customEvent.detail.type, customEvent.detail.message, customEvent.detail.duration);
+      }
+    };
+    window.addEventListener('quicknotes:toast', handleCustomToast);
+    return () => window.removeEventListener('quicknotes:toast', handleCustomToast);
+  }, [showToast]);
+
   return (
     <ToastContext.Provider value={{ toasts, showToast, dismissToast }}>
       {children}
-      <div className="absolute md:fixed bottom-24 right-4 left-4 sm:left-auto z-50 flex flex-col items-end gap-2 pointer-events-none" aria-live="polite">
+      <div className="absolute md:fixed top-4 right-4 left-4 sm:left-auto sm:right-4 z-50 flex flex-col items-end gap-2 pointer-events-none" aria-live="polite">
         {toasts.map((toast) => (
           <ToastItem key={toast.id} toast={toast} onDismiss={dismissToast} />
         ))}

@@ -560,8 +560,8 @@ export async function deleteNote(noteId: string): Promise<void> {
 export async function toggleArchiveNote(noteId: string): Promise<void> {
   const { notes, folders } = useAppStore.getState();
   const note = notes.find((n) => n.id === noteId);
-  const archive = folders.find((f) => f.isArchive);
-  const inbox = folders.find((f) => f.isInbox);
+  const archive = folders.find((f) => f.isArchive || f.name.toLowerCase() === 'archive');
+  const inbox = folders.find((f) => f.isInbox || f.name.toLowerCase() === 'inbox');
   if (!note || !archive || !inbox) return;
 
   const isArchived = note.folderId === archive.id;
@@ -571,6 +571,19 @@ export async function toggleArchiveNote(noteId: string): Promise<void> {
     pinned: false,
     archivedAt: isArchived ? undefined : now,
   });
+
+  if (!isArchived && note.attachments && note.attachments.length > 0) {
+    window.dispatchEvent(
+      new CustomEvent('quicknotes:toast', {
+        detail: {
+          type: 'warning',
+          message: `Ghi chú có ${note.attachments.length} file đính kèm sẽ hết hạn và tự động xóa sau 30 ngày trong Archive.`,
+          duration: 6000,
+        },
+      })
+    );
+  }
+
   if (useAppStore.getState().selectedNoteId === noteId) {
     useAppStore.getState().setSelectedNote(null);
   }
