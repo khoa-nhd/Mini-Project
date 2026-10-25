@@ -34,6 +34,7 @@ Ideas often arrive in brief windows — while walking, between conversations, or
 | **New Note** | Creates a note instantly | Big `+` button or `Ctrl+N` |
 | **Search** | Full-text across all notes | `Ctrl+K` |
 | **Folders** | Organize into Inbox / Archive / Custom | Sidebar |
+| **Swipe to Archive** | Archive or restore a note with a horizontal swipe | Swipe (touch) or drag (mouse) a note left/right |
 | **Auto-Save** | Saves after typing delay | Automatic |
 | **Offline** | Works without internet | IndexedDB + Service Worker |
 | **Sync** | Firestore when signed in | Background sync |

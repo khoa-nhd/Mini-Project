@@ -53,7 +53,7 @@ interface NoteItemProps {
   onSelect: () => void;
 }
 
-// Horizontal distance (px) a touch swipe must travel to archive / restore a note
+// Horizontal distance (px) a swipe must travel to archive / restore a note
 const SWIPE_THRESHOLD = 80;
 
 function SortableNoteItem({ note, isSelected, isArchived, draggable, searchQuery, folderName, onSelect }: NoteItemProps) {
@@ -69,33 +69,94 @@ function SortableNoteItem({ note, isSelected, isArchived, draggable, searchQuery
     opacity: isDragging ? 0.5 : 1,
   };
 
-  // Swipe left or right (touch) to archive, or restore when already archived
+  // Swipe left or right to archive, or restore when already archived.
+  // Touch and desktop mouse/pen drags share the same gesture state so the
+  // preview, threshold and result are identical on every platform.
   const [swipeX, setSwipeX] = useState(0);
-  const touchRef = useRef<{ x: number; y: number; horizontal: boolean | null } | null>(null);
-  const swipedRef = useRef(false);
+  const [isSwiping, setIsSwiping] = useState(false);
+  const gestureRef = useRef<{ startX: number; startY: number; horizontal: boolean | null; dx: number } | null>(null);
+  const activePointerRef = useRef<number | null>(null);
+  const suppressClickRef = useRef(false);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    const touch = e.touches[0];
-    touchRef.current = { x: touch.clientX, y: touch.clientY, horizontal: null };
-    swipedRef.current = false;
+  const startSwipe = (x: number, y: number) => {
+    gestureRef.current = { startX: x, startY: y, horizontal: null, dx: 0 };
+    suppressClickRef.current = false;
   };
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    const start = touchRef.current;
-    if (!start) return;
-    const dx = e.touches[0].clientX - start.x;
-    const dy = e.touches[0].clientY - start.y;
-    if (start.horizontal === null && (Math.abs(dx) > 10 || Math.abs(dy) > 10)) {
-      start.horizontal = Math.abs(dx) > Math.abs(dy);
+  /** Updates the gesture; returns true once it is tracked as a horizontal swipe. */
+  const moveSwipe = (x: number, y: number) => {
+    const gesture = gestureRef.current;
+    if (!gesture) return false;
+    const dx = x - gesture.startX;
+    const dy = y - gesture.startY;
+    if (gesture.horizontal === null && (Math.abs(dx) > 10 || Math.abs(dy) > 10)) {
+      gesture.horizontal = Math.abs(dx) > Math.abs(dy);
+      if (gesture.horizontal) setIsSwiping(true);
     }
-    if (start.horizontal) setSwipeX(dx);
+    if (!gesture.horizontal) return false;
+    gesture.dx = dx;
+    setSwipeX(dx);
+    return true;
   };
 
-  const handleTouchEnd = () => {
-    if (touchRef.current?.horizontal) swipedRef.current = true;
-    if (Math.abs(swipeX) >= SWIPE_THRESHOLD) toggleArchiveNote(note.id);
-    touchRef.current = null;
+  const finishSwipe = () => {
+    const gesture = gestureRef.current;
+    gestureRef.current = null;
+    setIsSwiping(false);
     setSwipeX(0);
+    if (!gesture?.horizontal) return;
+    // A finished swipe also fires a click; ignore it
+    suppressClickRef.current = true;
+    if (Math.abs(gesture.dx) >= SWIPE_THRESHOLD) toggleArchiveNote(note.id);
+  };
+
+  const cancelSwipe = () => {
+    gestureRef.current = null;
+    setIsSwiping(false);
+    setSwipeX(0);
+  };
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    // Touch already has native handlers below; this is the desktop path
+    if (e.pointerType === 'touch' || e.button !== 0) return;
+    const target = e.target as Element;
+    if (target.closest('button, a, input, textarea, select, .drag-handle')) return;
+    activePointerRef.current = e.pointerId;
+    startSwipe(e.clientX, e.clientY);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (activePointerRef.current !== e.pointerId) return;
+    if ((e.buttons & 1) === 0) {
+      activePointerRef.current = null;
+      cancelSwipe();
+      return;
+    }
+    if (!moveSwipe(e.clientX, e.clientY)) return;
+    // Keep tracking when the cursor leaves the row, and block text selection
+    e.preventDefault();
+    if (!e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    }
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (activePointerRef.current !== e.pointerId) return;
+    activePointerRef.current = null;
+    finishSwipe();
+  };
+
+  const handlePointerCancel = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (activePointerRef.current !== e.pointerId) return;
+    activePointerRef.current = null;
+    cancelSwipe();
+  };
+
+  const handlePointerLeave = (e: React.PointerEvent<HTMLDivElement>) => {
+    // Without capture, leaving the row ends the gesture instead of leaving it stuck
+    if (activePointerRef.current !== e.pointerId || e.currentTarget.hasPointerCapture(e.pointerId)) return;
+    activePointerRef.current = null;
+    cancelSwipe();
   };
 
   // Notes without a title borrow their first line, so the list stays scannable
@@ -110,18 +171,24 @@ function SortableNoteItem({ note, isSelected, isArchived, draggable, searchQuery
       ref={setNodeRef}
       style={style}
       className={cn(
-        'note-item group relative overflow-hidden touch-pan-y',
+        'note-item group relative overflow-hidden touch-pan-y select-none',
+        isSwiping && 'cursor-grabbing',
         isSelected && 'note-item-selected',
         note.pinned && 'note-item-pinned'
       )}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      onTouchCancel={() => { touchRef.current = null; setSwipeX(0); }}
+      onTouchStart={(e) => startSwipe(e.touches[0].clientX, e.touches[0].clientY)}
+      onTouchMove={(e) => moveSwipe(e.touches[0].clientX, e.touches[0].clientY)}
+      onTouchEnd={finishSwipe}
+      onTouchCancel={cancelSwipe}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerCancel}
+      onPointerLeave={handlePointerLeave}
       onClick={() => {
         // A finished swipe also fires a click; ignore it
-        if (swipedRef.current) {
-          swipedRef.current = false;
+        if (suppressClickRef.current) {
+          suppressClickRef.current = false;
           return;
         }
         onSelect();
