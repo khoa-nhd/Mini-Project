@@ -1,9 +1,12 @@
 import { useRef, useEffect, useState } from 'react';
-import { Save, Pin, Archive, ArchiveRestore, Trash2, Type, ArrowLeft } from 'lucide-react';
+import { Save, Pin, Archive, ArchiveRestore, Trash2, Type, ArrowLeft, ImagePlus, Paperclip, Upload } from 'lucide-react';
 import { Button } from './ui/Button';
 import { useAppStore } from '../stores/appStore';
 import { updateNote, toggleArchiveNote } from '../services/firebaseSync';
 import { useAutoSave } from '../hooks/useAutoSave';
+import { useToast } from './ui/Toast';
+import { AttachmentStrip } from './Attachments';
+import { addAttachments, AttachmentError } from '../services/attachments';
 import { formatRelativeTime, countWords, countChars, shortcutLabel, isMac, cn } from '../lib/utils';
 import type { Note } from '../types';
 
@@ -40,6 +43,35 @@ function NoteEditorPane({ note }: { note: Note }) {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const titleRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [pendingFiles, setPendingFiles] = useState(0);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const { showToast } = useToast();
+
+  const attachFiles = async (files: File[]) => {
+    if (files.length === 0) return;
+    setPendingFiles((n) => n + files.length);
+    try {
+      const added = await addAttachments(note.id, files);
+      if (added.length > 1) showToast('success', `Attached ${added.length} files`);
+    } catch (error) {
+      showToast('error', error instanceof AttachmentError ? error.message : 'Could not attach file');
+      console.error('Attach failed:', error);
+    } finally {
+      setPendingFiles((n) => Math.max(0, n - files.length));
+    }
+  };
+
+  // Paste an image (or files) anywhere in the editor; plain text pastes as usual
+  const handlePaste = (e: React.ClipboardEvent) => {
+    const files = Array.from(e.clipboardData.files);
+    if (files.length === 0) return;
+    e.preventDefault();
+    attachFiles(files);
+  };
+
+  const hasDraggedFiles = (e: React.DragEvent) => Array.from(e.dataTransfer.types).includes('Files');
 
   const wordCount = countWords(content);
   const charCount = countChars(content);
@@ -80,7 +112,36 @@ function NoteEditorPane({ note }: { note: Note }) {
   };
 
   return (
-    <div className="panel flex-1 flex flex-col min-w-0 overflow-hidden border-0 md:border md:rounded-2xl">
+    <div
+      className="panel relative flex-1 flex flex-col min-w-0 overflow-hidden border-0 md:border md:rounded-2xl"
+      onPaste={handlePaste}
+      onDragEnter={(e) => {
+        if (!hasDraggedFiles(e)) return;
+        e.preventDefault();
+        setIsDragOver(true);
+      }}
+      onDragOver={(e) => {
+        if (!hasDraggedFiles(e)) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+      }}
+      onDragLeave={(e) => {
+        // Only when the pointer actually leaves the editor, not when crossing children
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setIsDragOver(false);
+      }}
+      onDrop={(e) => {
+        if (!hasDraggedFiles(e)) return;
+        e.preventDefault();
+        setIsDragOver(false);
+        attachFiles(Array.from(e.dataTransfer.files));
+      }}
+    >
+      {isDragOver && (
+        <div className="pointer-events-none absolute inset-2 z-20 flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-primary bg-primary/10 text-primary backdrop-blur-sm">
+          <Upload className="w-8 h-8" />
+          <p className="font-medium">Drop to attach</p>
+        </div>
+      )}
       {/* Toolbar */}
       <div className="toolbar flex-shrink-0">
         <div className="flex-1 flex items-center gap-2 min-w-0">
@@ -160,25 +221,64 @@ function NoteEditorPane({ note }: { note: Note }) {
       </div>
 
       {/* Editor: a centred ~70ch column keeps long lines readable */}
-      <div className="flex-1 overflow-hidden relative flex justify-center">
+      <div className="flex-1 min-h-0 overflow-hidden flex justify-center">
         <textarea
           ref={textareaRef}
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Start typing your thoughts..."
-          className="w-full max-w-[70ch] h-full px-4 md:px-8 pt-5 pb-16 bg-transparent border-none focus-visible:outline-none resize-none text-foreground placeholder:text-muted-foreground font-sans text-base leading-relaxed"
+          className="w-full max-w-[70ch] h-full px-4 md:px-8 pt-5 pb-6 bg-transparent border-none focus-visible:outline-none resize-none text-foreground placeholder:text-muted-foreground font-sans text-base leading-relaxed"
           aria-label="Note content"
           spellCheck={true}
           autoComplete="off"
           data-gramm="false"
         />
+      </div>
 
-        {/* Word count badge (left side, the new-note button sits bottom right) */}
-        <div className="absolute bottom-4 left-4 pointer-events-none">
-          <span className="badge badge-muted text-xs">
-            {wordCount} words · {charCount} chars
-          </span>
-        </div>
+      <AttachmentStrip noteId={note.id} attachments={note.attachments ?? []} pending={pendingFiles} />
+
+      {/* Bottom bar: attach actions sit left, clear of the new-note button */}
+      <div className="flex-shrink-0 flex items-center gap-1 border-t border-border px-2 md:px-4 py-1.5">
+        <button
+          onClick={() => imageInputRef.current?.click()}
+          className="toolbar-btn flex items-center justify-center max-md:size-11"
+          aria-label="Add images"
+          title="Add images (or paste / drop them)"
+        >
+          <ImagePlus className="w-4.5 h-4.5" />
+        </button>
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          className="toolbar-btn flex items-center justify-center max-md:size-11"
+          aria-label="Attach files"
+          title="Attach files (or drop them here)"
+        >
+          <Paperclip className="w-4.5 h-4.5" />
+        </button>
+        <span className="ml-2 text-xs text-muted-foreground tabular-nums">
+          {pendingFiles > 0 ? 'Attaching…' : `${wordCount} words · ${charCount} chars`}
+        </span>
+        <input
+          ref={imageInputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          className="hidden"
+          onChange={(e) => {
+            attachFiles(Array.from(e.target.files ?? []));
+            e.target.value = '';
+          }}
+        />
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          className="hidden"
+          onChange={(e) => {
+            attachFiles(Array.from(e.target.files ?? []));
+            e.target.value = '';
+          }}
+        />
       </div>
     </div>
   );

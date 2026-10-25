@@ -41,6 +41,26 @@ export interface Note {
   wordCount: number;
   charCount: number;
   tags?: string[];
+  attachments?: Attachment[];
+}
+
+/**
+ * An image or file attached to a note. Only this metadata (with a small
+ * thumbnail for images) lives on the note; the bytes are split into chunks
+ * in the `attachmentChunks` collection.
+ */
+export interface Attachment {
+  id: string;
+  name: string;
+  type: string;
+  size: number;
+  kind: 'image' | 'file';
+  width?: number;
+  height?: number;
+  /** Small WebP/JPEG data URL, images only */
+  thumb?: string;
+  chunks: number;
+  createdAt: number;
 }
 
 export interface NoteWithFolder extends Note {

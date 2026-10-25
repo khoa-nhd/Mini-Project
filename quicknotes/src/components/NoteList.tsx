@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, Fragment } from 'react';
 import { cn, vibrateOnDragStart, formatRelativeTime, shortcutLabel, isMac } from '../lib/utils';
-import { Search, X, Pin, Archive, ArchiveRestore, Trash2, FileText, Clock, GripVertical, Menu } from 'lucide-react';
+import { Search, X, Pin, Archive, ArchiveRestore, Trash2, FileText, Clock, GripVertical, Menu, Paperclip, Plus } from 'lucide-react';
 import { useAppStore } from '../stores/appStore';
-import { updateNote, reorderNotes, toggleArchiveNote } from '../services/firebaseSync';
+import { updateNote, reorderNotes, toggleArchiveNote, createNewNote } from '../services/firebaseSync';
 import type { Note } from '../types';
 import { DndContext, closestCenter, KeyboardSensor, MouseSensor, TouchSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable';
@@ -174,6 +174,8 @@ function SortableNoteItem({ note, isSelected, isArchived, draggable, searchQuery
   const lines = note.content.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
   const title = note.title || lines[0] || 'Empty note';
   const preview = snippet(note.title ? note.content : lines.slice(1).join(' '), searchQuery);
+  const attachmentCount = note.attachments?.length ?? 0;
+  const coverImage = note.attachments?.find((a) => a.kind === 'image' && a.thumb);
   const swipeReady = Math.abs(swipeX) >= SWIPE_THRESHOLD;
   const SwipeIcon = isArchived ? ArchiveRestore : Archive;
 
@@ -285,11 +287,27 @@ function SortableNoteItem({ note, isSelected, isArchived, draggable, searchQuery
             </span>
             <span className="flex items-center gap-1">
               <FileText className="w-3 h-3" />
-              {note.wordCount} words
+              {note.wordCount} {note.wordCount === 1 ? 'word' : 'words'}
             </span>
+            {attachmentCount > 0 && (
+              <span className="flex items-center gap-1" aria-label={`${attachmentCount} attachments`}>
+                <Paperclip className="w-3 h-3" />
+                {attachmentCount}
+              </span>
+            )}
             {folderName && <span className="badge badge-muted truncate max-w-[8rem]">{folderName}</span>}
           </div>
         </div>
+
+        {coverImage && (
+          <img
+            src={coverImage.thumb}
+            alt=""
+            className="size-14 flex-shrink-0 rounded-lg object-cover border border-border pointer-events-none"
+            loading="lazy"
+            draggable={false}
+          />
+        )}
 
         {/* Quick actions float over the text on hover/focus so previews use the full width.
             Touch devices use swipe and the editor toolbar instead. */}
@@ -432,7 +450,16 @@ export function NoteList() {
           <h2 className="font-semibold text-foreground truncate flex-1">
             {query ? 'Search all notes' : activeFolder?.name ?? 'Notes'}
           </h2>
-          <span className="text-xs text-muted-foreground">{folderNotes.length}</span>
+          <span className="text-xs text-muted-foreground tabular-nums">{folderNotes.length}</span>
+          {/* Desktop "new note"; phones use the floating button instead */}
+          <button
+            onClick={() => createNewNote()}
+            className="hidden md:flex items-center justify-center size-8 rounded-lg bg-gradient-primary text-primary-foreground shadow-glow hover:brightness-110 transition-[filter] duration-150"
+            aria-label="Create new note"
+            title={`New note (${isMac ? '⌥N' : 'Alt+N'})`}
+          >
+            <Plus className="w-4 h-4" />
+          </button>
         </div>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />

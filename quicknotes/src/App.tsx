@@ -78,7 +78,10 @@ function NewNoteButton() {
         // absolute on phones: iOS Safari tints its bottom bar from fixed elements near the edge
         'absolute md:fixed bottom-6 right-6 z-40 flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-primary text-primary-foreground shadow-glow hover:brightness-110 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-[filter,transform] duration-150',
         // On phones the editor fills the screen; keep the button out of the text
-        hasSelection && 'hidden md:flex'
+        // Phones only: on desktop the list header has its own button, and a floating
+        // one would cover the editor's bottom-right controls
+        'md:hidden',
+        hasSelection && 'hidden'
       )}
     >
       <Plus className="w-7 h-7" />

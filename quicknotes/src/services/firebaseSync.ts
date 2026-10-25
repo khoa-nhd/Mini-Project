@@ -40,6 +40,7 @@ import { generateId } from '../lib/utils';
 const NOTES_COLLECTION = 'notes';
 const FOLDERS_COLLECTION = 'folders';
 const USERS_COLLECTION = 'users';
+const ATTACHMENT_CHUNKS_COLLECTION = 'attachmentChunks';
 
 // Firestore caps a write batch at 500 operations
 const BATCH_LIMIT = 450;
@@ -56,7 +57,7 @@ const defaultSyncStatus: SyncStatus = {
   pendingChanges: 0,
 };
 
-function getUserId(): string {
+export function getUserId(): string {
   const user = auth.currentUser;
   if (!user) throw new Error('User not authenticated');
   return user.uid;
@@ -173,7 +174,7 @@ function updateSyncStatus(partial: Partial<SyncStatus>) {
  * once the server acknowledges, which never happens while offline. So the
  * caller updates local state first, and we track the server ack here.
  */
-function trackWrite(write: Promise<unknown>, onError?: () => Promise<void>): void {
+export function trackWrite(write: Promise<unknown>, onError?: () => Promise<void>): void {
   const pending = useAppStore.getState().syncStatus.pendingChanges + 1;
   updateSyncStatus({ status: navigator.onLine ? 'syncing' : 'offline', pendingChanges: pending });
 
@@ -510,6 +511,13 @@ export async function updateNote(noteId: string, updates: Partial<Note>): Promis
 
 /** Permanently delete a note. */
 export async function deleteNote(noteId: string): Promise<void> {
+  // Attachment bytes live in their own documents; remove them with the note
+  const attachments = useAppStore.getState().notes.find((n) => n.id === noteId)?.attachments ?? [];
+  for (const attachment of attachments) {
+    for (let i = 0; i < attachment.chunks; i++) {
+      trackWrite(deleteDoc(doc(db, ATTACHMENT_CHUNKS_COLLECTION, `${attachment.id}_${i}`)));
+    }
+  }
   useAppStore.getState().deleteNote(noteId);
   await deleteNoteOffline(noteId);
 
@@ -803,12 +811,14 @@ export async function deleteAllUserData(): Promise<void> {
   const userId = getUserId();
   stopRealtimeSync();
 
-  const [notesSnap, foldersSnap] = await Promise.all([
+  const [notesSnap, foldersSnap, chunksSnap] = await Promise.all([
     getDocs(query(collection(db, NOTES_COLLECTION), where('userId', '==', userId))),
     getDocs(query(collection(db, FOLDERS_COLLECTION), where('userId', '==', userId))),
+    getDocs(query(collection(db, ATTACHMENT_CHUNKS_COLLECTION), where('userId', '==', userId))),
   ]);
 
   const ops: Array<(batch: ReturnType<typeof writeBatch>) => void> = [
+    ...chunksSnap.docs.map((d) => (b: ReturnType<typeof writeBatch>) => b.delete(d.ref)),
     ...notesSnap.docs.map((d) => (b: ReturnType<typeof writeBatch>) => b.delete(d.ref)),
     ...foldersSnap.docs.map((d) => (b: ReturnType<typeof writeBatch>) => b.delete(d.ref)),
     (b) => b.delete(doc(db, USERS_COLLECTION, userId)),

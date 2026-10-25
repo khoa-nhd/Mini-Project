@@ -23,6 +23,16 @@ service cloud.firestore {
       allow delete: if isOwner(resource.data.userId);
     }
 
+    // Attachment bytes, split into chunks (see src/services/attachments.ts)
+    match /attachmentChunks/{chunkId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId)
+        && request.resource.data.data is string
+        && request.resource.data.data.size() <= 750000;
+      allow update: if false;
+      allow delete: if isOwner(resource.data.userId);
+    }
+
     // Users collection
     match /users/{userId} {
       allow read, write: if isOwner(userId);
