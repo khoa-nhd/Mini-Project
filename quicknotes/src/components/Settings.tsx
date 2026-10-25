@@ -214,7 +214,8 @@ export function SettingsModal() {
             </div>
           </section>
         </div>
-        <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-border">
+        <div className="flex items-center justify-between gap-3 mt-6 pt-4 border-t border-border">
+          <span className="text-xs text-muted-foreground">Version {__APP_VERSION__}</span>
           <Button variant="ghost" onClick={() => setShowSettings(false)}>Close</Button>
         </div>
       </Modal>

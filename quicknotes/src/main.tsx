@@ -5,6 +5,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import './index.css';
 import { App } from './App';
 import { setupInstallPrompt } from './lib/install-prompt';
+import { registerSW } from 'virtual:pwa-register';
 
 setupInstallPrompt();
 
@@ -28,4 +29,21 @@ createRoot(document.getElementById('root')!).render(
   </StrictMode>
 );
 
-// The service worker is registered automatically by vite-plugin-pwa (registerType: 'autoUpdate')
+// Service worker: with autoUpdate, registerSW reloads the page as soon as a new
+// build takes control. Installed apps are often resumed rather than reopened,
+// so also check for a new build on every return to the foreground and hourly.
+if (import.meta.env.PROD) {
+  registerSW({
+    immediate: true,
+    onRegisteredSW(_url, registration) {
+      if (!registration) return;
+      const check = () => {
+        if (navigator.onLine) registration.update().catch(() => {});
+      };
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') check();
+      });
+      setInterval(check, 60 * 60 * 1000);
+    },
+  });
+}

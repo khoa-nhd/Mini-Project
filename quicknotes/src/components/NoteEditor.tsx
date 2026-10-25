@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
-import { Save, Pin, Archive, ArchiveRestore, Trash2, Type, ArrowLeft, ImagePlus, Paperclip, Upload } from 'lucide-react';
+import { Save, Pin, Archive, ArchiveRestore, Trash2, Type, ArrowLeft, ImagePlus, Paperclip, Upload, ClipboardPaste } from 'lucide-react';
 import { Button } from './ui/Button';
 import { useAppStore } from '../stores/appStore';
 import { updateNote, toggleArchiveNote } from '../services/firebaseSync';
@@ -69,6 +69,29 @@ function NoteEditorPane({ note }: { note: Note }) {
     if (files.length === 0) return;
     e.preventDefault();
     attachFiles(files);
+  };
+
+  // Phone keyboards only paste text into a plain text box, so offer an explicit
+  // "Paste" button that reads images straight from the clipboard
+  const pasteFromClipboard = async () => {
+    if (!navigator.clipboard?.read) {
+      showToast('info', "This browser can't read images from the clipboard. Use Image instead.");
+      return;
+    }
+    try {
+      const items = await navigator.clipboard.read();
+      const files: File[] = [];
+      for (const item of items) {
+        const type = item.types.find((t) => t.startsWith('image/'));
+        if (!type) continue;
+        const blob = await item.getType(type);
+        files.push(new File([blob], `Pasted image ${files.length + 1}.${type.split('/')[1] || 'png'}`, { type }));
+      }
+      if (files.length > 0) attachFiles(files);
+      else showToast('info', 'No image on the clipboard. Copy an image first.');
+    } catch {
+      showToast('error', 'Clipboard access was blocked. Allow it, or use Image instead.');
+    }
   };
 
   const hasDraggedFiles = (e: React.DragEvent) => Array.from(e.dataTransfer.types).includes('Files');
@@ -237,27 +260,28 @@ function NoteEditorPane({ note }: { note: Note }) {
 
       <AttachmentStrip noteId={note.id} attachments={note.attachments ?? []} pending={pendingFiles} />
 
-      {/* Bottom bar: attach actions sit left, clear of the new-note button */}
-      <div className="flex-shrink-0 flex items-center gap-1 border-t border-border px-2 md:px-4 py-1.5">
-        <button
-          onClick={() => imageInputRef.current?.click()}
-          className="toolbar-btn flex items-center justify-center max-md:size-11"
-          aria-label="Add images"
-          title="Add images (or paste / drop them)"
-        >
-          <ImagePlus className="w-4.5 h-4.5" />
-        </button>
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          className="toolbar-btn flex items-center justify-center max-md:size-11"
-          aria-label="Attach files"
-          title="Attach files (or drop them here)"
-        >
-          <Paperclip className="w-4.5 h-4.5" />
-        </button>
-        <span className="ml-2 text-xs text-muted-foreground tabular-nums">
-          {pendingFiles > 0 ? 'Attaching…' : `${wordCount} words · ${charCount} chars`}
+      {/* Bottom bar: labelled attach actions, word count on the right */}
+      <div className="flex-shrink-0 flex items-center gap-1.5 border-t border-border px-2 md:px-4 py-2">
+        {[
+          { label: 'Image', icon: ImagePlus, onClick: () => imageInputRef.current?.click(), title: 'Add images (or drop them here)' },
+          { label: 'File', icon: Paperclip, onClick: () => fileInputRef.current?.click(), title: 'Attach files (or drop them here)' },
+          { label: 'Paste', icon: ClipboardPaste, onClick: pasteFromClipboard, title: 'Paste an image from the clipboard (Ctrl+V also works)' },
+        ].map(({ label, icon: Icon, onClick, title }) => (
+          <button
+            key={label}
+            onClick={onClick}
+            disabled={pendingFiles > 0}
+            title={title}
+            className="flex items-center gap-1.5 h-9 max-md:h-11 px-3 rounded-lg border border-border text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-[var(--surface-hover)] disabled:opacity-50 transition-colors"
+          >
+            <Icon className="w-4 h-4" />
+            {label}
+          </button>
+        ))}
+        <span className="ml-auto pl-2 text-xs text-muted-foreground tabular-nums whitespace-nowrap max-sm:hidden">
+          {pendingFiles > 0 ? 'Attaching…' : `${wordCount} words`}
         </span>
+        {pendingFiles > 0 && <span className="ml-auto text-xs text-primary sm:hidden">Attaching…</span>}
         <input
           ref={imageInputRef}
           type="file"

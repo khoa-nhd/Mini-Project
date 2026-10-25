@@ -49,7 +49,7 @@ export function App() {
   return (
     <ToastProvider>
       <a href="#main-content" className="skip-link">Skip to main content</a>
-      <div className="h-dvh flex overflow-hidden md:p-3 md:gap-3">
+      <div className="h-dvh flex overflow-hidden md:p-3 md:gap-3 max-md:safe-area-y">
         <Sidebar />
         <main id="main-content" className="flex-1 flex overflow-hidden min-w-0 md:gap-3">
           <NoteList />
@@ -76,7 +76,7 @@ function NewNoteButton() {
       title={`New note (${isMac ? '⌥N' : 'Alt+N'})`}
       className={cn(
         // absolute on phones: iOS Safari tints its bottom bar from fixed elements near the edge
-        'absolute md:fixed bottom-6 right-6 z-40 flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-primary text-primary-foreground shadow-glow hover:brightness-110 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-[filter,transform] duration-150',
+        'absolute md:fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom))] right-6 z-40 flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-primary text-primary-foreground shadow-glow hover:brightness-110 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-[filter,transform] duration-150',
         // On phones the editor fills the screen; keep the button out of the text
         // Phones only: on desktop the list header has its own button, and a floating
         // one would cover the editor's bottom-right controls

@@ -109,11 +109,13 @@
 
   /* Phones: the system bars are black (theme-color), so keep the screen edges
      black too — no blue glow bleeding into the top/bottom edges */
+  /* Phones are portrait: stretch the glow vertically so it reads like desktop */
   @media (max-width: 767px) {
-    .dark,
     .dark body {
-      background-color: #000000;
-      background-image: radial-gradient(70% 40% at 50% 45%, rgb(59 130 246 / 0.10), transparent 70%);
+      background-image:
+        radial-gradient(90% 45% at 0% 0%, rgb(59 130 246 / 0.28), transparent 70%),
+        radial-gradient(90% 45% at 100% 100%, rgb(99 102 241 / 0.24), transparent 70%),
+        radial-gradient(60% 30% at 80% 35%, rgb(14 165 233 / 0.07), transparent 70%);
     }
   }
 
@@ -538,6 +540,12 @@
   box-shadow: var(--highlight-top);
   backdrop-filter: blur(16px) saturate(140%);
   -webkit-backdrop-filter: blur(16px) saturate(140%);
+}
+
+/* viewport-fit=cover lets the app draw under phone system bars; keep content clear of them */
+@utility safe-area-y {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 @utility bg-gradient-primary {
