@@ -1,0 +1,22 @@
+{
+  "name": "quizgenerator",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "server",
+    "web"
+  ],
+  "scripts": {
+    "test": "npm run test --workspaces --if-present",
+    "spike": "tsx spike/publish.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "dotenv": "^16.4.7",
+    "playwright": "1.64.1",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3"
+  }
+}
