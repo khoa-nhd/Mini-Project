@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+*.tsbuildinfo
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Persistent Playwright login profile (contains Blooket session cookies)
+playwright-profile/
+
+# Spike debug artifacts
+spike/screenshots/
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Local temp dir for Blooket CSV uploads (BLOOKET_TMP_DIR)
+.tmp/
