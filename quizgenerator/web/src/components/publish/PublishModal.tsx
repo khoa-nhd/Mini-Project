@@ -11,6 +11,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { buildBlooketCsv } from '@quizgenerator/shared';
+import { getTurnstileToken } from '../../lib/turnstile.js';
 import saveAs from 'file-saver';
 
 interface PublishModalProps {
@@ -57,7 +58,8 @@ export const PublishModal: React.FC<PublishModalProps> = ({
     setErrorMessage('');
 
     try {
-      // 1. Submit publish job to backend
+      // 1. Submit publish job to backend (with a fresh human-verification token)
+      const turnstileToken = await getTurnstileToken();
       const res = await fetch('/api/publish', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -65,6 +67,7 @@ export const PublishModal: React.FC<PublishModalProps> = ({
           title: title.trim() || 'Untitled Set',
           description,
           questions,
+          turnstileToken,
         }),
       });
 

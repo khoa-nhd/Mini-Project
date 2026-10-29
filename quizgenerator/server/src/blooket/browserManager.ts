@@ -7,6 +7,7 @@ import {
   type SessionInfo,
   type SessionState,
 } from './session.js';
+import { adminLink, notifyAdmin } from '../notify/telegram.js';
 
 const IDLE_CLOSE_MS = 10 * 60 * 1000;
 
@@ -32,8 +33,19 @@ class BrowserManager {
   }
 
   setSessionState(state: SessionState): void {
+    const previous = this.sessionInfo.state;
     this.info = { state, checkedAt: new Date().toISOString() };
     saveSessionInfo(this.info);
+
+    if (state === 'expired' && previous !== 'expired') {
+      void notifyAdmin(
+        `🔒 Blooket session expired — publishing is paused (users can still download CSV).
+Log in again: ${adminLink()}`,
+        { throttleKey: 'session-expired', throttleMs: 6 * 60 * 60 * 1000 },
+      );
+    } else if (state === 'active' && (previous === 'expired' || previous === 'logging-in')) {
+      void notifyAdmin('✅ Blooket session restored — publishing is back on.');
+    }
   }
 
   /** Run `task` with exclusive use of the shared Blooket page. */

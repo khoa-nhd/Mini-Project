@@ -2,6 +2,8 @@ import type { FastifyPluginAsync } from 'fastify';
 import crypto from 'crypto';
 import { jobQueue } from '../queue/jobQueue.js';
 import { browserManager } from '../blooket/browserManager.js';
+import { readJobLog } from '../queue/jobLog.js';
+import { notifyAdmin, telegramConfigured } from '../notify/telegram.js';
 
 const PLACEHOLDER_PASSWORDS = new Set(['admin', 'change-this-in-production']);
 const MIN_PRODUCTION_LENGTH = 16;
@@ -70,7 +72,15 @@ export const adminRoute: FastifyPluginAsync = async (fastify) => {
       session: browserManager.sessionInfo,
       recentJobsCount: recentJobs.length,
       recentJobs,
+      // Survives restarts, unlike the in-memory list above.
+      jobLog: readJobLog(20),
+      telegramConfigured: telegramConfigured(),
     });
+  });
+
+  fastify.post('/admin/notify/test', async (_request, reply) => {
+    const sent = await notifyAdmin('🧪 Test message from Quiz Generator admin.');
+    return reply.send({ sent, telegramConfigured: telegramConfigured() });
   });
 
   // Opens the dashboard in the shared browser window (queued behind any running publish).

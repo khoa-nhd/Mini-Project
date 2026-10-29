@@ -1,9 +1,11 @@
 import type { FastifyPluginAsync } from 'fastify';
 import { RefineRequestSchema } from '@quizgenerator/shared';
 import { refineQuestionsWithPrompt } from '../llm/gemini.js';
+import { rateLimits } from '../security.js';
 
 export const refineRoute: FastifyPluginAsync = async (fastify) => {
-  fastify.post('/api/refine', async (request, reply) => {
+  // No Turnstile here: refine is a quick follow-up chat; the daily limit caps cost.
+  fastify.post('/api/refine', { config: { rateLimit: rateLimits().refine } }, async (request, reply) => {
     const parseResult = RefineRequestSchema.safeParse(request.body);
     if (!parseResult.success) {
       return reply.status(400).send({

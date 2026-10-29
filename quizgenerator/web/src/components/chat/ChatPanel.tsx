@@ -10,6 +10,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import type { Question, RefineResponse } from '@quizgenerator/shared';
+import { getTurnstileToken } from '../../lib/turnstile.js';
 
 interface UploadedFile {
   file: File;
@@ -80,6 +81,9 @@ export const ChatPanel: React.FC = () => {
       formData.append('prompt', trimmedPrompt);
 
       try {
+        const turnstileToken = await getTurnstileToken();
+        if (turnstileToken) formData.append('turnstileToken', turnstileToken);
+
         const response = await fetch('/api/generate', {
           method: 'POST',
           body: formData,

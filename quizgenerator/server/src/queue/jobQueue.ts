@@ -2,6 +2,9 @@ import { EventEmitter } from 'events';
 import crypto from 'crypto';
 import type { Question, PublishJobStatus, PublishJobProgress } from '@quizgenerator/shared';
 import { publishToBlooket } from '../blooket/publisher.js';
+import { SessionExpiredError } from '../blooket/session.js';
+import { adminLink, notifyAdmin } from '../notify/telegram.js';
+import { appendJobLog, hashIp } from './jobLog.js';
 
 export interface PublishJob {
   id: string;
@@ -13,6 +16,8 @@ export interface PublishJob {
   url?: string;
   error?: string;
   createdAt: number;
+  /** Hashed client IP for the job log; the raw IP is never stored. */
+  ipHash: string;
 }
 
 class PublishJobQueue extends EventEmitter {
@@ -24,7 +29,12 @@ class PublishJobQueue extends EventEmitter {
     super();
   }
 
-  public enqueue(title: string, description: string, questions: Question[]): string {
+  public enqueue(
+    title: string,
+    description: string,
+    questions: Question[],
+    meta: { ip?: string } = {},
+  ): string {
     const id = `job_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`;
     const job: PublishJob = {
       id,
@@ -33,6 +43,7 @@ class PublishJobQueue extends EventEmitter {
       questions,
       status: 'queued',
       createdAt: Date.now(),
+      ipHash: meta.ip ? hashIp(meta.ip) : '',
     };
 
     this.queue.push(job);
@@ -83,6 +94,7 @@ class PublishJobQueue extends EventEmitter {
     const job = this.queue.shift()!;
     this.activeJob = job;
     this.updateQueuePositions();
+    const startedAt = Date.now();
 
     try {
       const url = await publishToBlooket({
@@ -102,7 +114,27 @@ class PublishJobQueue extends EventEmitter {
       job.status = 'failed';
       job.error = err.message || 'Publishing failed';
       this.emitProgress(job, job.error);
+      // Session expiry is reported by the browser manager; anything else is a bug or a Blooket change.
+      if (!(err instanceof SessionExpiredError)) {
+        void notifyAdmin(
+          `⚠️ Blooket publish failed: ${job.error}
+Set: ${job.title} (${job.questions.length} questions)
+${adminLink()}`,
+          { throttleKey: 'publish-failed', throttleMs: 10 * 60 * 1000 },
+        );
+      }
     } finally {
+      appendJobLog({
+        at: new Date().toISOString(),
+        jobId: job.id,
+        ipHash: job.ipHash,
+        title: job.title,
+        questionCount: job.questions.length,
+        status: job.status === 'done' ? 'done' : 'failed',
+        url: job.url,
+        error: job.error,
+        durationMs: Date.now() - startedAt,
+      });
       this.recentJobs.unshift(job);
       if (this.recentJobs.length > 20) {
         this.recentJobs.pop();

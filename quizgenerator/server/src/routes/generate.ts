@@ -2,9 +2,16 @@ import type { FastifyPluginAsync } from 'fastify';
 import { extractFileContent } from '../extractors/index.js';
 import { chunkDocumentText } from '../llm/chunker.js';
 import { extractFromChunk } from '../llm/gemini.js';
+import {
+  MAX_UPLOAD_FILES,
+  ALLOWED_UPLOAD_EXTENSIONS,
+  isAllowedUpload,
+  rateLimits,
+  verifyTurnstile,
+} from '../security.js';
 
 export const generateRoute: FastifyPluginAsync = async (fastify) => {
-  fastify.post('/api/generate', async (request, reply) => {
+  fastify.post('/api/generate', { config: { rateLimit: rateLimits().generate } }, async (request, reply) => {
     // Set headers for SSE stream
     reply.raw.setHeader('Content-Type', 'text/event-stream');
     reply.raw.setHeader('Cache-Control', 'no-cache, no-transform');
@@ -19,9 +26,16 @@ export const generateRoute: FastifyPluginAsync = async (fastify) => {
       const parts = request.parts();
       const files: { filename: string; mimeType: string; buffer: Buffer }[] = [];
       let prompt = '';
+      let turnstileToken: string | undefined;
+      const rejected: string[] = [];
 
       for await (const part of parts) {
         if (part.type === 'file') {
+          if (!isAllowedUpload(part.filename) || files.length >= MAX_UPLOAD_FILES) {
+            rejected.push(part.filename);
+            part.file.resume(); // drain the stream so parsing continues
+            continue;
+          }
           const buffer = await part.toBuffer();
           files.push({
             filename: part.filename,
@@ -31,12 +45,27 @@ export const generateRoute: FastifyPluginAsync = async (fastify) => {
         } else {
           if (part.fieldname === 'prompt') {
             prompt = String(part.value);
+          } else if (part.fieldname === 'turnstileToken') {
+            turnstileToken = String(part.value);
           }
         }
       }
 
+      const human = await verifyTurnstile(turnstileToken, request.ip);
+      if (!human.ok) {
+        sendEvent('error', { message: human.error });
+        reply.raw.end();
+        return;
+      }
+
+      // Reported with the final 'done' (or 'error') event, which the chat shows.
+      const skippedNote =
+        rejected.length > 0
+          ? `Skipped ${rejected.join(', ')} (up to ${MAX_UPLOAD_FILES} files of type ${ALLOWED_UPLOAD_EXTENSIONS.join(', ')}).`
+          : '';
+
       if (files.length === 0) {
-        sendEvent('error', { message: 'No files uploaded.' });
+        sendEvent('error', { message: skippedNote || 'No files uploaded.' });
         reply.raw.end();
         return;
       }
@@ -126,11 +155,18 @@ export const generateRoute: FastifyPluginAsync = async (fastify) => {
             chunks: chunks.length,
             failedChunks: failedChunks.length,
           },
-          ...(failedChunks.length > 0
+          ...(failedChunks.length > 0 || skippedNote
             ? {
-                warning: `${failedChunks.length} of ${chunks.length} chunk(s) failed (chunks ${failedChunks
-                  .map((f) => f.chunk)
-                  .join(', ')}). Those questions are missing — retry to include them.`,
+                warning: [
+                  failedChunks.length > 0
+                    ? `${failedChunks.length} of ${chunks.length} chunk(s) failed (chunks ${failedChunks
+                        .map((f) => f.chunk)
+                        .join(', ')}). Those questions are missing — retry to include them.`
+                    : '',
+                  skippedNote,
+                ]
+                  .filter(Boolean)
+                  .join(' '),
               }
             : {}),
         });

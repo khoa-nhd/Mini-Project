@@ -3,9 +3,10 @@ import { PublishRequestSchema, validateQuizDraft } from '@quizgenerator/shared';
 import { jobQueue } from '../queue/jobQueue.js';
 import { browserManager } from '../blooket/browserManager.js';
 import { isPublishAvailable } from '../blooket/session.js';
+import { rateLimits, verifyTurnstile } from '../security.js';
 
 export const publishRoute: FastifyPluginAsync = async (fastify) => {
-  fastify.post('/api/publish', async (request, reply) => {
+  fastify.post('/api/publish', { config: { rateLimit: rateLimits().publish } }, async (request, reply) => {
     const parseResult = PublishRequestSchema.safeParse(request.body);
     if (!parseResult.success) {
       return reply.status(400).send({
@@ -14,7 +15,12 @@ export const publishRoute: FastifyPluginAsync = async (fastify) => {
       });
     }
 
-    const { title, description, questions } = parseResult.data;
+    const { title, description, questions, turnstileToken } = parseResult.data;
+
+    const human = await verifyTurnstile(turnstileToken, request.ip);
+    if (!human.ok) {
+      return reply.status(403).send({ error: human.error });
+    }
 
     // Validate the draft
     const validation = validateQuizDraft({
@@ -41,7 +47,7 @@ export const publishRoute: FastifyPluginAsync = async (fastify) => {
       });
     }
 
-    const jobId = jobQueue.enqueue(title, description, questions as any);
+    const jobId = jobQueue.enqueue(title, description, questions as any, { ip: request.ip });
     return reply.status(202).send({ jobId });
   });
 };
