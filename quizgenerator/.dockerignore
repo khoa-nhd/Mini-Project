@@ -1,0 +1,13 @@
+# Keep the build context small and never ship secrets or the local login profile.
+**/node_modules
+**/dist
+**/*.tsbuildinfo
+.env
+.env.*
+!.env.example
+**/playwright-profile
+.tmp
+spike
+fixtures
+deploy
+*.md

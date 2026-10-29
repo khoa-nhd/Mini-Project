@@ -1,0 +1,61 @@
+# Production stack on the VPS. Run from quizgenerator/ with a filled-in .env:
+#   ./deploy/deploy.sh        (or: docker compose up -d --build)
+# Only Caddy is reachable from the internet (80/443); the app, VNC and noVNC
+# stay on the internal Docker network.
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+      args:
+        VITE_TURNSTILE_SITE_KEY: ${VITE_TURNSTILE_SITE_KEY:-}
+    image: quizgenerator-app
+    env_file: .env
+    # Fixed container settings win over anything copied from .env.example.
+    environment:
+      NODE_ENV: production
+      PORT: "8080"
+      TRUST_PROXY: "true"
+      PLAYWRIGHT_HEADLESS: "false"
+      DISPLAY: ":99"
+      BLOOKET_PROFILE_DIR: /data/profile
+      STATE_DIR: /data/state
+      BLOOKET_TMP_DIR: /data/tmp
+      WEB_DIST_DIR: /app/web/dist
+      VNC_UPSTREAM: http://127.0.0.1:6080
+      PUBLIC_URL: https://${DOMAIN:?Set DOMAIN in .env}
+    volumes:
+      - app-data:/data
+    # Chromium needs more shared memory than Docker's 64MB default.
+    shm_size: 1gb
+    expose:
+      - "8080"
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+  caddy:
+    image: caddy:2.10-alpine
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN in .env}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+volumes:
+  app-data:
+  caddy-data:
+  caddy-config:
