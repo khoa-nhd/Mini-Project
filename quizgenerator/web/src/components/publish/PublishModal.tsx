@@ -349,8 +349,8 @@ export const PublishModal: React.FC<PublishModalProps> = ({
               </span>
               <ol className="list-decimal list-inside space-y-1 text-[11px] text-slate-400">
                 <li>Download your formatted Blooket CSV below.</li>
-                <li>Go to <strong className="text-white">blooket.com/create</strong> and pick "CSV Import".</li>
-                <li>Upload the downloaded file and click "Save Set".</li>
+                <li>Create a set at <strong className="text-white">dashboard.blooket.com/create</strong>.</li>
+                <li>On its edit page pick "Import from → Spreadsheet", upload the file and click "Save Set".</li>
               </ol>
             </div>
 

@@ -5,7 +5,12 @@ import * as os from 'os';
 import type { Question, PublishJobStatus } from '@quizgenerator/shared';
 import { buildBlooketCsv } from '@quizgenerator/shared';
 import { BLOOKET_SELECTORS } from './selectors.js';
-import { USER_DATA_DIR, checkBlooketSession } from './session.js';
+import {
+  SessionExpiredError,
+  checkBlooketSession,
+  interactiveLoginAllowed,
+} from './session.js';
+import { browserManager } from './browserManager.js';
 
 export interface PublishParams {
   title: string;
@@ -27,8 +32,14 @@ async function ensurePersistentSession(
 ): Promise<void> {
   const loggedIn = await checkBlooketSession(page);
   if (loggedIn) {
+    browserManager.setSessionState('active');
     return;
   }
+  if (!interactiveLoginAllowed()) {
+    browserManager.setSessionState('expired');
+    throw new SessionExpiredError();
+  }
+  browserManager.setSessionState('logging-in');
 
   onProgress(
     'logging-in',
@@ -50,8 +61,10 @@ async function ensurePersistentSession(
       (url) => url.hostname.includes('dashboard.blooket.com'),
       { timeout: 300000 },
     );
+    browserManager.setSessionState('active');
     console.log('✅ Successfully logged in and saved to persistent profile!');
   } catch {
+    browserManager.setSessionState('expired');
     throw new Error(
       'Login timed out (300s). Please ensure you log in to Blooket and pass the human verification in the browser window.',
     );
@@ -167,170 +180,144 @@ export async function publishToBlooket(
   const csvContent = buildBlooketCsv(questions);
   fs.writeFileSync(tempCsvPath, csvContent, 'utf-8');
 
-  onProgress('logging-in', 'Launching persistent browser session...');
+  onProgress('logging-in', 'Waiting for the Blooket browser session...');
 
-  // Use persistent context so cookies & login state are saved forever
-  const isHeadless = process.env.PLAYWRIGHT_HEADLESS === 'true';
-  // BLOOKET_BROWSER_CHANNEL=chrome launches the real installed Chrome instead of
-  // Playwright's Chromium, which helps when Blooket's human verification rejects
-  // the default automation browser.
-  const channel = process.env.BLOOKET_BROWSER_CHANNEL || undefined;
-  const context = await chromium.launchPersistentContext(USER_DATA_DIR, {
-    headless: isHeadless,
-    channel,
-    viewport: { width: 1280, height: 800 },
-    args: ['--disable-blink-features=AutomationControlled'],
-  });
+  // One shared persistent window: publishes and session checks run one at a time.
+  return browserManager.withPage(async (page) => {
+    try {
+      // 2. Ensure session (waits for manual login if profile expired)
+      await ensurePersistentSession(page, onProgress);
 
-  // No custom UA: Playwright's own version string is consistent, a stale one is a
-  // signal that makes the "verify you are human" challenge fail.
-  await context.addInitScript(() => {
-    Object.defineProperty(navigator, 'webdriver', {
-      get: () => undefined,
-    });
-  });
+      // 3. Create the set with a title only: the current UI creates an empty set and
+      //    the CSV import lives on the Edit page (verified from a real run).
+      onProgress('creating-set', 'Opening question set creator...');
+      await page.goto(BLOOKET_SELECTORS.create.url, {
+        waitUntil: 'domcontentloaded',
+        timeout: 90000,
+      });
+      await page.waitForSelector(BLOOKET_SELECTORS.create.createButton, {
+        timeout: 60000,
+      });
+      await randomDelay();
 
-  const pages = context.pages();
-  const page =
-    pages.length > 0 ? pages[0] : await context.newPage();
-  // Give a human time to type credentials and pass human verification.
-  page.setDefaultTimeout(90000);
-  page.setDefaultNavigationTimeout(90000);
+      // Fill the VISIBLE title field: a hidden/stale match leaves the required
+      // field empty and the form's submit button stays disabled.
+      const titleField = page
+        .locator(BLOOKET_SELECTORS.create.titleInput)
+        .filter({ visible: true })
+        .first();
+      await titleField.fill(title);
+      if (description) {
+        await page
+          .locator(BLOOKET_SELECTORS.create.descriptionInput)
+          .filter({ visible: true })
+          .first()
+          .fill(description)
+          .catch(() => {});
+      }
+      await randomDelay();
 
-  try {
-    // 2. Ensure session (waits for manual login if profile expired)
-    await ensurePersistentSession(page, onProgress);
+      // Click ONLY an enabled "Create Set": the plain selector resolves to two
+      // elements and its first can be a disabled duplicate submit, which made the
+      // click retry until the 90s timeout (observed in a real run).
+      const createBtn = page
+        .locator(BLOOKET_SELECTORS.create.createButtonEnabled)
+        .filter({ visible: true })
+        .first();
+      try {
+        await createBtn.click({ timeout: 30000 });
+      } catch (err) {
+        // If the form never enabled, one re-fill of the visible title and retry
+        // recovers the common "wrong input matched" case before giving up.
+        await titleField.fill(title).catch(() => {});
+        await createBtn.click({ timeout: 15000 });
+      }
+      await page.waitForURL(
+        (url) =>
+          url.pathname.includes('/edit') ||
+          url.pathname.includes('/set/'),
+        { timeout: 90000 },
+      );
+      await randomDelay();
+      // Save can redirect to /my-sets (observed in a real run), losing the id — keep
+      // the edit URL so the public link is always derivable from it.
+      const editUrl = page.url();
 
-    // 3. Create the set with a title only: the current UI creates an empty set and
-    //    the CSV import lives on the Edit page (verified from a real run).
-    onProgress('creating-set', 'Opening question set creator...');
-    await page.goto(BLOOKET_SELECTORS.create.url, {
-      waitUntil: 'domcontentloaded',
-      timeout: 90000,
-    });
-    await page.waitForSelector(BLOOKET_SELECTORS.create.createButton, {
-      timeout: 60000,
-    });
-    await randomDelay();
+      // 4. Import the CSV from the Edit page ("IMPORT FROM → Spreadsheet").
+      onProgress(
+        'importing',
+        `Importing ${questions.length} questions from CSV...`,
+      );
+      let fileInput = await pickFileInput(page);
+      if (!fileInput) {
+        await openSpreadsheetImport(page);
+        fileInput = await pickFileInput(page);
+      }
+      if (!fileInput) {
+        throw new Error(
+          'No CSV file input found after opening the Spreadsheet import',
+        );
+      }
+      await fileInput.setInputFiles(tempCsvPath);
+      await randomDelay(2000, 3000);
 
-    // Fill the VISIBLE title field: a hidden/stale match leaves the required
-    // field empty and the form's submit button stays disabled.
-    const titleField = page
-      .locator(BLOOKET_SELECTORS.create.titleInput)
-      .filter({ visible: true })
-      .first();
-    await titleField.fill(title);
-    if (description) {
+      // 5. Verify the imported question count before saving.
+      let imported: number | null = null;
+      for (let attempt = 0; attempt < 45; attempt++) {
+        imported = await readQuestionCount(page);
+        if (imported !== null && imported >= questions.length) break;
+        imported = null;
+        await page.waitForTimeout(1000);
+      }
+      if (imported !== questions.length) {
+        throw new Error(
+          `Imported ${imported ?? 'no'} questions, expected ${questions.length}. Screenshot shows the editor state.`,
+        );
+      }
+
+      // 6. Save the set.
+      onProgress('saving', 'Saving question set to Blooket...');
+      // Visible only: the selector must never resolve to a hidden consent-widget button.
       await page
-        .locator(BLOOKET_SELECTORS.create.descriptionInput)
+        .locator(BLOOKET_SELECTORS.edit.saveButton)
         .filter({ visible: true })
         .first()
-        .fill(description)
-        .catch(() => {});
-    }
-    await randomDelay();
+        .click();
+      await randomDelay(1500, 2500);
 
-    // Click ONLY an enabled "Create Set": the plain selector resolves to two
-    // elements and its first can be a disabled duplicate submit, which made the
-    // click retry until the 90s timeout (observed in a real run).
-    const createBtn = page
-      .locator(BLOOKET_SELECTORS.create.createButtonEnabled)
-      .filter({ visible: true })
-      .first();
-    try {
-      await createBtn.click({ timeout: 30000 });
-    } catch (err) {
-      // If the form never enabled, one re-fill of the visible title and retry
-      // recovers the common "wrong input matched" case before giving up.
-      await titleField.fill(title).catch(() => {});
-      await createBtn.click({ timeout: 15000 });
-    }
-    await page.waitForURL(
-      (url) =>
-        url.pathname.includes('/edit') ||
-        url.pathname.includes('/set/'),
-      { timeout: 90000 },
-    );
-    await randomDelay();
-    // Save can redirect to /my-sets (observed in a real run), losing the id — keep
-    // the edit URL so the public link is always derivable from it.
-    const editUrl = page.url();
+      // 7. Final URL: prefer a real /set/ redirect, else derive it from /edit?id=.
+      await page
+        .waitForURL((url) => url.pathname.includes('/set/'), {
+          timeout: 15000,
+        })
+        .catch(() => undefined);
+      const finalUrl =
+        page.url().includes('/set/')
+          ? page.url()
+          : deriveSetUrl(editUrl);
 
-    // 4. Import the CSV from the Edit page ("IMPORT FROM → Spreadsheet").
-    onProgress(
-      'importing',
-      `Importing ${questions.length} questions from CSV...`,
-    );
-    let fileInput = await pickFileInput(page);
-    if (!fileInput) {
-      await openSpreadsheetImport(page);
-      fileInput = await pickFileInput(page);
-    }
-    if (!fileInput) {
-      throw new Error(
-        'No CSV file input found after opening the Spreadsheet import',
-      );
-    }
-    await fileInput.setInputFiles(tempCsvPath);
-    await randomDelay(2000, 3000);
+      // 8. Confirm the set opens while logged out (privacy must be Public).
+      const isPublic = await verifyPublic(finalUrl);
+      if (!isPublic) {
+        onProgress(
+          'done',
+          `Set saved with ${questions.length} questions, but it could not be confirmed public — check Privacy is set to Public.`,
+        );
+        return finalUrl;
+      }
 
-    // 5. Verify the imported question count before saving.
-    let imported: number | null = null;
-    for (let attempt = 0; attempt < 45; attempt++) {
-      imported = await readQuestionCount(page);
-      if (imported !== null && imported >= questions.length) break;
-      imported = null;
-      await page.waitForTimeout(1000);
-    }
-    if (imported !== questions.length) {
-      throw new Error(
-        `Imported ${imported ?? 'no'} questions, expected ${questions.length}. Screenshot shows the editor state.`,
-      );
-    }
-
-    // 6. Save the set.
-    onProgress('saving', 'Saving question set to Blooket...');
-    // Visible only: the selector must never resolve to a hidden consent-widget button.
-    await page
-      .locator(BLOOKET_SELECTORS.edit.saveButton)
-      .filter({ visible: true })
-      .first()
-      .click();
-    await randomDelay(1500, 2500);
-
-    // 7. Final URL: prefer a real /set/ redirect, else derive it from /edit?id=.
-    await page
-      .waitForURL((url) => url.pathname.includes('/set/'), {
-        timeout: 15000,
-      })
-      .catch(() => undefined);
-    const finalUrl =
-      page.url().includes('/set/')
-        ? page.url()
-        : deriveSetUrl(editUrl);
-
-    // 8. Confirm the set opens while logged out (privacy must be Public).
-    const isPublic = await verifyPublic(finalUrl);
-    if (!isPublic) {
       onProgress(
         'done',
-        `Set saved with ${questions.length} questions, but it could not be confirmed public — check Privacy is set to Public.`,
+        `Published successfully with ${questions.length} questions!`,
       );
       return finalUrl;
+    } finally {
+      // Cleanup temp CSV file immediately; the shared window stays open for the next job.
+      if (fs.existsSync(tempCsvPath)) {
+        try {
+          fs.unlinkSync(tempCsvPath);
+        } catch {}
+      }
     }
-
-    onProgress(
-      'done',
-      `Published successfully with ${questions.length} questions!`,
-    );
-    return finalUrl;
-  } finally {
-    // Cleanup temp CSV file immediately
-    if (fs.existsSync(tempCsvPath)) {
-      try {
-        fs.unlinkSync(tempCsvPath);
-      } catch {}
-    }
-    await context.close().catch(() => {});
-  }
+  });
 }

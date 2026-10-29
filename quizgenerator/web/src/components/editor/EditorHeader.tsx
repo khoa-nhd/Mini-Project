@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useQuizStore } from '../../state/useQuizStore.js';
 import {
   Download,
@@ -10,8 +10,8 @@ import {
   RotateCcw,
   Clock,
   Sparkles,
-  LogIn,
-  LogOut,
+  CircleCheck,
+  CirclePause,
 } from 'lucide-react';
 import { buildBlooketCsv, validateQuizDraft, type Question } from '@quizgenerator/shared';
 import saveAs from 'file-saver';
@@ -43,8 +43,23 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
     undo,
   } = useQuizStore();
 
-  // Session state
-  const [isSessionActive, setIsSessionActive] = useState<boolean>(false);
+  // Whether the server can publish to Blooket right now (null = not known yet).
+  const [publishAvailable, setPublishAvailable] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/status')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && data) setPublishAvailable(Boolean(data.publishAvailable));
+      })
+      .catch(() => {
+        // Unknown status: keep Publish enabled, the modal reports any failure.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Validation
   const validation = validateQuizDraft({
@@ -73,26 +88,12 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
     setTimeout(() => setIsApplyingTime(false), 1500);
   };
 
-  const handleNewSession = async () => {
-    // Clear all quiz state for a fresh session
-    setIsSessionActive(false);
+  const handleNewSession = () => {
+    // Clear all quiz state for a fresh quiz (the Blooket login is server-side).
     setTitle('');
     setDescription('');
     setDefaultTime(20);
     setQuestions([], false);
-    // Now fetch to reset the Blooket session
-    try {
-      const res = await fetch('/api/blooket/new-session', {
-        method: 'POST',
-        credentials: 'include',
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setIsSessionActive(data.loggedIn ?? false);
-      }
-    } catch (e) {
-      console.warn('Failed to reset session');
-    }
   };
 
   return (
@@ -101,20 +102,21 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
 
       {/* Session Status Display */}
       <div className="flex items-center gap-3 text-xs">
-        {isSessionActive ? (
-          <span className="text-indigo-400">
-            <LogOut className="w-3.5 h-3.5" /> Active session
+        {publishAvailable === false ? (
+          <span className="flex items-center gap-1 text-amber-400" title="Download the CSV and import it in Blooket instead">
+            <CirclePause className="w-3.5 h-3.5" /> Blooket publishing paused
           </span>
-        ) : (
-          <span className="text-indigo-400">
-            <LogIn className="w-3.5 h-3.5" /> No session
+        ) : publishAvailable ? (
+          <span className="flex items-center gap-1 text-emerald-400">
+            <CircleCheck className="w-3.5 h-3.5" /> Blooket publishing ready
           </span>
-        )}<button
+        ) : null}
+        <button
   onClick={handleNewSession}
   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-medium transition-all shadow-md hover:shadow-indigo-500/25 active:scale-95"
-  title="Start new Blooket session">
+  title="Clear the editor and start a new quiz">
   <RotateCcw className="w-3.5 h-3.5 opacity-70" />
-  <span>New Session</span>
+  <span>New Quiz</span>
 </button>
       </div>
 
@@ -173,8 +175,14 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
 
           <button
             onClick={onOpenPublish}
-            disabled={questions.length === 0 || !validation.isValid}
-            title={!validation.isValid ? 'Fix errors before publishing' : 'Publish to Blooket'}
+            disabled={questions.length === 0 || !validation.isValid || publishAvailable === false}
+            title={
+              publishAvailable === false
+                ? 'Publishing is paused — use Download CSV'
+                : !validation.isValid
+                  ? 'Fix errors before publishing'
+                  : 'Publish to Blooket'
+            }
             className="flex items-center gap-1.5 text-xs font-bold px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:opacity-50 text-white transition-all shadow-md hover:shadow-indigo-500/25 active:scale-95"
           >
             <UploadCloud className="w-4 h-4" />

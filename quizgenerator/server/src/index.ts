@@ -27,7 +27,8 @@ import { publishRoute } from './routes/publish.js';
 import { publishStatusRoute } from './routes/publishStatus.js';
 import { adminRoute } from './routes/admin.js';
 import { healthRoute } from './routes/health.js';
-import { blooketSessionRoute } from './routes/blooketSession.js';
+import { statusRoute } from './routes/status.js';
+import { assertAdminConfig } from './routes/admin.js';
 
 const server = fastify({
   logger: {
@@ -36,6 +37,9 @@ const server = fastify({
 });
 
 async function main() {
+  // Refuse to start in production without a real admin password.
+  assertAdminConfig();
+
   await server.register(cors, {
     origin: true,
   });
@@ -53,7 +57,7 @@ async function main() {
   await server.register(publishRoute);
   await server.register(publishStatusRoute);
   await server.register(adminRoute);
-  await server.register(blooketSessionRoute);
+  await server.register(statusRoute);
 
   const port = parseInt(process.env.PORT || '3001', 10);
   const host = '0.0.0.0';
