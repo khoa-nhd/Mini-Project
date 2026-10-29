@@ -31,6 +31,9 @@ async function ensurePersistentSession(
   onProgress: (status: PublishJobStatus, message?: string) => void,
 ): Promise<void> {
   const loggedIn = await checkBlooketSession(page);
+  if (loggedIn === null) {
+    throw new Error('Could not reach Blooket. Try again in a moment.');
+  }
   if (loggedIn) {
     browserManager.setSessionState('active');
     return;

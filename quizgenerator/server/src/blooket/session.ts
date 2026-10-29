@@ -73,7 +73,11 @@ export function saveSessionInfo(info: SessionInfo, stateDir = getStateDir()): vo
   }
 }
 
-export async function checkBlooketSession(page: Page): Promise<boolean> {
+/**
+ * true = logged in, false = sent to login/challenge, null = Blooket could not be
+ * reached (network trouble says nothing about the session, so callers keep the old state).
+ */
+export async function checkBlooketSession(page: Page): Promise<boolean | null> {
   try {
     await page.goto('https://dashboard.blooket.com', {
       waitUntil: 'domcontentloaded',
@@ -86,6 +90,6 @@ export async function checkBlooketSession(page: Page): Promise<boolean> {
     }
     return true;
   } catch {
-    return false;
+    return null;
   }
 }

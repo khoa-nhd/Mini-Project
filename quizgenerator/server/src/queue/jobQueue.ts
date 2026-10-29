@@ -117,9 +117,7 @@ class PublishJobQueue extends EventEmitter {
       // Session expiry is reported by the browser manager; anything else is a bug or a Blooket change.
       if (!(err instanceof SessionExpiredError)) {
         void notifyAdmin(
-          `⚠️ Blooket publish failed: ${job.error}
-Set: ${job.title} (${job.questions.length} questions)
-${adminLink()}`,
+          `⚠️ Blooket publish failed: ${job.error}\nSet: ${job.title} (${job.questions.length} questions)\n${adminLink()}`,
           { throttleKey: 'publish-failed', throttleMs: 10 * 60 * 1000 },
         );
       }

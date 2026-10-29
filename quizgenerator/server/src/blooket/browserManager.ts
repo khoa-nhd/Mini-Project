@@ -8,8 +8,10 @@ import {
   type SessionState,
 } from './session.js';
 import { adminLink, notifyAdmin } from '../notify/telegram.js';
+import { BLOOKET_SELECTORS } from './selectors.js';
 
 const IDLE_CLOSE_MS = 10 * 60 * 1000;
+const LOGIN_WINDOW_MS = 10 * 60 * 1000;
 
 /**
  * Owns the single persistent Chromium context for the Blooket profile.
@@ -39,8 +41,7 @@ class BrowserManager {
 
     if (state === 'expired' && previous !== 'expired') {
       void notifyAdmin(
-        `🔒 Blooket session expired — publishing is paused (users can still download CSV).
-Log in again: ${adminLink()}`,
+        `🔒 Blooket session expired — publishing is paused (users can still download CSV).\nLog in again: ${adminLink()}`,
         { throttleKey: 'session-expired', throttleMs: 6 * 60 * 60 * 1000 },
       );
     } else if (state === 'active' && (previous === 'expired' || previous === 'logging-in')) {
@@ -68,10 +69,36 @@ Log in again: ${adminLink()}`,
   checkSession(): Promise<SessionState> {
     return this.withPage(async (page) => {
       const loggedIn = await checkBlooketSession(page);
+      if (loggedIn === null) throw new Error('Could not reach Blooket to check the session');
       const state: SessionState = loggedIn ? 'active' : 'expired';
       this.setSessionState(state);
       return state;
     });
+  }
+
+  /**
+   * Opens the Blooket login page in the shared window and waits for a human to
+   * finish it (on the server that is the noVNC view in /admin). Returns at once;
+   * the state moves logging-in → active, or → expired after 10 minutes.
+   * Returns false when a login is already running.
+   */
+  startLogin(): boolean {
+    if (this.sessionInfo.state === 'logging-in') return false;
+    this.setSessionState('logging-in');
+
+    this.withPage(async (page) => {
+      // The stored session may still be fine (e.g. the admin clicked by mistake).
+      await page.goto(BLOOKET_SELECTORS.login.url, { waitUntil: 'domcontentloaded' });
+      await page.bringToFront().catch(() => {});
+      await page.waitForURL((url) => url.hostname.includes('dashboard.blooket.com'), {
+        timeout: LOGIN_WINDOW_MS,
+      });
+      this.setSessionState('active');
+    }).catch((err: any) => {
+      console.warn(`Blooket login did not complete: ${String(err.message).split('\n')[0]}`);
+      this.setSessionState('expired');
+    });
+    return true;
   }
 
   async close(): Promise<void> {

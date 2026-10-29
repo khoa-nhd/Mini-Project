@@ -32,6 +32,7 @@ import { assertAdminConfig } from './routes/admin.js';
 import { assertTurnstileConfig, registerRateLimit } from './security.js';
 import { registerWebApp } from './webApp.js';
 import { notifyAdmin } from './notify/telegram.js';
+import { startSessionScheduler } from './blooket/sessionScheduler.js';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -82,6 +83,7 @@ async function main() {
     await server.listen({ port, host });
     console.log(`Server listening at http://${host}:${port}`);
     if (isProduction) void notifyAdmin('🚀 Quiz Generator server started.');
+    startSessionScheduler();
   } catch (err) {
     server.log.error(err);
     process.exit(1);

@@ -36,7 +36,7 @@ Internet ──443──► Caddy (container)
                    ├─ /                → app:8080  (web/dist, SPA fallback)
                    ├─ /api/*           → app:8080  (generate, refine, publish, status)
                    ├─ /admin           → app:8080  (trang admin, auth bằng cookie phiên admin)
-                   └─ /admin/vnc/*     → app:6080  (noVNC websockify, Caddy basic_auth + admin cookie)
+                   └─ /admin/vnc/*     → app:8080  (Fastify proxy → websockify :6080, sau cookie admin)
 
 app (container, image mcr.microsoft.com/playwright:v1.64.1-noble, arm64)
   supervisord
@@ -116,7 +116,7 @@ volumes
   - Stage runtime: image Playwright, `apt-get install xvfb x11vnc novnc websockify supervisor`, copy `server/dist`, `packages/shared/dist`, `web/dist`, cài production deps, copy `supervisord.conf`.
 - Image Playwright `-noble` có bản arm64, Chromium chạy được trên ARM. **Không** dùng `BLOOKET_BROWSER_CHANNEL=chrome` vì Google Chrome không có bản Linux arm64.
 - `docker-compose.yml`: `app` (restart unless-stopped, `shm_size: 1gb`, env_file `.env`, volumes) + `caddy` (ports 80/443, `Caddyfile`).
-- `Caddyfile`: `{$DOMAIN}` → reverse_proxy, `flush_interval -1` cho SSE, `/admin/vnc/*` → `app:6080` có `basic_auth`.
+- `Caddyfile`: `{$DOMAIN}` → reverse_proxy `app:8080`, `flush_interval -1` cho SSE. noVNC đi qua Fastify (`VNC_UPSTREAM`), nên Caddy không cần route riêng.
 
 ### 3.9 Env mới (`.env.example`)
 
@@ -131,7 +131,7 @@ DISPLAY=:99
 GEMINI_API_KEY=
 GEMINI_MODEL=gemini-3.6-flash
 ADMIN_PASSWORD=            # ≥ 16 ký tự, bắt buộc
-VNC_BASIC_AUTH_HASH=       # caddy hash-password
+VNC_UPSTREAM=http://127.0.0.1:6080
 TURNSTILE_SECRET=
 VITE_TURNSTILE_SITE_KEY=   # dùng lúc build web
 TELEGRAM_BOT_TOKEN=
@@ -201,6 +201,6 @@ RATE_LIMIT_PUBLISH_PER_DAY=10
 | Oracle hết máy ARM / thu hồi VM | Nâng PAYG, budget alert. Dự phòng Hetzner CAX11 với cùng image arm64 |
 | Blooket đổi UI | Selector tập trung một chỗ, Telegram báo lỗi, fallback CSV |
 | Tài khoản Blooket bị khoá (ToS) | Rate limit, hàng đợi tuần tự, fallback CSV (đã chấp nhận ở PLAN) |
-| Lộ trang admin hoặc VNC | Không expose 5900/6080. Auth 2 lớp (cookie admin + Caddy basic_auth). Mật khẩu ≥ 16 ký tự |
+| Lộ trang admin hoặc VNC | Không expose 5900/6080. Mọi đường `/admin/*` (kể cả noVNC và WebSocket) đều cần cookie admin ký HMAC, `HttpOnly` + `SameSite=Strict`. Đăng nhập bị giới hạn 10 lần / 15 phút. Mật khẩu ≥ 16 ký tự |
 | RAM: Chromium + Xvfb + Node | 12GB thừa sức. `shm_size: 1gb`. Đóng context sau 10 phút không dùng |
 | Lộ secret | Chỉ để ở `.env` trên VM. Đổi mật khẩu Blooket và Gemini key từng dán trong chat trước khi lên production |
