@@ -2,6 +2,10 @@
 
 # ⌘ Mini-Project
 
+<!-- license -->
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
+
 ```
 MIT License
 
