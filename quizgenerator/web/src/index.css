@@ -22,3 +22,100 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(148, 163, 184, 0.4);
 }
+
+/* ------------------------------------------------------------------ *
+ * Gacha animations. All transforms/opacity only (GPU-composited in the
+ * compositor thread), no layout thrash — the 60 FPS target on mobile.
+ * ------------------------------------------------------------------ */
+
+@keyframes gacha-burst {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform:
+      rotate(var(--burst-angle))
+      translateX(var(--burst-distance))
+      rotate(var(--burst-rotate))
+      scale(0.4);
+    opacity: 0;
+  }
+}
+
+.gacha-burst {
+  animation: gacha-burst 850ms cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+}
+
+@keyframes gacha-pop {
+  0% {
+    transform: scale(0.4) translateY(20px);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.08) translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.gacha-pop {
+  animation: gacha-pop 420ms cubic-bezier(0.22, 1.4, 0.4, 1) both;
+}
+
+@keyframes gacha-shake {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  15% { transform: translate(-3px, 1px) rotate(-4deg); }
+  30% { transform: translate(3px, -2px) rotate(3deg); }
+  45% { transform: translate(-4px, 2px) rotate(-5deg); }
+  60% { transform: translate(4px, -1px) rotate(4deg); }
+  80% { transform: translate(-2px, 1px) rotate(-2deg); }
+}
+
+/* Escalating intensity — set --gacha-shake-scale from JS (0.5 idle → 2.2 peak). */
+.gacha-shake {
+  animation: gacha-shake 0.28s ease-in-out infinite;
+  transform-origin: 50% 90%;
+  scale: var(--gacha-shake-scale, 1);
+}
+
+@keyframes gacha-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.gacha-float {
+  animation: gacha-float 2.4s ease-in-out infinite;
+}
+
+@keyframes gacha-beam {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Legendary radial beam: conic-gradient sweeps behind the reveal card. */
+.gacha-beam {
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(251, 191, 36, 0.35) 0deg 12deg,
+    transparent 12deg 24deg
+  );
+  border-radius: 50%;
+  animation: gacha-beam 8s linear infinite;
+}
+
+/* Screen shake for a legendary crack-open: applied to the modal root. */
+@keyframes gacha-quake {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-6px, 3px); }
+  40% { transform: translate(5px, -4px); }
+  60% { transform: translate(-4px, 2px); }
+  80% { transform: translate(3px, -2px); }
+}
+
+.gacha-quake {
+  animation: gacha-quake 0.4s ease-in-out 2;
+}

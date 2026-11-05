@@ -10,6 +10,8 @@ import {
   rateLimits,
   verifyTurnstile,
 } from '../security.js';
+import { grantGachaCoins, tryResolvePid } from '../gacha/routes.js';
+import { ECONOMY } from '../gacha/data.js';
 
 export const generateRoute: FastifyPluginAsync = async (fastify) => {
   fastify.post('/api/generate', { config: { rateLimit: rateLimits().generate } }, async (request, reply) => {
@@ -164,6 +166,13 @@ export const generateRoute: FastifyPluginAsync = async (fastify) => {
           totalChunks: chunks.length,
         });
       } else {
+        // Reward loop: a fully successful generation grants gacha coins for
+        // players who already hold a gacha identity (SSE headers are flushed,
+        // so we cannot mint a new identity mid-stream).
+        if (totalExtracted > 0) {
+          const pid = tryResolvePid(request);
+          if (pid) grantGachaCoins(pid, ECONOMY.generateBonus);
+        }
         sendEvent('done', {
           stats: {
             total: totalExtracted,

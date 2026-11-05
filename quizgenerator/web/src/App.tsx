@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuizStore } from './state/useQuizStore.js';
+import { GachaModal } from './gacha/GachaModal.js';
 import { ChatPanel } from './components/chat/ChatPanel.js';
 import { EditorHeader } from './components/editor/EditorHeader.js';
 import { EditorCardList } from './components/editor/EditorCardList.js';
@@ -11,12 +12,14 @@ import {
   Edit3,
   Sparkles,
   Zap,
+  Gift,
 } from 'lucide-react';
 
 export const App: React.FC = () => {
   const { viewMode, mobileTab, setMobileTab, questions } = useQuizStore();
   const [isPublishOpen, setIsPublishOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [isGachaOpen, setIsGachaOpen] = useState(false);
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-slate-950 text-slate-100">
@@ -68,6 +71,14 @@ export const App: React.FC = () => {
             <Sparkles className="w-3 h-3 text-amber-400" />
             <span>{questions.length} questions loaded</span>
           </span>
+          <button
+            onClick={() => setIsGachaOpen(true)}
+            title="Treasure Desk — chests & rewards"
+            className="flex items-center gap-1.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white px-3 py-1.5 rounded-full font-bold text-[11px] shadow-md shadow-amber-700/30 active:scale-95 transition-all"
+          >
+            <Gift className="w-3.5 h-3.5" />
+            <span>Chests</span>
+          </button>
         </div>
       </header>
 
@@ -104,6 +115,7 @@ export const App: React.FC = () => {
         isOpen={isPublishOpen}
         onClose={() => setIsPublishOpen(false)}
       />
+      <GachaModal isOpen={isGachaOpen} onClose={() => setIsGachaOpen(false)} />
       <RecentSetsModal
         isOpen={isHistoryOpen}
         onClose={() => setIsHistoryOpen(false)}
