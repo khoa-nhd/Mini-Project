@@ -1,7 +1,8 @@
 import type { FastifyPluginAsync } from 'fastify';
 import { extractFileContent } from '../extractors/index.js';
 import { chunkDocumentText } from '../llm/chunker.js';
-import { extractFromChunk } from '../llm/gemini.js';
+import { getGeminiModel, extractFromChunk } from '../llm/gemini.js';
+import { makeExtractKey, cachedExtract } from '../llm/extractCache.js';
 import {
   MAX_UPLOAD_FILES,
   ALLOWED_UPLOAD_EXTENSIONS,
@@ -104,12 +105,26 @@ export const generateRoute: FastifyPluginAsync = async (fastify) => {
         const batch = chunks.slice(i, i + CONCURRENCY);
         const results = await Promise.all(
           batch.map((chunk) =>
-            extractFromChunk(
-              chunk.text,
-              prompt,
-              chunk.answerKey,
-              imageBuffer,
-              imageMimeType
+            // Identical chunk inputs (text + answer key + prompt + model + image)
+            // are served from the process-local extract cache, so re-uploading the
+            // same document skips the Gemini round-trip entirely.
+            cachedExtract(
+              makeExtractKey(
+                chunk.text,
+                chunk.answerKey,
+                prompt,
+                getGeminiModel(),
+                imageBuffer,
+                imageMimeType
+              ),
+              () =>
+                extractFromChunk(
+                  chunk.text,
+                  prompt,
+                  chunk.answerKey,
+                  imageBuffer,
+                  imageMimeType
+                )
             ).catch((err) => {
               const message = String(err?.message || err);
               console.error(`Chunk ${chunk.chunkIndex} error:`, message);

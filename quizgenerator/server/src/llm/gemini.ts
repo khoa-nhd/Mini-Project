@@ -3,7 +3,18 @@ import { SYSTEM_PROMPT_EXTRACT, SYSTEM_PROMPT_REFINE } from './prompt.js';
 import type { Question, RefineResponse } from '@quizgenerator/shared';
 import crypto from 'crypto';
 
+export function getGeminiModel(): string {
+  return process.env.GEMINI_MODEL || 'gemini-3.6-flash';
+}
+
+// Reuse a single long-lived client: its config only depends on read-only env
+// vars, and the SDK pools TLS/HTTP sessions internally, so constructing a new
+// GoogleGenAI per request paid extra connection setup on every chunk/refine
+// call and under the sequential queue did nothing useful.
+let clientCache: GoogleGenAI | null = null;
+
 export function getGeminiClient(): GoogleGenAI {
+  if (clientCache) return clientCache;
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error('GEMINI_API_KEY is not set in environment variables.');
@@ -11,7 +22,7 @@ export function getGeminiClient(): GoogleGenAI {
   // Default SDK retry is 5 attempts with up to 60s backoff — one overloaded
   // 503 chain measured ~222s before failing. Cap it: 3 attempts, short backoff,
   // and a hard 60s per-request timeout so a hung call cannot stall the SSE stream.
-  return new GoogleGenAI({
+  clientCache = new GoogleGenAI({
     apiKey,
     httpOptions: {
       timeout: Number(process.env.GEMINI_TIMEOUT_MS || 60000),
@@ -24,6 +35,7 @@ export function getGeminiClient(): GoogleGenAI {
       },
     },
   });
+  return clientCache;
 }
 
 export const EXTRACT_RESPONSE_SCHEMA = {

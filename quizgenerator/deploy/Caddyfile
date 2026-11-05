@@ -3,6 +3,12 @@
 {$DOMAIN} {
 	encode zstd gzip
 
+	# Vite emits content-hashed asset URLs, so the browser cache answer from
+	# webApp.ts (max-age=31536000, immutable) is safe — repeat it at the edge as
+	# defense in depth.
+	@assets path /assets/*
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+
 	# Caddy replaces any client-sent X-Forwarded-For, so the app's per-IP rate
 	# limits see the real address (TRUST_PROXY=true in the app).
 	reverse_proxy app:8080 {
