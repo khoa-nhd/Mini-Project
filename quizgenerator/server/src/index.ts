@@ -28,7 +28,6 @@ import { publishStatusRoute } from './routes/publishStatus.js';
 import { adminRoute } from './routes/admin.js';
 import { healthRoute } from './routes/health.js';
 import { statusRoute } from './routes/status.js';
-import { gachaRoute } from './gacha/routes.js';
 import { assertAdminConfig } from './routes/admin.js';
 import { assertTurnstileConfig, registerRateLimit } from './security.js';
 import { registerWebApp } from './webApp.js';
@@ -73,7 +72,6 @@ async function main() {
   await server.register(publishStatusRoute);
   await server.register(adminRoute);
   await server.register(statusRoute);
-  await server.register(gachaRoute);
 
   // Last: its not-found handler serves index.html for client-side routes.
   await registerWebApp(server);
