@@ -66,8 +66,8 @@ export const App: React.FC = () => {
         </div>
 
         {/* Top Right Info */}
-        <div className="flex items-center gap-3 text-xs text-slate-400">
-          <span className="hidden sm:flex items-center gap-1 bg-slate-800/60 px-2.5 py-1 rounded-full border border-slate-700/60 text-[11px]">
+        <div className="hidden sm:flex items-center gap-3 text-xs text-slate-400">
+          <span className="flex items-center gap-1 bg-slate-800/60 px-2.5 py-1 rounded-full border border-slate-700/60 text-[11px]">
             <Sparkles className="w-3 h-3 text-amber-400" />
             <span>{questions.length} questions loaded</span>
           </span>
